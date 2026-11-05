@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- viewport-fit=cover lets the app draw under the iPhone notch and home bar (see safe-area padding) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- Colours the phone's browser bar to match the app background -->
+    <meta name="theme-color" content="#f5f6f8" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0a0b0e" media="(prefers-color-scheme: dark)" />
+    <!-- Lets the app run full-screen when added to the home screen -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Elite Rides" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>Elite Rides Admin</title>
+    <script>
+      // Apply the saved (or system) theme before React loads,
+      // so the page never flashes the wrong colours on refresh.
+      const savedTheme = localStorage.getItem('elite-rides-theme')
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.documentElement.classList.add('dark')
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

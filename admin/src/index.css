@@ -1,0 +1,120 @@
+@import 'tailwindcss';
+
+/* `dark:` utilities are driven by a `dark` class on <html> (see useTheme) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Colour tokens — light mode */
+:root {
+  --canvas: #f5f6f8;
+  --surface: #ffffff;
+  --surface-muted: #f9fafb;
+  --sidebar: #ffffff;
+  --line: #e6e8ec;
+  --ink: #0d1017;
+  --muted: #6b7180;
+  --nav-hover: #f2f3f5;
+  --nav-active: #fff4ec;
+  /* Brand colour — use for fills, icons, bars and dots */
+  --accent: #fc6203;
+  /* Darker brand shade for small text, so it stays readable on light backgrounds */
+  --accent-ink: #c24a00;
+  --accent-soft: #fff1e6;
+  /* Status colours — form errors and success messages */
+  --danger: #dc2626;
+  --danger-soft: #fef2f2;
+  --success: #15803d;
+  --success-soft: #ecfdf3;
+  /* Chart colours. Checked for colour-blind safety against --surface in both modes. */
+  --chart-1: #fc6203;
+  --chart-2: #2a78d6;
+  /* Hairline gridlines inside charts */
+  --chart-grid: #eef0f3;
+  color-scheme: light;
+}
+
+/* Colour tokens — dark mode */
+.dark {
+  --canvas: #0a0b0e;
+  --surface: #121419;
+  --surface-muted: #16181e;
+  --sidebar: #0e1014;
+  --line: #23262e;
+  --ink: #f2f3f5;
+  --muted: #8b909c;
+  --nav-hover: #181b21;
+  --nav-active: #1c1f26;
+  --accent: #fc6203;
+  --accent-ink: #ff8a3d;
+  --accent-soft: rgba(252, 98, 3, 0.14);
+  --danger: #f87171;
+  --danger-soft: rgba(248, 113, 113, 0.12);
+  --success: #4ade80;
+  --success-soft: rgba(74, 222, 128, 0.12);
+  /* A touch deeper than the brand orange so chart marks don't glare on the dark surface */
+  --chart-1: #f05d02;
+  --chart-2: #3987e5;
+  --chart-grid: #1d2026;
+  color-scheme: dark;
+}
+
+/* Expose the tokens to Tailwind, e.g. `bg-surface`, `text-muted`, `border-line` */
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-sidebar: var(--sidebar);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-nav-hover: var(--nav-hover);
+  --color-nav-active: var(--nav-active);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-grid: var(--chart-grid);
+
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Fade-and-rise animation for pages, used as `animate-page-in` */
+@theme {
+  --animate-page-in: page-in 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+
+  @keyframes page-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+html {
+  /* Remove the grey flash mobile browsers draw on tapped buttons and links */
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  @apply bg-canvas font-sans text-ink antialiased;
+}
+
+/* Recharts charts can be focused for keyboard users. Hide the focus ring
+   when they're clicked with a mouse, but keep it for keyboard navigation. */
+.recharts-wrapper *:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Slim scrollbar for the sidebar navigation (Tailwind has no utility for this) */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
