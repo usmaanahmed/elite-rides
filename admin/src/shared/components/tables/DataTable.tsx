@@ -1,8 +1,23 @@
+import {
+  columnFilteringFeature,
+  createFilteredRowModel,
+  createPaginatedRowModel,
+  createSortedRowModel,
+  filterFns,
+  globalFilteringFeature,
+  rowPaginationFeature,
+  rowSortingFeature,
+  sortFns,
+  tableFeatures,
+  useTable,
+  type ColumnDef,
+  type RowData,
+} from '@tanstack/react-table'
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, type LucideIcon } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { SearchInput } from '../inputs/SearchInput'
 
-export type DataTableColumn<Row> = {
+export type DataTableColumn<Row extends RowData> = {
   key: string
   header: string
   // The value this column is sorted and searched by. Leave it out for columns
@@ -19,7 +34,7 @@ type SortState = {
   direction: 'asc' | 'desc'
 }
 
-type DataTableProps<Row> = {
+type DataTableProps<Row extends RowData> = {
   rows: Row[]
   columns: DataTableColumn<Row>[]
   // A unique, stable key for each row, usually its id
@@ -31,11 +46,18 @@ type DataTableProps<Row> = {
   className?: string
 }
 
-function compareValues(a: string | number, b: string | number) {
-  if (typeof a === 'number' && typeof b === 'number') return a - b
-  // numeric: true puts "Car 2" before "Car 10"
-  return String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' })
-}
+// The TanStack Table features this table uses: searching, sorting and pagination
+const tableFeatureList = tableFeatures({
+  columnFilteringFeature,
+  globalFilteringFeature,
+  rowSortingFeature,
+  rowPaginationFeature,
+  filteredRowModel: createFilteredRowModel(),
+  sortedRowModel: createSortedRowModel(),
+  paginatedRowModel: createPaginatedRowModel(),
+  filterFns,
+  sortFns,
+})
 
 // Page numbers for the pagination bar, with null for a "…" gap, e.g. [1, null, 4, 5, 6, null, 12]
 function getPageNumbers(currentPage: number, totalPages: number) {
@@ -53,9 +75,42 @@ function getPageNumbers(currentPage: number, totalPages: number) {
   return pages
 }
 
+// Turns one of our simple column descriptions into a TanStack Table column
+function createTableColumn<Row extends RowData>(column: DataTableColumn<Row>): ColumnDef<typeof tableFeatureList, Row, unknown> {
+  const getValue = column.getValue
+
+  // Shows the custom render if there is one, otherwise the plain value
+  function renderCell(row: Row): ReactNode {
+    if (column.render) return column.render(row)
+    if (getValue) return getValue(row)
+    return null
+  }
+
+  // Columns like images or buttons have no value, so they can't be sorted or searched
+  if (!getValue) {
+    return {
+      id: column.key,
+      header: column.header,
+      enableSorting: false,
+      enableGlobalFilter: false,
+      cell: (info) => renderCell(info.row.original),
+    }
+  }
+
+  return {
+    id: column.key,
+    header: column.header,
+    accessorFn: getValue,
+    // First click sorts A→Z (or low→high), the next click flips it
+    sortDescFirst: false,
+    cell: (info) => renderCell(info.row.original),
+  }
+}
+
 // A table with a "Show N entries" picker, a search box, sortable columns and pagination.
 // Everything happens in the browser, so it suits lists of up to a few thousand rows.
-export function DataTable<Row>({
+// Built with TanStack Table.
+export function DataTable<Row extends RowData>({
   rows,
   columns,
   getRowKey,
@@ -64,52 +119,47 @@ export function DataTable<Row>({
   searchPlaceholder = 'Search…',
   className = '',
 }: DataTableProps<Row>) {
-  const [pageSize, setPageSize] = useState(pageSizeOptions[0])
   const [search, setSearch] = useState('')
-  const [sort, setSort] = useState<SortState | null>(initialSort ?? null)
-  const [page, setPage] = useState(1)
 
-  // 1. Keep the rows where any searchable column contains the search text
-  const searchText = search.trim().toLowerCase()
-  const matchingRows = searchText
-    ? rows.filter((row) =>
-        columns.some((column) => column.getValue && String(column.getValue(row)).toLowerCase().includes(searchText)),
-      )
-    : rows
+  const table = useTable({
+    features: tableFeatureList,
+    columns: columns.map(createTableColumn),
+    data: rows,
+    getRowId: getRowKey,
+    globalFilterFn: 'includesString',
+    enableSortingRemoval: false,
+    enableMultiSort: false,
+    initialState: {
+      sorting: initialSort ? [{ id: initialSort.columnKey, desc: initialSort.direction === 'desc' }] : [],
+      pagination: { pageIndex: 0, pageSize: pageSizeOptions[0] },
+    },
+  })
 
-  // 2. Sort them by the chosen column
-  const getSortValue = columns.find((column) => column.key === sort?.columnKey)?.getValue
-  const sortedRows =
-    sort && getSortValue
-      ? [...matchingRows].sort((a, b) => {
-          const result = compareValues(getSortValue(a), getSortValue(b))
-          return sort.direction === 'asc' ? result : -result
-        })
-      : matchingRows
+  const pageSize = table.state.pagination.pageSize
+  const currentPage = table.state.pagination.pageIndex + 1
+  const totalPages = Math.max(1, table.getPageCount())
 
-  // 3. Cut out the current page
-  const totalPages = Math.max(1, Math.ceil(sortedRows.length / pageSize))
-  // Rows can disappear (e.g. after a delete), so never stay on a page that no longer exists
-  const currentPage = Math.min(page, totalPages)
+  // The rows left after searching and sorting (all pages), and the rows on this page
+  const matchingRowCount = table.getPrePaginatedRowModel().rows.length
+  const pageRows = table.getRowModel().rows
   const firstIndex = (currentPage - 1) * pageSize
-  const pageRows = sortedRows.slice(firstIndex, firstIndex + pageSize)
+  const searchText = search.trim()
 
   function handleSearchChange(value: string) {
     setSearch(value)
-    setPage(1)
+    table.setGlobalFilter(value.trim())
+    table.setPageIndex(0)
   }
 
   function handlePageSizeChange(value: string) {
-    setPageSize(Number(value))
-    setPage(1)
+    table.setPageSize(Number(value))
+    table.setPageIndex(0)
   }
 
-  // First click sorts A→Z (or low→high), the next click flips it
-  function handleSort(columnKey: string) {
-    setSort((current) => ({
-      columnKey,
-      direction: current?.columnKey === columnKey && current.direction === 'asc' ? 'desc' : 'asc',
-    }))
+  // Finds the extra classes (like a width) a column asked for
+  function getColumnClassName(columnKey: string): string {
+    const column = columns.find((item) => item.key === columnKey)
+    return column?.className ?? ''
   }
 
   return (
@@ -144,47 +194,57 @@ export function DataTable<Row>({
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead className="border-y border-line bg-surface-muted">
-            <tr>
-              {columns.map((column) => {
-                const sortDirection = sort?.columnKey === column.key ? sort.direction : null
-                const SortIcon = sortDirection === 'asc' ? ArrowUp : sortDirection === 'desc' ? ArrowDown : ArrowUpDown
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  const sortDirection = header.column.getIsSorted()
+                  let SortIcon = ArrowUpDown
+                  let ariaSort: 'ascending' | 'descending' | undefined = undefined
+                  if (sortDirection === 'asc') {
+                    SortIcon = ArrowUp
+                    ariaSort = 'ascending'
+                  } else if (sortDirection === 'desc') {
+                    SortIcon = ArrowDown
+                    ariaSort = 'descending'
+                  }
 
-                return (
-                  <th
-                    key={column.key}
-                    scope="col"
-                    aria-sort={sortDirection === 'asc' ? 'ascending' : sortDirection === 'desc' ? 'descending' : undefined}
-                    className={`whitespace-nowrap px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted first:pl-5 last:pr-5 ${column.className ?? ''}`}
-                  >
-                    {column.getValue ? (
-                      <button
-                        type="button"
-                        onClick={() => handleSort(column.key)}
-                        className="group inline-flex items-center gap-1.5 uppercase tracking-wide transition-colors hover:text-ink"
-                      >
-                        {column.header}
-                        <SortIcon
-                          className={`size-3.5 ${sortDirection ? 'text-accent' : 'text-muted/50 group-hover:text-muted'}`}
-                          strokeWidth={2}
-                        />
-                      </button>
-                    ) : (
-                      column.header
-                    )}
-                  </th>
-                )
-              })}
-            </tr>
+                  return (
+                    <th
+                      key={header.id}
+                      scope="col"
+                      aria-sort={ariaSort}
+                      className={`whitespace-nowrap px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted first:pl-5 last:pr-5 ${getColumnClassName(header.column.id)}`}
+                    >
+                      {header.column.getCanSort() ? (
+                        <button
+                          type="button"
+                          onClick={header.column.getToggleSortingHandler()}
+                          className="group inline-flex items-center gap-1.5 uppercase tracking-wide transition-colors hover:text-ink"
+                        >
+                          <table.FlexRender header={header} />
+                          <SortIcon
+                            className={`size-3.5 ${sortDirection ? 'text-accent' : 'text-muted/50 group-hover:text-muted'}`}
+                            strokeWidth={2}
+                          />
+                        </button>
+                      ) : (
+                        <table.FlexRender header={header} />
+                      )}
+                    </th>
+                  )
+                })}
+              </tr>
+            ))}
           </thead>
           <tbody className="divide-y divide-line">
             {pageRows.map((row) => (
-              <tr key={getRowKey(row)} className="transition-colors hover:bg-surface-muted">
-                {columns.map((column) => (
+              <tr key={row.id} className="transition-colors hover:bg-surface-muted">
+                {row.getAllCells().map((cell) => (
                   <td
-                    key={column.key}
-                    className={`px-4 py-3 align-middle text-ink first:pl-5 last:pr-5 ${column.className ?? ''}`}
+                    key={cell.id}
+                    className={`px-4 py-3 align-middle text-ink first:pl-5 last:pr-5 ${getColumnClassName(cell.column.id)}`}
                   >
-                    {column.render ? column.render(row) : column.getValue?.(row)}
+                    <table.FlexRender cell={cell} />
                   </td>
                 ))}
               </tr>
@@ -202,9 +262,9 @@ export function DataTable<Row>({
 
       <div className="flex flex-col gap-3 border-t border-line p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
         <p className="text-sm text-muted">
-          Showing <span className="font-medium text-ink">{sortedRows.length === 0 ? 0 : firstIndex + 1}</span> to{' '}
+          Showing <span className="font-medium text-ink">{matchingRowCount === 0 ? 0 : firstIndex + 1}</span> to{' '}
           <span className="font-medium text-ink">{firstIndex + pageRows.length}</span> of{' '}
-          <span className="font-medium text-ink">{sortedRows.length}</span> entries
+          <span className="font-medium text-ink">{matchingRowCount}</span> entries
           {searchText && ` (filtered from ${rows.length} total)`}
         </p>
 
@@ -212,7 +272,7 @@ export function DataTable<Row>({
           <PageArrowButton
             icon={ChevronLeft}
             label="Previous page"
-            onClick={() => setPage(currentPage - 1)}
+            onClick={() => table.setPageIndex(currentPage - 2)}
             disabled={currentPage === 1}
           />
           {getPageNumbers(currentPage, totalPages).map((pageNumber, index) =>
@@ -224,7 +284,7 @@ export function DataTable<Row>({
               <button
                 key={pageNumber}
                 type="button"
-                onClick={() => setPage(pageNumber)}
+                onClick={() => table.setPageIndex(pageNumber - 1)}
                 aria-current={pageNumber === currentPage ? 'page' : undefined}
                 className={`grid size-9 place-items-center rounded-lg text-sm font-medium tabular-nums transition-colors ${
                   pageNumber === currentPage ? 'bg-accent text-white' : 'text-muted hover:bg-nav-hover hover:text-ink'
@@ -237,7 +297,7 @@ export function DataTable<Row>({
           <PageArrowButton
             icon={ChevronRight}
             label="Next page"
-            onClick={() => setPage(currentPage + 1)}
+            onClick={() => table.setPageIndex(currentPage)}
             disabled={currentPage === totalPages}
           />
         </nav>

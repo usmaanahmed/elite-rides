@@ -1,25 +1,22 @@
+import { API_URL } from '../../../shared/api/apiUrl'
+import { readJsonResponse } from '../../../shared/api/readJsonResponse'
 import type { NewVehicle, Vehicle } from '../types/vehicle'
+import { withFullImageUrl } from '../utils/withFullImageUrl'
 
 // Saves a new vehicle and returns it as saved (with its id, TBMS ID and image URL).
-// TODO: replace the fake delay with the real request once the backend endpoint exists.
-// The image means it has to be sent as FormData, e.g.
-//   const formData = new FormData()
-//   formData.append('name', vehicle.name)
-//   formData.append('image', vehicle.image)
-//   const response = await axios.post('/vehicles', formData)
-//   return response.data
-export function addVehicle(vehicle: NewVehicle): Promise<Vehicle> {
-  const { image, ...details } = vehicle
-  const savedVehicle: Vehicle = {
-    ...details,
-    id: crypto.randomUUID(),
-    // The server will hand out the real TBMS ID
-    tbmsId: String(Math.floor(1000 + Math.random() * 9000)),
-    // A temporary local link to the picked file; the server will return a hosted URL
-    imageUrl: URL.createObjectURL(image),
-  }
+// The image means the data has to be sent as FormData instead of JSON.
+export async function addVehicle(vehicle: NewVehicle): Promise<Vehicle> {
+  const formData = new FormData()
+  formData.append('name', vehicle.name)
+  formData.append('description', vehicle.description)
+  formData.append('passengerCapacity', String(vehicle.passengerCapacity))
+  formData.append('luggageCapacity', String(vehicle.luggageCapacity))
+  formData.append('handLuggageCapacity', String(vehicle.handLuggageCapacity))
+  formData.append('discountRate', String(vehicle.discountRate))
+  formData.append('returnDiscountRate', String(vehicle.returnDiscountRate))
+  formData.append('image', vehicle.image)
 
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(savedVehicle), 800)
-  })
+  const response = await fetch(`${API_URL}/vehicles`, { method: 'POST', body: formData })
+  const savedVehicle = (await readJsonResponse(response)) as Vehicle
+  return withFullImageUrl(savedVehicle)
 }

@@ -1,4 +1,4 @@
-import { Car, Plus, Trash2 } from 'lucide-react'
+import { Car, LoaderCircle, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '../../../shared/components/buttons/Button'
 import { EmptyStateCard } from '../../../shared/components/cards/EmptyStateCard'
@@ -7,11 +7,15 @@ import { Modal } from '../../../shared/components/modals/Modal'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { AddVehicleModal } from '../components/AddVehicleModal'
 import { VehiclesTable } from '../components/VehiclesTable'
-import { SAMPLE_VEHICLES } from '../data/sampleVehicles'
+import { useDeleteVehicle } from '../hooks/useDeleteVehicle'
+import { useVehicles } from '../hooks/useVehicles'
 import type { Vehicle } from '../types/vehicle'
 
 export function VehiclesMileagePage() {
-  const [vehicles, setVehicles] = useState<Vehicle[]>(SAMPLE_VEHICLES)
+  // The vehicles list from the server (React Query keeps it cached and up to date)
+  const vehiclesQuery = useVehicles()
+  const deleteVehicleMutation = useDeleteVehicle()
+
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   // The vehicle waiting for the user to confirm its deletion (null = no dialog)
   const [vehicleToDelete, setVehicleToDelete] = useState<Vehicle | null>(null)
@@ -24,16 +28,75 @@ export function VehiclesMileagePage() {
   }
 
   function handleVehicleAdded(vehicle: Vehicle) {
-    setVehicles((current) => [...current, vehicle])
     setSuccessMessage(`${vehicle.name} was added`)
   }
 
-  // TODO: call the backend's delete endpoint once it exists
-  function confirmDelete() {
-    if (!vehicleToDelete) return
-    setVehicles((current) => current.filter((vehicle) => vehicle.id !== vehicleToDelete.id))
-    setSuccessMessage(`${vehicleToDelete.name} was deleted`)
+  function openDeleteDialog(vehicle: Vehicle) {
+    deleteVehicleMutation.reset()
+    setVehicleToDelete(vehicle)
+  }
+
+  function closeDeleteDialog() {
+    // Don't allow closing halfway through deleting
+    if (deleteVehicleMutation.isPending) return
     setVehicleToDelete(null)
+  }
+
+  async function confirmDelete() {
+    if (!vehicleToDelete) return
+
+    try {
+      await deleteVehicleMutation.mutateAsync(vehicleToDelete.id)
+      setSuccessMessage(`${vehicleToDelete.name} was deleted`)
+      setVehicleToDelete(null)
+    } catch {
+      // The error is shown inside the dialog (see deleteVehicleMutation.error below)
+    }
+  }
+
+  // Works out what the main part of the page should show
+  function renderVehicles() {
+    if (vehiclesQuery.isPending) {
+      return (
+        <div className="mt-8 flex items-center justify-center gap-2 py-16 text-sm text-muted">
+          <LoaderCircle className="size-4 animate-spin" strokeWidth={2} />
+          Loading vehicles…
+        </div>
+      )
+    }
+
+    if (vehiclesQuery.isError) {
+      return (
+        <div className="mt-8 space-y-3">
+          <Alert variant="error" title="Vehicles could not be loaded" description={vehiclesQuery.error.message} />
+          <Button variant="secondary" onClick={() => vehiclesQuery.refetch()} isLoading={vehiclesQuery.isFetching}>
+            Try again
+          </Button>
+        </div>
+      )
+    }
+
+    if (vehiclesQuery.data.length === 0) {
+      return (
+        <EmptyStateCard
+          icon={Car}
+          title="No vehicles yet"
+          description="Add a vehicle to set its mileage rates."
+          action={
+            <Button variant="secondary" icon={Plus} onClick={openAddModal}>
+              Add vehicle
+            </Button>
+          }
+          className="mt-8"
+        />
+      )
+    }
+
+    return (
+      <div className="mt-8">
+        <VehiclesTable vehicles={vehiclesQuery.data} onDelete={openDeleteDialog} />
+      </div>
+    )
   }
 
   return (
@@ -57,23 +120,7 @@ export function VehiclesMileagePage() {
         />
       )}
 
-      {vehicles.length > 0 ? (
-        <div className="mt-8">
-          <VehiclesTable vehicles={vehicles} onDelete={setVehicleToDelete} />
-        </div>
-      ) : (
-        <EmptyStateCard
-          icon={Car}
-          title="No vehicles yet"
-          description="Add a vehicle to set its mileage rates."
-          action={
-            <Button variant="secondary" icon={Plus} onClick={openAddModal}>
-              Add vehicle
-            </Button>
-          }
-          className="mt-8"
-        />
-      )}
+      {renderVehicles()}
 
       <AddVehicleModal
         isOpen={isAddModalOpen}
@@ -83,23 +130,28 @@ export function VehiclesMileagePage() {
 
       <Modal
         isOpen={vehicleToDelete !== null}
-        onClose={() => setVehicleToDelete(null)}
+        onClose={closeDeleteDialog}
         title="Delete vehicle?"
         footer={
           <div className="flex justify-end gap-2.5">
-            <Button variant="secondary" onClick={() => setVehicleToDelete(null)}>
+            <Button variant="secondary" onClick={closeDeleteDialog} disabled={deleteVehicleMutation.isPending}>
               Cancel
             </Button>
-            <Button icon={Trash2} onClick={confirmDelete}>
+            <Button icon={Trash2} onClick={confirmDelete} isLoading={deleteVehicleMutation.isPending}>
               Delete
             </Button>
           </div>
         }
       >
-        <p className="text-sm text-muted">
-          <span className="font-semibold text-ink">{vehicleToDelete?.name}</span> will be removed and customers won't be
-          able to book it any more.
-        </p>
+        <div className="space-y-4">
+          <p className="text-sm text-muted">
+            <span className="font-semibold text-ink">{vehicleToDelete?.name}</span> will be removed and customers won't
+            be able to book it any more.
+          </p>
+          {deleteVehicleMutation.isError && (
+            <Alert variant="error" title="The vehicle could not be deleted" description={deleteVehicleMutation.error.message} />
+          )}
+        </div>
       </Modal>
     </>
   )

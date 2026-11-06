@@ -8,7 +8,7 @@ import { ImageUpload } from '../../../shared/components/inputs/ImageUpload'
 import { TextArea } from '../../../shared/components/inputs/TextArea'
 import { TextInput } from '../../../shared/components/inputs/TextInput'
 import { Modal } from '../../../shared/components/modals/Modal'
-import { addVehicle } from '../api/addVehicle'
+import { useAddVehicle } from '../hooks/useAddVehicle'
 import {
   ALLOWED_IMAGE_TYPES,
   DESCRIPTION_MAX_LENGTH,
@@ -53,6 +53,9 @@ export function AddVehicleModal({ isOpen, onClose, onVehicleAdded }: AddVehicleM
     mode: 'onTouched',
   })
 
+  // Saves the vehicle on the server and refreshes the vehicles list
+  const addVehicleMutation = useAddVehicle()
+
   // Read the description as it is typed, for the character counter
   const description = useWatch({ control, name: 'description' })
 
@@ -80,13 +83,18 @@ export function AddVehicleModal({ isOpen, onClose, onVehicleAdded }: AddVehicleM
     }
 
     try {
-      const savedVehicle = await addVehicle(newVehicle)
+      const savedVehicle = await addVehicleMutation.mutateAsync(newVehicle)
       onVehicleAdded(savedVehicle)
       reset()
       onClose()
-    } catch {
+    } catch (error) {
+      // Show the server's message (e.g. "Image must be 2 MB or smaller") when there is one
+      let message = 'The vehicle could not be saved. Please try again.'
+      if (error instanceof Error && error.message) {
+        message = error.message
+      }
       // 'root' is a form-wide error that isn't tied to one field
-      setError('root', { message: 'The vehicle could not be saved. Please try again.' })
+      setError('root', { message })
     }
   }
 
