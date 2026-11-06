@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router'
 import { BanAddressesPage } from './features/addresses/pages/BanAddressesPage'
 import { DropdownAddressesPage } from './features/addresses/pages/DropdownAddressesPage'
 import { BookingsPage } from './features/bookings/pages/BookingsPage'
+import { ApiTestPage } from './features/connection-test/pages/ApiTestPage'
 import { DashboardPage } from './features/dashboard/pages/DashboardPage'
 import { FixedPricePage } from './features/pricing/pages/FixedPricePage'
 import { HourlyRatePage } from './features/pricing/pages/HourlyRatePage'
@@ -31,6 +32,7 @@ export const router = createBrowserRouter([
       { path: ROUTES.surchargeDates, element: <SurchargeOnDatePage /> },
       { path: ROUTES.settings, element: <ComingSoonPage title="Settings" /> },
       { path: ROUTES.help, element: <ComingSoonPage title="Help & Support" /> },
+      { path: ROUTES.apiTest, element: <ApiTestPage /> },
       // '*' matches any URL not listed above
       { path: '*', element: <NotFoundPage /> },
     ],

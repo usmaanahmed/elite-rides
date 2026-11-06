@@ -11,4 +11,5 @@ export const ROUTES = {
   surchargeDates: '/surcharge-dates',
   settings: '/settings',
   help: '/help',
+  apiTest: '/api-test',
 }
