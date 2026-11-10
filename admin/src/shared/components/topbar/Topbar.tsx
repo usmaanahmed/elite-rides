@@ -11,6 +11,7 @@ type TopbarProps = {
   hasUnreadNotifications: boolean
   userName: string
   userRole: string
+  onSignOut: () => void
 }
 
 // Desktop-only top bar (lg and up). Phones and tablets use MobileTopbar instead.
@@ -21,6 +22,7 @@ export function Topbar({
   hasUnreadNotifications,
   userName,
   userRole,
+  onSignOut,
 }: TopbarProps) {
   const lastIndex = breadcrumbs.length - 1
 
@@ -47,7 +49,7 @@ export function Topbar({
 
         <div className="mx-1 h-6 w-px bg-line" />
 
-        <UserBadge name={userName} role={userRole} />
+        <UserBadge name={userName} role={userRole} onSignOut={onSignOut} />
       </div>
     </header>
   )

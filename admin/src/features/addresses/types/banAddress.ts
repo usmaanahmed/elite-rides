@@ -8,3 +8,9 @@ export type NewBanAddress = {
   // Trimmed, e.g. "221B Baker Street, London NW1 6XE"
   address: string
 }
+
+// A banned address as saved on the server
+export type BanAddress = {
+  id: string
+  address: string
+}

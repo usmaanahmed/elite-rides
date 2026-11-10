@@ -20,3 +20,25 @@ export type NewDropdownAddress = {
   dropoffCharge: number
   type: AddressType
 }
+
+// A drop down address as saved on the server
+export type DropdownAddress = {
+  id: string
+  address: string
+  comparableValue: string
+  pickupCharge: number
+  dropoffCharge: number
+  type: AddressType
+}
+
+// One row of a CSV import that could not be saved
+export type ImportRowError = {
+  row: number
+  message: string
+}
+
+// What the server sends back after a CSV import
+export type ImportResult = {
+  addedCount: number
+  errors: ImportRowError[]
+}

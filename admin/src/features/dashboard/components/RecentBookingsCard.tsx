@@ -4,11 +4,11 @@ import { ChartCard } from '../../../shared/components/charts/ChartCard'
 import { ROUTES } from '../../../shared/constants/routes'
 import { getInitials } from '../../../shared/utils/getInitials'
 import { PAYMENT_METHOD_LABELS } from '../../bookings/constants/paymentMethods'
-import type { Booking } from '../../bookings/types/booking'
+import type { BookingSummary } from '../../bookings/types/booking'
 import { formatFare, formatPickupDateTime } from '../../bookings/utils/formatBookingValues'
 
 type RecentBookingsCardProps = {
-  bookings: Booking[]
+  bookings: BookingSummary[]
   className?: string
 }
 

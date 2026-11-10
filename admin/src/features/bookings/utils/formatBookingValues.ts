@@ -5,6 +5,11 @@ export function formatPickupDateTime(pickupAt: string) {
   return { date: `${day}-${month}-${year}`, time: timePart.slice(0, 5) }
 }
 
+// ("2026-03-05", "22:00") → { date: '05-03-2026', time: '22:00' }
+export function formatPickupDateAndTime(pickupDate: string, pickupTime: string) {
+  return formatPickupDateTime(`${pickupDate}T${pickupTime}`)
+}
+
 // 749.11 → "£749.11"
 export function formatFare(fare: number) {
   return `£${fare.toFixed(2)}`

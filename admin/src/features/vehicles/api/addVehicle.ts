@@ -1,4 +1,4 @@
-import { API_URL } from '../../../shared/api/apiUrl'
+import { apiFetch } from '../../../shared/api/apiFetch'
 import { readJsonResponse } from '../../../shared/api/readJsonResponse'
 import type { NewVehicle, Vehicle } from '../types/vehicle'
 import { withFullImageUrl } from '../utils/withFullImageUrl'
@@ -16,7 +16,7 @@ export async function addVehicle(vehicle: NewVehicle): Promise<Vehicle> {
   formData.append('returnDiscountRate', String(vehicle.returnDiscountRate))
   formData.append('image', vehicle.image)
 
-  const response = await fetch(`${API_URL}/vehicles`, { method: 'POST', body: formData })
+  const response = await apiFetch('/vehicles', { method: 'POST', body: formData })
   const savedVehicle = (await readJsonResponse(response)) as Vehicle
   return withFullImageUrl(savedVehicle)
 }

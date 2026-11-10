@@ -4,6 +4,7 @@ Har naya task shuru karne se pehle yeh file poori parho aur in rules ko follow k
 
 ## Project Structure
 - `admin/` – frontend (React admin dashboard)
+- `client/` – public website + customer booking widget (React, port 5174, `/api/public/...` use karta hai)
 - `server/` – backend (Node + Express + MongoDB)
 
 ## Tech Stack (MERN)

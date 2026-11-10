@@ -5,15 +5,15 @@ import { FormField } from '../../../shared/components/forms/FormField'
 import { FormModalFooter } from '../../../shared/components/forms/FormModalFooter'
 import { TextInput } from '../../../shared/components/inputs/TextInput'
 import { Modal } from '../../../shared/components/modals/Modal'
-import { addBanAddress } from '../api/addBanAddress'
+import { useAddBanAddress } from '../hooks/useBanAddresses'
 import { ADDRESS_MAX_LENGTH, banAddressFormSchema } from '../schemas/banAddressFormSchema'
-import type { BanAddressFormValues, NewBanAddress } from '../types/banAddress'
+import type { BanAddress, BanAddressFormValues } from '../types/banAddress'
 
 type AddBanAddressModalProps = {
   isOpen: boolean
   onClose: () => void
   // Called with the saved address after it has been banned
-  onBanAddressAdded: (banAddress: NewBanAddress) => void
+  onBanAddressAdded: (banAddress: BanAddress) => void
 }
 
 // Lets the footer's Save button (which sits outside the <form>) submit the form
@@ -37,6 +37,8 @@ export function AddBanAddressModal({ isOpen, onClose, onBanAddressAdded }: AddBa
     mode: 'onTouched',
   })
 
+  const addMutation = useAddBanAddress()
+
   function handleClose() {
     // Don't allow closing halfway through saving
     if (isSubmitting) return
@@ -46,16 +48,19 @@ export function AddBanAddressModal({ isOpen, onClose, onBanAddressAdded }: AddBa
 
   // Only runs once every field has passed validation (the schema has already trimmed the address)
   async function saveBanAddress(values: BanAddressFormValues) {
-    const newBanAddress: NewBanAddress = { address: values.address }
-
     try {
-      await addBanAddress(newBanAddress)
-      onBanAddressAdded(newBanAddress)
+      const savedAddress = await addMutation.mutateAsync({ address: values.address })
+      onBanAddressAdded(savedAddress)
       reset()
       onClose()
-    } catch {
+    } catch (error) {
+      // Show the server's message (e.g. "already banned") when there is one
+      let message = 'The address could not be banned. Please try again.'
+      if (error instanceof Error && error.message) {
+        message = error.message
+      }
       // 'root' is a form-wide error that isn't tied to one field
-      setError('root', { message: 'The address could not be banned. Please try again.' })
+      setError('root', { message })
     }
   }
 

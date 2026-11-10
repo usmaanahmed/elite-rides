@@ -2,8 +2,8 @@ import {
   Banknote,
   CalendarClock,
   CalendarPlus,
+  Calculator,
   Car,
-  Clock,
   Gauge,
   House,
   LifeBuoy,
@@ -12,8 +12,11 @@ import {
   MapPin,
   MapPinOff,
   MapPinPlus,
+  Moon,
   Settings,
   Tags,
+  Ticket,
+  TrafficCone,
 } from 'lucide-react'
 import type { MobileTab, NavItem, NavSection, QuickAction } from '../types/navigation'
 import { ROUTES } from './routes'
@@ -31,6 +34,7 @@ export const mainNavigation: NavSection[] = [
     items: [
       { path: ROUTES.dropdownAddresses, label: 'Drop down Addresses', icon: MapPin },
       { path: ROUTES.banAddresses, label: 'Ban Addresses', icon: MapPinOff },
+      { path: ROUTES.congestionAddresses, label: 'Congestion Addresses', icon: TrafficCone },
     ],
   },
   {
@@ -38,7 +42,7 @@ export const mainNavigation: NavSection[] = [
     items: [
       { path: ROUTES.vehicles, label: 'Vehicles & Mileage Setting', icon: Car },
       { path: ROUTES.fixedPrices, label: 'Fixed Price Setting', icon: Banknote },
-      { path: ROUTES.hourlyRates, label: 'Hourly Rate', icon: Clock },
+      { path: ROUTES.priceChecker, label: 'Price Checker', icon: Calculator },
     ],
   },
   {
@@ -46,7 +50,12 @@ export const mainNavigation: NavSection[] = [
     items: [
       { path: ROUTES.surchargeAddresses, label: 'Surcharge Addresses', icon: Map },
       { path: ROUTES.surchargeDates, label: 'Surcharge On Date', icon: CalendarClock },
+      { path: ROUTES.surchargeNight, label: 'Surcharge Night', icon: Moon },
     ],
+  },
+  {
+    title: 'Coupons',
+    items: [{ path: ROUTES.coupons, label: 'All Coupons', icon: Ticket }],
   },
 ]
 
@@ -64,20 +73,23 @@ export const mobileTabs: MobileTab[] = [
     path: ROUTES.vehicles,
     label: 'Pricing',
     icon: Tags,
-    relatedPaths: [ROUTES.fixedPrices, ROUTES.hourlyRates],
+    relatedPaths: [ROUTES.fixedPrices, ROUTES.priceChecker],
   },
 ]
 
 // Shortcuts in the sheet that opens from the mobile "+" button
 export const quickActions: QuickAction[] = [
-  { path: ROUTES.bookings, label: 'New booking', hint: 'Bookings', icon: CalendarPlus },
+  { path: ROUTES.newBooking, label: 'New booking', hint: 'Bookings', icon: CalendarPlus },
   { path: ROUTES.dropdownAddresses, label: 'Dropdown address', hint: 'Addresses', icon: MapPinPlus },
   { path: ROUTES.banAddresses, label: 'Ban address', hint: 'Addresses', icon: MapPinOff },
+  { path: ROUTES.congestionAddresses, label: 'Congestion address', hint: 'Addresses', icon: TrafficCone },
   { path: ROUTES.vehicles, label: 'Vehicle', hint: 'Pricing', icon: Car },
   { path: ROUTES.fixedPrices, label: 'Fixed price', hint: 'Pricing', icon: Banknote },
-  { path: ROUTES.hourlyRates, label: 'Hourly rate', hint: 'Pricing', icon: Clock },
+  { path: ROUTES.priceChecker, label: 'Price checker', hint: 'Pricing', icon: Calculator },
   { path: ROUTES.surchargeAddresses, label: 'Surcharge address', hint: 'Surcharges', icon: Map },
   { path: ROUTES.surchargeDates, label: 'Date surcharge', hint: 'Surcharges', icon: CalendarClock },
+  { path: ROUTES.surchargeNight, label: 'Night surcharge', hint: 'Surcharges', icon: Moon },
+  { path: ROUTES.coupons, label: 'Coupon', hint: 'Coupons', icon: Ticket },
 ]
 
 // Looks up the label of the page at a URL, e.g. '/bookings' -> 'Bookings'

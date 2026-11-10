@@ -18,6 +18,7 @@ type MobileMenuSheetProps = {
   onThemeToggle: () => void
   userName: string
   userRole: string
+  onSignOut: () => void
 }
 
 // Rounded white card that groups menu rows, with thin lines between them
@@ -42,6 +43,7 @@ export function MobileMenuSheet({
   onThemeToggle,
   userName,
   userRole,
+  onSignOut,
 }: MobileMenuSheetProps) {
   const navigate = useNavigate()
   const { pathname } = useLocation()
@@ -102,6 +104,10 @@ export function MobileMenuSheet({
 
       <button
         type="button"
+        onClick={() => {
+          onSignOut()
+          onClose()
+        }}
         className="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-line bg-surface text-[15px] font-semibold text-red-600 transition-colors active:bg-nav-hover dark:text-red-400"
       >
         <LogOut className="size-[18px]" strokeWidth={2} />

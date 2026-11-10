@@ -58,14 +58,15 @@ export function DashboardPage() {
         }
       />
 
-      {/* Two stat cards per row on phones, like a native app's summary tiles */}
+      {/* Two stat cards per row on phones, like a native app's summary tiles.
+          The date range text ("vs previous 30 days") is each card's caption. */}
       <div className="mt-6 grid grid-cols-2 gap-3 sm:mt-8 sm:gap-5 xl:grid-cols-4">
         <StatCard
           label="Total bookings"
           value={formatCount(totals.bookings)}
           icon={CalendarCheck}
           change={getChange(totals.bookings, totals.previousBookings)}
-          comparisonLabel={comparisonLabel}
+          caption={comparisonLabel}
           trend={data.trend.map((point) => point.bookings)}
         />
         <StatCard
@@ -73,7 +74,7 @@ export function DashboardPage() {
           value={formatPounds(averageFare)}
           icon={Receipt}
           change={getChange(averageFare, previousAverageFare)}
-          comparisonLabel={comparisonLabel}
+          caption={comparisonLabel}
           trend={data.trend.map((point) => getAverageFare(point.revenue, point.bookings))}
         />
         <StatCard
@@ -81,7 +82,7 @@ export function DashboardPage() {
           value={formatCount(totals.airportBookings)}
           icon={Plane}
           change={getChange(totals.airportBookings, totals.previousAirportBookings)}
-          comparisonLabel={comparisonLabel}
+          caption={comparisonLabel}
           trend={data.trend.map((point) => point.airportBookings)}
         />
         <StatCard
@@ -91,7 +92,7 @@ export function DashboardPage() {
           change={getChange(totals.cancelledBookings, totals.previousCancelledBookings)}
           // Fewer cancellations is good, so a drop shows in green
           isUpGood={false}
-          comparisonLabel={comparisonLabel}
+          caption={comparisonLabel}
           trend={data.trend.map((point) => point.cancelledBookings)}
         />
       </div>

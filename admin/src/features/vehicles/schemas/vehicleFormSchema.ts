@@ -7,7 +7,7 @@ export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
 // A text box that must hold a whole number between `min` and `max`, e.g. "4".
 // Checks run in order and only the first failing message is shown.
-function wholeNumberField(fieldName: string, min: number, max: number) {
+export function wholeNumberField(fieldName: string, min: number, max: number) {
   return z
     .string()
     .trim()
@@ -17,7 +17,7 @@ function wholeNumberField(fieldName: string, min: number, max: number) {
 }
 
 // A percentage from 0 to 100 with at most 2 decimal places, e.g. "10" or "12.5"
-function percentageField(fieldName: string) {
+export function percentageField(fieldName: string) {
   return z
     .string()
     .trim()

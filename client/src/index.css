@@ -1,0 +1,118 @@
+@import 'tailwindcss';
+
+/* Colour tokens — same names and values as the admin panel (admin/src/index.css),
+   so the website and admin share one colour scheme. */
+:root {
+  /* Light colours — used on the booking card */
+  --surface: #ffffff;
+  --surface-muted: #f9fafb;
+  --line: #e6e8ec;
+  --ink: #0d1017;
+  --muted: #6b7180;
+  /* Brand colour — use for fills, icons, bars and dots */
+  --accent: #fc6203;
+  /* Darker brand shade for small text, so it stays readable on light backgrounds */
+  --accent-ink: #c24a00;
+  --accent-soft: #fff1e6;
+  /* Form error colour */
+  --danger: #dc2626;
+
+  /* Dark hero — the admin's dark-mode canvas and surface */
+  --night: #0a0b0e;
+  --night-raised: #121419;
+  /* Lighter brand shade for text on the dark hero (admin's dark-mode accent-ink) */
+  --accent-bright: #ff8a3d;
+  /* Blue glow in the hero background (admin's second chart colour) */
+  --dusk: #2a78d6;
+}
+
+/* Expose the tokens to Tailwind, e.g. `bg-surface`, `text-accent`, `border-line` */
+@theme inline {
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-danger: var(--danger);
+  --color-night: var(--night);
+  --color-night-raised: var(--night-raised);
+  --color-accent-bright: var(--accent-bright);
+  --color-dusk: var(--dusk);
+
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Instrument Serif', ui-serif, Georgia, serif;
+}
+
+/* Animations, used as `animate-rise-in`, `animate-fade-in` and `animate-route-flow` */
+@theme {
+  --animate-rise-in: rise-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-fade-in: fade-in 0.3s ease-out both;
+  --animate-route-flow: route-flow 1.6s linear infinite;
+
+  /* Fade in while moving up a little — hero text on page load */
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Moves the dashes along the route line. 32 = two full dash patterns (2 + 14 = 16),
+     so the loop has no visible jump. */
+  @keyframes route-flow {
+    to {
+      stroke-dashoffset: -32;
+    }
+  }
+}
+
+html {
+  /* Remove the grey flash mobile browsers draw on tapped buttons and links */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth scrolling for "#quote" links, unless the visitor prefers less motion */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  @apply bg-night font-sans text-white antialiased;
+}
+
+/* Faint map-style grid behind the hero. It fades out towards the edges. */
+.map-grid {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.045) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 20%, transparent 75%);
+}
+
+/* Date inputs: softer calendar icon, and left-aligned text on iPhone (Safari centres it by default) */
+input[type='date']::-webkit-calendar-picker-indicator {
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+input[type='date']::-webkit-date-and-time-value {
+  text-align: left;
+}

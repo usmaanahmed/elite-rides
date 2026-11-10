@@ -1,8 +1,8 @@
-import type { Booking, PaymentMethod } from '../types/booking'
+import type { BookingSummary, PaymentMethod } from '../types/booking'
 
 // Placeholder bookings so the table has something to show.
 // TODO: remove once bookings are loaded from the backend.
-export const SAMPLE_BOOKINGS: Booking[] = (
+export const SAMPLE_BOOKINGS: BookingSummary[] = (
   [
     ['ELR001663', 'Doris Motta', '2026-03-05T22:00', 'Heathrow Terminals 2 & 3 Station, Hounslow, UK', '12 Ainslie Wood Rd, London E4 9BY, UK', 'Saloon', 'pay_card', 74],
     ['ELR014261', 'Zeeshan Rana', '2025-10-17T23:04', 'High Wycombe HP12, UK', '123 York St, Belfast BT15 1AS, UK', 'Saloon', 'pay_card', 749.11],

@@ -15,6 +15,7 @@ type ButtonProps = {
   // Id of the <form> this button submits. Only needed when the button sits
   // outside the form, like a "Save" button in a modal footer.
   form?: string
+  className?: string
 }
 
 const variantClasses = {
@@ -32,6 +33,7 @@ export function Button({
   disabled = false,
   isLoading = false,
   form,
+  className = '',
 }: ButtonProps) {
   return (
     <button
@@ -39,7 +41,7 @@ export function Button({
       onClick={onClick}
       disabled={disabled || isLoading}
       form={form}
-      className={`inline-flex h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition-all active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 ${variantClasses[variant]}`}
+      className={`inline-flex h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition-all active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 ${variantClasses[variant]} ${className}`}
     >
       {isLoading && <LoaderCircle className="size-4 animate-spin" strokeWidth={2} />}
       {!isLoading && Icon && <Icon className="size-4" strokeWidth={2} />}

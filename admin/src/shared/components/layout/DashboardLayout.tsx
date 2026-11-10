@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Outlet, ScrollRestoration, useLocation } from 'react-router'
+import { Outlet, ScrollRestoration, useLocation, useNavigate } from 'react-router'
+import { useAuth } from '../../auth/AuthContext'
 import {
   footerNavigation,
   getNavItemLabel,
@@ -7,6 +8,7 @@ import {
   mobileTabs,
   quickActions,
 } from '../../constants/navigation'
+import { ROUTES } from '../../constants/routes'
 import { useTheme } from '../../hooks/useTheme'
 import { BottomNavBar } from '../mobile/BottomNavBar'
 import { MobileMenuSheet } from '../mobile/MobileMenuSheet'
@@ -18,14 +20,18 @@ import { Topbar } from '../topbar/Topbar'
 // Which mobile bottom sheet is open, if any (only one can be open at a time)
 type OpenSheet = 'none' | 'create' | 'menu'
 
-const USER_NAME = 'Admin User'
-const USER_ROLE = 'Super Admin'
+// No admin roles yet (see Phase 14), so everyone logged in shows the same role label
+const USER_ROLE = 'Administrator'
 
 export function DashboardLayout() {
+  const { admin, logout } = useAuth()
+  const navigate = useNavigate()
   const { theme, toggleTheme } = useTheme()
   const location = useLocation()
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [openSheet, setOpenSheet] = useState<OpenSheet>('none')
+
+  const userName = admin?.name || 'Admin'
 
   // Build the breadcrumbs from the current URL, e.g. '/rides' -> Elite Rides > Rides
   const pageLabel = getNavItemLabel(location.pathname) || 'Page not found'
@@ -41,6 +47,11 @@ export function DashboardLayout() {
   // Tapping a bottom-bar button again closes its sheet
   function toggleSheet(sheet: OpenSheet) {
     setOpenSheet(openSheet === sheet ? 'none' : sheet)
+  }
+
+  function handleSignOut() {
+    logout()
+    navigate(ROUTES.login)
   }
 
   return (
@@ -59,15 +70,16 @@ export function DashboardLayout() {
           theme={theme}
           onThemeToggle={toggleTheme}
           hasUnreadNotifications
-          userName={USER_NAME}
+          userName={userName}
           userRole={USER_ROLE}
+          onSignOut={handleSignOut}
         />
 
         {/* Phones and tablets: app-style top bar */}
         <MobileTopbar
           pageTitle={pageLabel}
           hasUnreadNotifications
-          userName={USER_NAME}
+          userName={userName}
           onAvatarClick={() => setOpenSheet('menu')}
         />
 
@@ -99,8 +111,9 @@ export function DashboardLayout() {
         footerItems={footerNavigation}
         theme={theme}
         onThemeToggle={toggleTheme}
-        userName={USER_NAME}
+        userName={userName}
         userRole={USER_ROLE}
+        onSignOut={handleSignOut}
       />
 
       {/* Scrolls back to the top when moving to a new page, like switching tabs in an app */}

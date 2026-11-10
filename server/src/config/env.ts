@@ -9,10 +9,19 @@ dotenv.config();
 const clientUrlText = process.env.CLIENT_URL || "http://localhost:5173";
 const clientUrls = clientUrlText.split(",").map((url) => url.trim());
 
+// Login token bina secret key ke sign/verify nahi ho sakta
+if (!process.env.JWT_SECRET) {
+  throw new Error("JWT_SECRET .env file me set karna zaroori hai");
+}
+
 export const env = {
   port: Number(process.env.PORT) || 5000,
   mongoUri: process.env.MONGO_URI || "mongodb://127.0.0.1:27017/elite-rides",
   clientUrls: clientUrls,
   // Upload ki hui images (car photos) is folder me save hoti hain
   uploadsFolder: path.resolve(process.cwd(), "uploads"),
+  // Login token sign/verify karne ke liye secret key
+  jwtSecret: process.env.JWT_SECRET,
+  // Distance (miles) nikalne ke liye Google key. Khaali ho to quote nahi ban sakta (server phir bhi chalta hai)
+  googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || "",
 };

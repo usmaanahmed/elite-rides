@@ -1,22 +1,41 @@
-import { Car, LoaderCircle, Plus, Trash2 } from 'lucide-react'
+import { Plus, SlidersHorizontal, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '../../../shared/components/buttons/Button'
-import { EmptyStateCard } from '../../../shared/components/cards/EmptyStateCard'
 import { Alert } from '../../../shared/components/feedback/Alert'
+import { SegmentedControl } from '../../../shared/components/inputs/SegmentedControl'
 import { Modal } from '../../../shared/components/modals/Modal'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { AddVehicleModal } from '../components/AddVehicleModal'
+import { CalculationFormatModal } from '../components/CalculationFormatModal'
+import { EditVehicleModal } from '../components/EditVehicleModal'
+import { FleetSummary } from '../components/FleetSummary'
+import { VehicleRatesModal } from '../components/VehicleRatesModal'
+import { VehiclesEmptyState } from '../components/VehiclesEmptyState'
+import { VehiclesGrid } from '../components/VehiclesGrid'
+import { VehiclesGridSkeleton } from '../components/VehiclesGridSkeleton'
 import { VehiclesTable } from '../components/VehiclesTable'
 import { useDeleteVehicle } from '../hooks/useDeleteVehicle'
 import { useVehicles } from '../hooks/useVehicles'
 import type { Vehicle } from '../types/vehicle'
+
+// The two ways to show the vehicles: as cards (the default) or as a table
+const VIEW_OPTIONS = [
+  { value: 'cards', label: 'Cards' },
+  { value: 'table', label: 'Table' },
+]
 
 export function VehiclesMileagePage() {
   // The vehicles list from the server (React Query keeps it cached and up to date)
   const vehiclesQuery = useVehicles()
   const deleteVehicleMutation = useDeleteVehicle()
 
+  // 'cards' or 'table'
+  const [view, setView] = useState('cards')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [isCalculationFormatModalOpen, setIsCalculationFormatModalOpen] = useState(false)
+  // The vehicle open in the Edit / £ Rates modal (null = that modal is closed)
+  const [vehicleToEdit, setVehicleToEdit] = useState<Vehicle | null>(null)
+  const [vehicleToEditRates, setVehicleToEditRates] = useState<Vehicle | null>(null)
   // The vehicle waiting for the user to confirm its deletion (null = no dialog)
   const [vehicleToDelete, setVehicleToDelete] = useState<Vehicle | null>(null)
   // Text for the success message, e.g. "Saloon was added" (null = no message)
@@ -29,6 +48,18 @@ export function VehiclesMileagePage() {
 
   function handleVehicleAdded(vehicle: Vehicle) {
     setSuccessMessage(`${vehicle.name} was added`)
+  }
+
+  function handleVehicleUpdated(vehicle: Vehicle) {
+    setSuccessMessage(`${vehicle.name} was updated`)
+  }
+
+  function handleRatesSaved(vehicle: Vehicle) {
+    setSuccessMessage(`Rates saved for ${vehicle.name}`)
+  }
+
+  function handleCalculationFormatSaved() {
+    setSuccessMessage('Calculation format saved')
   }
 
   function openDeleteDialog(vehicle: Vehicle) {
@@ -54,13 +85,32 @@ export function VehiclesMileagePage() {
     }
   }
 
+  // True once the list has loaded and there are no vehicles in it
+  const isFleetEmpty = vehiclesQuery.isSuccess && vehiclesQuery.data.length === 0
+
+  // The header buttons. Hidden while there are no vehicles, because the empty
+  // state has its own big "Add your first vehicle" button.
+  function renderHeaderActions() {
+    if (isFleetEmpty) return null
+
+    return (
+      <div className="flex items-center gap-2.5">
+        <Button variant="secondary" icon={SlidersHorizontal} onClick={() => setIsCalculationFormatModalOpen(true)}>
+          Calculation format
+        </Button>
+        <Button icon={Plus} onClick={openAddModal}>
+          Add vehicle
+        </Button>
+      </div>
+    )
+  }
+
   // Works out what the main part of the page should show
   function renderVehicles() {
     if (vehiclesQuery.isPending) {
       return (
-        <div className="mt-8 flex items-center justify-center gap-2 py-16 text-sm text-muted">
-          <LoaderCircle className="size-4 animate-spin" strokeWidth={2} />
-          Loading vehicles…
+        <div className="mt-8">
+          <VehiclesGridSkeleton />
         </div>
       )
     }
@@ -78,24 +128,47 @@ export function VehiclesMileagePage() {
 
     if (vehiclesQuery.data.length === 0) {
       return (
-        <EmptyStateCard
-          icon={Car}
-          title="No vehicles yet"
-          description="Add a vehicle to set its mileage rates."
-          action={
-            <Button variant="secondary" icon={Plus} onClick={openAddModal}>
-              Add vehicle
-            </Button>
-          }
-          className="mt-8"
-        />
+        <div className="mt-8">
+          <VehiclesEmptyState onAddVehicle={openAddModal} />
+        </div>
       )
     }
 
+    const vehicles = vehiclesQuery.data
+
     return (
-      <div className="mt-8">
-        <VehiclesTable vehicles={vehiclesQuery.data} onDelete={openDeleteDialog} />
-      </div>
+      <>
+        <div className="mt-6 sm:mt-8">
+          <FleetSummary vehicles={vehicles} />
+        </div>
+
+        <div className="mt-8 flex flex-wrap items-end justify-between gap-3 sm:mt-10">
+          <div>
+            <h2 className="text-lg font-semibold tracking-tight text-ink">Your fleet</h2>
+            <p className="mt-0.5 text-sm text-muted">Seats, luggage space and rates for every vehicle.</p>
+          </div>
+          <SegmentedControl label="Show vehicles as" options={VIEW_OPTIONS} value={view} onChange={setView} />
+        </div>
+
+        <div className="mt-4">
+          {view === 'table' ? (
+            <VehiclesTable
+              vehicles={vehicles}
+              onEdit={setVehicleToEdit}
+              onEditRates={setVehicleToEditRates}
+              onDelete={openDeleteDialog}
+            />
+          ) : (
+            <VehiclesGrid
+              vehicles={vehicles}
+              onAddVehicle={openAddModal}
+              onEdit={setVehicleToEdit}
+              onEditRates={setVehicleToEditRates}
+              onDelete={openDeleteDialog}
+            />
+          )}
+        </div>
+      </>
     )
   }
 
@@ -103,12 +176,8 @@ export function VehiclesMileagePage() {
     <>
       <PageHeader
         title="Vehicles & Mileage Setting"
-        description="Manage vehicle types and the price charged per mile."
-        actions={
-          <Button icon={Plus} onClick={openAddModal}>
-            Add vehicle
-          </Button>
-        }
+        description="Every vehicle customers can book: how many passengers and bags it carries, and its price per mile."
+        actions={renderHeaderActions()}
       />
 
       {successMessage && (
@@ -127,6 +196,29 @@ export function VehiclesMileagePage() {
         onClose={() => setIsAddModalOpen(false)}
         onVehicleAdded={handleVehicleAdded}
       />
+
+      <EditVehicleModal
+        isOpen={vehicleToEdit !== null}
+        onClose={() => setVehicleToEdit(null)}
+        vehicle={vehicleToEdit}
+        onVehicleUpdated={handleVehicleUpdated}
+      />
+
+      <VehicleRatesModal
+        isOpen={vehicleToEditRates !== null}
+        onClose={() => setVehicleToEditRates(null)}
+        vehicle={vehicleToEditRates}
+        onRatesSaved={handleRatesSaved}
+      />
+
+      {vehiclesQuery.data && (
+        <CalculationFormatModal
+          isOpen={isCalculationFormatModalOpen}
+          onClose={() => setIsCalculationFormatModalOpen(false)}
+          vehicles={vehiclesQuery.data}
+          onSaved={handleCalculationFormatSaved}
+        />
+      )}
 
       <Modal
         isOpen={vehicleToDelete !== null}
