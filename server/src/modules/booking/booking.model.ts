@@ -44,6 +44,7 @@ const bookingSchema = new Schema(
       extraLuggage: { type: Number, default: 0 },
       specialLuggage: { type: Number, default: 0 },
       wheelchair: { type: Boolean, default: false },
+      pet: { type: Boolean, default: false },
     },
     flightNo: { type: String, default: "" },
     arrivalFrom: { type: String, default: "" },

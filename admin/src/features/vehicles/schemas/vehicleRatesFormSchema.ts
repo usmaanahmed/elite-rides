@@ -47,12 +47,17 @@ const slabBandSchema = z
 export const vehicleRatesFormSchema = z
   .object({
     rateType: z.enum(['mileage', 'slab']),
+    // false = Single price mode: the vehicle's own distance rates are not used
+    bandsRequired: z.boolean(),
     fixedPrice: priceField('fixed price', 0),
     hourlyRate: priceField('hourly rate', 0),
     mileageBands: z.array(mileageBandSchema),
     slabBands: z.array(slabBandSchema),
   })
   .superRefine((values, ctx) => {
+    if (!values.bandsRequired) {
+      return
+    }
     if (values.rateType === 'mileage' && values.mileageBands.length === 0) {
       ctx.addIssue({ code: 'custom', message: 'Add at least one mileage band', path: ['mileageBands'] })
     }

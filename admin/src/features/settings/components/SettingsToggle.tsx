@@ -7,7 +7,6 @@ type ToggleName =
   | 'pricing.mileageBySlabs'
   | 'pricing.roundOff'
   | 'pricing.showCard'
-  | 'pricing.showPayInCar'
   | 'general.guestLogin'
   | 'general.hourlyRateStatus'
   | 'general.isQuotation'

@@ -40,6 +40,7 @@ const defaultValues: PriceCheckerFormValues = {
   specialLuggage: '0',
   meetAndGreet: false,
   wheelchair: false,
+  pet: false,
   couponCode: '',
 }
 
@@ -95,6 +96,7 @@ export function PriceCheckerForm({ isLoading, onSubmitQuote }: PriceCheckerFormP
         extraLuggage: Number(values.extraLuggage),
         specialLuggage: Number(values.specialLuggage),
         wheelchair: values.wheelchair,
+        pet: values.pet,
       },
       couponCode: values.couponCode,
       vehicleId: '',
@@ -238,6 +240,10 @@ export function PriceCheckerForm({ isLoading, onSubmitQuote }: PriceCheckerFormP
             <label className="flex items-center gap-2 text-sm text-ink">
               <input type="checkbox" className="size-4 accent-accent" {...register('wheelchair')} />
               Wheelchair
+            </label>
+            <label className="flex items-center gap-2 text-sm text-ink">
+              <input type="checkbox" className="size-4 accent-accent" {...register('pet')} />
+              Pet
             </label>
           </div>
         </div>

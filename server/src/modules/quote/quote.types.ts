@@ -12,6 +12,7 @@ export interface QuoteExtras {
   extraLuggage: number;
   specialLuggage: number;
   wheelchair: boolean;
+  pet: boolean;
 }
 
 // Quote mangne wali request (validation ke baad)

@@ -31,13 +31,41 @@ const officeSchema = z.object({
   siteUrl: optionalUrl,
 });
 
-const pricingSchema = z.object({
-  mileageBySlabs: z.boolean(),
-  roundOff: z.boolean(),
-  setPrice: z.enum(["per_vehicle", "single_price"]),
-  showCard: z.boolean(),
-  showPayInCar: z.boolean(),
+const mileageBandSchema = z.object({
+  fromMiles: z.number().min(1),
+  toMiles: z.number().min(1),
+  ratePerMile: z.number().positive(),
 });
+
+const slabBandSchema = z.object({
+  fromMiles: z.number().min(1),
+  toMiles: z.number().min(1),
+  price: z.number().positive(),
+});
+
+const singleRatesSchema = z.object({
+  fixedPrice: priceField,
+  mileageBands: z.array(mileageBandSchema).default([]),
+  slabBands: z.array(slabBandSchema).default([]),
+});
+
+// Single price mode me active band type (slab ya mileage) ke kam az kam ek band zaroori hai
+const pricingSchema = z
+  .object({
+    mileageBySlabs: z.boolean(),
+    roundOff: z.boolean(),
+    setPrice: z.enum(["per_vehicle", "single_price"]),
+    showCard: z.boolean(),
+    singleRates: singleRatesSchema,
+  })
+  .refine(
+    (pricing) => {
+      if (pricing.setPrice !== "single_price") return true;
+      if (pricing.mileageBySlabs) return pricing.singleRates.slabBands.length > 0;
+      return pricing.singleRates.mileageBands.length > 0;
+    },
+    { message: "Add at least one band for the single price rates", path: ["singleRates"] }
+  );
 
 const extrasSchema = z.object({
   babySeatPrice: priceField,
@@ -46,6 +74,7 @@ const extrasSchema = z.object({
   luggagePrice: priceField,
   specialLuggagePrice: priceField,
   wheelchairPrice: priceField,
+  petPrice: priceField,
   returnExtraPrice: priceField,
   waitingPricePer5Minutes: priceField,
   viaPrice: priceField,

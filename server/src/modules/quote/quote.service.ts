@@ -23,6 +23,7 @@ import {
   calculateExtraLines,
   calculatePremium,
   roundToWholePound,
+  VehicleRates,
 } from "./quote.calculator.js";
 import { getDistanceInMiles } from "./distance.service.js";
 import { LocationCharges, QuoteInput, QuoteLine, QuoteResponse, TripType, VehicleQuote } from "./quote.types.js";
@@ -156,6 +157,23 @@ function reverseLocationCharges(location: LocationCharges): LocationCharges {
 
 // ---------- Ek leg ----------
 
+// Distance fare ke liye kaunse rates use hon.
+// "Mileage by slabs" setting saari vehicles ke liye slab ya mileage bands chunti hai.
+// "Single price" mode me saari vehicles settings ke shared rates use karti hain (premium phir bhi vehicle ka apna)
+function getRatesToUse(vehicle: VehicleResponse, settings: SettingsResponse): VehicleRates {
+  let rateType: "mileage" | "slab" = "mileage";
+  if (settings.pricing.mileageBySlabs) {
+    rateType = "slab";
+  }
+
+  if (settings.pricing.setPrice === "single_price") {
+    const shared = settings.pricing.singleRates;
+    return { rateType: rateType, fixedPrice: shared.fixedPrice, mileageBands: shared.mileageBands, slabBands: shared.slabBands };
+  }
+
+  return { rateType: rateType, fixedPrice: vehicle.fixedPrice, mileageBands: vehicle.mileageBands, slabBands: vehicle.slabBands };
+}
+
 // Base fare: fixed price route, ya hourly, ya miles wala fare (+ vehicle ki fixed price + premium)
 async function buildBaseFareLines(params: LegParams): Promise<LegResult> {
   const { vehicle, labelPrefix } = params;
@@ -177,13 +195,14 @@ async function buildBaseFareLines(params: LegParams): Promise<LegResult> {
     return { lines: lines, unavailableReason: "" };
   }
 
-  const distanceFare = calculateDistanceFare(vehicle, params.miles);
+  const rates = getRatesToUse(vehicle, params.settings);
+  const distanceFare = calculateDistanceFare(rates, params.miles);
   if (distanceFare === null) {
     return { lines: [], unavailableReason: "No rates are set for this vehicle" };
   }
   lines.push({ label: `${labelPrefix}Distance fare (${params.miles} miles)`, amount: distanceFare });
-  if (vehicle.fixedPrice > 0) {
-    lines.push({ label: `${labelPrefix}Vehicle base price`, amount: roundMoney(vehicle.fixedPrice) });
+  if (rates.fixedPrice > 0) {
+    lines.push({ label: `${labelPrefix}Vehicle base price`, amount: roundMoney(rates.fixedPrice) });
   }
 
   // Premium (Calculation Format) mileage fare + vehicle base price par lagta hai

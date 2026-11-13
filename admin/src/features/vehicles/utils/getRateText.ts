@@ -1,4 +1,4 @@
-import type { Vehicle } from '../types/vehicle'
+import type { RateType, Vehicle } from '../types/vehicle'
 
 // 1.8 -> "£1.80"
 function formatPoundsAndPence(value: number): string {
@@ -15,9 +15,10 @@ function getBandCountText(bandCount: number): string {
 
 // A short line about how a vehicle is priced by distance, for its card and table row,
 // e.g. "From £1.80/mile · 3 bands" or "From £50 · 2 slab bands".
+// rateType comes from the "Mileage by slabs" setting (it is the same for every vehicle).
 // Gives back null when no rates have been saved for the vehicle yet.
-export function getRateText(vehicle: Vehicle): string | null {
-  if (vehicle.rateType === 'slab') {
+export function getRateText(vehicle: Vehicle, rateType: RateType): string | null {
+  if (rateType === 'slab') {
     if (vehicle.slabBands.length === 0) {
       return null
     }

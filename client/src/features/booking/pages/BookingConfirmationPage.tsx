@@ -41,9 +41,10 @@ export function BookingConfirmationPage() {
     isConfirmed = false
   }
 
-  let paymentText = `Pay ${formatMoney(booking.balanceDue)} to your driver`
-  if (booking.paymentMethod === 'pay_card') {
-    paymentText = 'Paid by card'
+  // Old bookings made with "pay in car" still show the driver text
+  let paymentText = 'Card payment'
+  if (booking.paymentMethod === 'pay_cash') {
+    paymentText = `Pay ${formatMoney(booking.balanceDue)} to your driver`
   }
 
   return (

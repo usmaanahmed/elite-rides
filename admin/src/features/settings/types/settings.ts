@@ -1,6 +1,20 @@
 // "none" = koi discount nahi
 export type DiscountType = 'none' | 'fixed' | 'percent'
 
+// "Single price" mode ka shared rate table (saari vehicles ke liye)
+export type SingleRates = {
+  fixedPrice: number
+  mileageBands: { fromMiles: number; toMiles: number; ratePerMile: number }[]
+  slabBands: { fromMiles: number; toMiles: number; price: number }[]
+}
+
+// Single rates jaisa form me hai (numbers text hain)
+export type SingleRatesFormValues = {
+  fixedPrice: string
+  mileageBands: { fromMiles: string; toMiles: string; ratePerMile: string }[]
+  slabBands: { fromMiles: string; toMiles: string; price: string }[]
+}
+
 // Settings exactly jaisi server par saved hain (numbers asli numbers hain)
 export type Settings = {
   office: {
@@ -16,7 +30,7 @@ export type Settings = {
     roundOff: boolean
     setPrice: 'per_vehicle' | 'single_price'
     showCard: boolean
-    showPayInCar: boolean
+    singleRates: SingleRates
   }
   extras: {
     babySeatPrice: number
@@ -25,6 +39,7 @@ export type Settings = {
     luggagePrice: number
     specialLuggagePrice: number
     wheelchairPrice: number
+    petPrice: number
     returnExtraPrice: number
     waitingPricePer5Minutes: number
     viaPrice: number
@@ -54,7 +69,13 @@ export type Settings = {
 // Settings form ki values: numbers typing ke waqt text rehte hain
 export type SettingsFormValues = {
   office: Settings['office']
-  pricing: Settings['pricing']
+  pricing: {
+    mileageBySlabs: boolean
+    roundOff: boolean
+    setPrice: 'per_vehicle' | 'single_price'
+    showCard: boolean
+    singleRates: SingleRatesFormValues
+  }
   extras: {
     babySeatPrice: string
     boosterSeatPrice: string
@@ -62,6 +83,7 @@ export type SettingsFormValues = {
     luggagePrice: string
     specialLuggagePrice: string
     wheelchairPrice: string
+    petPrice: string
     returnExtraPrice: string
     waitingPricePer5Minutes: string
     viaPrice: string

@@ -27,12 +27,13 @@ const extraPrices: ExtrasSettings = {
   luggagePrice: 3,
   specialLuggagePrice: 10,
   wheelchairPrice: 0,
+  petPrice: 8,
   returnExtraPrice: 0,
   waitingPricePer5Minutes: 0,
   viaPrice: 0,
 };
 
-const noExtras = { babySeats: 0, boosterSeats: 0, meetAndGreet: false, extraLuggage: 0, specialLuggage: 0, wheelchair: false };
+const noExtras = { babySeats: 0, boosterSeats: 0, meetAndGreet: false, extraLuggage: 0, specialLuggage: 0, wheelchair: false, pet: false };
 
 // Distance fare + vehicle fixed price = base fare (premium isi par lagta hai)
 function baseFare(miles: number, fixedPrice: number): number {
@@ -63,6 +64,13 @@ test("Example 3: People Carrier 15 mi, raat, baby seat, meet & greet = £62.40",
   assert.equal(addUpLines(extraLines), 10);
   const nightSurcharge = 5;
   assert.equal(roundMoney(base + premium + nightSurcharge + addUpLines(extraLines)), 62.4);
+});
+
+test("Pet extra: flat price ek line banati hai, pet na ho to koi line nahi", () => {
+  const withPet = calculateExtraLines({ ...noExtras, pet: true }, extraPrices);
+  assert.equal(addUpLines(withPet), 8);
+  const withoutPet = calculateExtraLines(noExtras, extraPrices);
+  assert.equal(withoutPet.length, 0);
 });
 
 test("Example 4: 8 Seater Mini Bus 30 mi, Stansted pickup, Christmas = £129.40", () => {

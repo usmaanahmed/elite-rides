@@ -30,6 +30,7 @@ export type BookingExtras = {
   extraLuggage: number
   specialLuggage: number
   wheelchair: boolean
+  pet: boolean
 }
 
 // Everything chosen so far in the booking steps

@@ -23,6 +23,7 @@ function describeExtras(booking: Booking): string {
   if (extras.extraLuggage > 0) names.push(`Extra luggage × ${extras.extraLuggage}`)
   if (extras.specialLuggage > 0) names.push(`Special luggage × ${extras.specialLuggage}`)
   if (extras.wheelchair) names.push('Wheelchair')
+  if (extras.pet) names.push('Pet')
 
   if (names.length === 0) {
     return 'None'

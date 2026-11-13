@@ -1,18 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus, Trash2 } from 'lucide-react'
 import { useEffect } from 'react'
-import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
+import { useFieldArray, useForm } from 'react-hook-form'
 import { Alert } from '../../../shared/components/feedback/Alert'
 import { Button } from '../../../shared/components/buttons/Button'
 import { FormField } from '../../../shared/components/forms/FormField'
 import { FormModalFooter } from '../../../shared/components/forms/FormModalFooter'
 import { FormSection } from '../../../shared/components/forms/FormSection'
-import { SegmentedControl } from '../../../shared/components/inputs/SegmentedControl'
 import { TextInput } from '../../../shared/components/inputs/TextInput'
 import { Modal } from '../../../shared/components/modals/Modal'
+import { useSettings } from '../../settings/hooks/useSettings'
 import { useUpdateVehicleRates } from '../hooks/useUpdateVehicleRates'
 import { vehicleRatesFormSchema } from '../schemas/vehicleRatesFormSchema'
-import type { Vehicle, VehicleRates, VehicleRatesFormValues } from '../types/vehicle'
+import type { RateType, Vehicle, VehicleRates, VehicleRatesFormValues } from '../types/vehicle'
 
 type VehicleRatesModalProps = {
   isOpen: boolean
@@ -24,36 +24,47 @@ type VehicleRatesModalProps = {
 // Lets the footer's Save button (which sits outside the <form>) submit the form
 const FORM_ID = 'vehicle-rates-form'
 
-const rateTypeOptions = [
-  { value: 'mileage', label: 'Mileage bands' },
-  { value: 'slab', label: 'Slab bands' },
-]
+// The rate type (mileage or slab) is not chosen here: the "Mileage by slabs" setting decides it for all vehicles.
+// Only the band type in use gets a blank starting row; the other type keeps whatever was saved.
+// When "Set price" is "Single price", the vehicle's own distance rates are not used, so bands are optional.
+function toFormValues(vehicle: Vehicle, rateType: RateType, bandsRequired: boolean): VehicleRatesFormValues {
+  let mileageBands = vehicle.mileageBands.map((band) => ({
+    fromMiles: String(band.fromMiles),
+    toMiles: String(band.toMiles),
+    ratePerMile: String(band.ratePerMile),
+  }))
+  if (mileageBands.length === 0 && rateType === 'mileage' && bandsRequired) {
+    mileageBands = [{ fromMiles: '1', toMiles: '', ratePerMile: '' }]
+  }
 
-function toFormValues(vehicle: Vehicle): VehicleRatesFormValues {
+  let slabBands = vehicle.slabBands.map((band) => ({
+    fromMiles: String(band.fromMiles),
+    toMiles: String(band.toMiles),
+    price: String(band.price),
+  }))
+  if (slabBands.length === 0 && rateType === 'slab' && bandsRequired) {
+    slabBands = [{ fromMiles: '1', toMiles: '', price: '' }]
+  }
+
   return {
-    rateType: vehicle.rateType,
+    rateType: rateType,
+    bandsRequired: bandsRequired,
     fixedPrice: String(vehicle.fixedPrice),
     hourlyRate: String(vehicle.hourlyRate),
-    mileageBands:
-      vehicle.mileageBands.length > 0
-        ? vehicle.mileageBands.map((band) => ({
-            fromMiles: String(band.fromMiles),
-            toMiles: String(band.toMiles),
-            ratePerMile: String(band.ratePerMile),
-          }))
-        : [{ fromMiles: '1', toMiles: '', ratePerMile: '' }],
-    slabBands:
-      vehicle.slabBands.length > 0
-        ? vehicle.slabBands.map((band) => ({
-            fromMiles: String(band.fromMiles),
-            toMiles: String(band.toMiles),
-            price: String(band.price),
-          }))
-        : [{ fromMiles: '1', toMiles: '', price: '' }],
+    mileageBands: mileageBands,
+    slabBands: slabBands,
   }
 }
 
 export function VehicleRatesModal({ isOpen, onClose, vehicle, onRatesSaved }: VehicleRatesModalProps) {
+  // Settings decide which band type is used and whether each vehicle has its own rates
+  const settingsQuery = useSettings()
+  let rateType: RateType = 'mileage'
+  if (settingsQuery.data?.pricing.mileageBySlabs) {
+    rateType = 'slab'
+  }
+  const bandsRequired = settingsQuery.data?.pricing.setPrice !== 'single_price'
+
   const {
     register,
     handleSubmit,
@@ -64,21 +75,18 @@ export function VehicleRatesModal({ isOpen, onClose, vehicle, onRatesSaved }: Ve
     formState: { errors, isSubmitting, isDirty },
   } = useForm<VehicleRatesFormValues>({
     resolver: zodResolver(vehicleRatesFormSchema),
-    defaultValues: vehicle ? toFormValues(vehicle) : undefined,
+    defaultValues: vehicle ? toFormValues(vehicle, rateType, bandsRequired) : undefined,
     mode: 'onTouched',
   })
 
   const updateRatesMutation = useUpdateVehicleRates()
-  // Read live (not just at submit time) so the form switches between mileage/slab bands as it's picked
-  const rateType = useWatch({ control, name: 'rateType' })
-
   const mileageBandsArray = useFieldArray({ control, name: 'mileageBands' })
   const slabBandsArray = useFieldArray({ control, name: 'slabBands' })
 
-  // Load the vehicle's current rates into the form whenever a different vehicle is opened
+  // Load the vehicle's current rates into the form whenever a different vehicle is opened (or the settings change)
   useEffect(() => {
-    if (vehicle) reset(toFormValues(vehicle))
-  }, [vehicle, reset])
+    if (vehicle) reset(toFormValues(vehicle, rateType, bandsRequired))
+  }, [vehicle, rateType, bandsRequired, reset])
 
   function handleClose() {
     if (isSubmitting) return
@@ -102,7 +110,7 @@ export function VehicleRatesModal({ isOpen, onClose, vehicle, onRatesSaved }: Ve
     if (!vehicle) return
 
     const rates: VehicleRates = {
-      rateType: values.rateType,
+      rateType: rateType,
       fixedPrice: Number(values.fixedPrice),
       hourlyRate: Number(values.hourlyRate),
       mileageBands: values.mileageBands.map((band) => ({
@@ -147,7 +155,7 @@ export function VehicleRatesModal({ isOpen, onClose, vehicle, onRatesSaved }: Ve
           submitLabel="Save rates"
           isSubmitting={isSubmitting}
           canReset={isDirty}
-          onReset={() => reset(toFormValues(vehicle))}
+          onReset={() => reset(toFormValues(vehicle, rateType, bandsRequired))}
           onCancel={handleClose}
         />
       }
@@ -156,11 +164,19 @@ export function VehicleRatesModal({ isOpen, onClose, vehicle, onRatesSaved }: Ve
       <form id={FORM_ID} onSubmit={handleSubmit(saveRates)} noValidate className="space-y-8">
         {errors.root?.message && <Alert variant="error" title={errors.root.message} />}
 
+        {!bandsRequired && (
+          <p className="rounded-xl border border-line p-3 text-sm text-muted">
+            Single price is on: distance rates are set once in Settings and used by every vehicle. Only the hourly rate is set here.
+          </p>
+        )}
+
         <FormSection title="Base pricing">
           <div className="grid gap-4 sm:grid-cols-2">
-            <FormField label="Fixed price" htmlFor="fixedPrice" hint="Added on top of the distance fare." error={errors.fixedPrice?.message}>
-              <TextInput id="fixedPrice" inputMode="decimal" placeholder="0.00" prefix="£" {...register('fixedPrice')} hasError={!!errors.fixedPrice} />
-            </FormField>
+            {bandsRequired && (
+              <FormField label="Fixed price" htmlFor="fixedPrice" hint="Added on top of the distance fare." error={errors.fixedPrice?.message}>
+                <TextInput id="fixedPrice" inputMode="decimal" placeholder="0.00" prefix="£" {...register('fixedPrice')} hasError={!!errors.fixedPrice} />
+              </FormField>
+            )}
 
             <FormField label="Hourly rate" htmlFor="hourlyRate" hint="£0.00 turns off hourly hire for this vehicle." error={errors.hourlyRate?.message}>
               <TextInput id="hourlyRate" inputMode="decimal" placeholder="0.00" prefix="£" suffix="per hour" {...register('hourlyRate')} hasError={!!errors.hourlyRate} />
@@ -168,14 +184,11 @@ export function VehicleRatesModal({ isOpen, onClose, vehicle, onRatesSaved }: Ve
           </div>
         </FormSection>
 
-        <FormSection title="Distance fare" description="Charge per mile across bands, or a flat price per range.">
-          <Controller
-            name="rateType"
-            control={control}
-            render={({ field }) => (
-              <SegmentedControl label="Rate type" options={rateTypeOptions} value={field.value} onChange={field.onChange} className="w-full" />
-            )}
-          />
+        {bandsRequired && (
+        <FormSection
+          title={rateType === 'slab' ? 'Distance fare (slab bands)' : 'Distance fare (mileage bands)'}
+          description="Set by the Mileage by slabs switch in Settings: a flat price per range when on, a price per mile when off."
+        >
 
           {rateType === 'mileage' ? (
             <div className="mt-4 space-y-3">
@@ -241,6 +254,7 @@ export function VehicleRatesModal({ isOpen, onClose, vehicle, onRatesSaved }: Ve
             </div>
           )}
         </FormSection>
+        )}
       </form>
     </Modal>
   )

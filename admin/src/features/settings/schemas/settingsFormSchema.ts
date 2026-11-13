@@ -29,13 +29,85 @@ const officeSchema = z.object({
   siteUrl: optionalLink,
 })
 
-const pricingSchema = z.object({
-  mileageBySlabs: z.boolean(),
-  roundOff: z.boolean(),
-  setPrice: z.enum(['per_vehicle', 'single_price']),
-  showCard: z.boolean(),
-  showPayInCar: z.boolean(),
-})
+// A whole number of miles, e.g. "1" or "20"
+const milesField = z
+  .string()
+  .trim()
+  .min(1, 'Enter the miles')
+  .regex(/^d+$/, 'Use a whole number, e.g. 20')
+  .refine((value) => Number(value) >= 1, 'Must be at least 1')
+
+// A price above £0, e.g. 12.50
+const bandPriceField = z
+  .string()
+  .trim()
+  .min(1, 'Enter an amount')
+  .regex(/^d+(.d{1,2})?$/, 'Use an amount like 10 or 12.50')
+  .refine((value) => Number(value) > 0, 'Must be more than £0')
+  .refine((value) => Number(value) <= MAX_PRICE, `Cannot be more than £${MAX_PRICE.toLocaleString()}`)
+
+const mileageBandSchema = z
+  .object({ fromMiles: milesField, toMiles: milesField, ratePerMile: bandPriceField })
+  .refine((band) => Number(band.toMiles) > Number(band.fromMiles), {
+    message: 'Must be more than the from miles',
+    path: ['toMiles'],
+  })
+
+const slabBandSchema = z
+  .object({ fromMiles: milesField, toMiles: milesField, price: bandPriceField })
+  .refine((band) => Number(band.toMiles) > Number(band.fromMiles), {
+    message: 'Must be more than the from miles',
+    path: ['toMiles'],
+  })
+
+const pricingSchema = z
+  .object({
+    mileageBySlabs: z.boolean(),
+    roundOff: z.boolean(),
+    setPrice: z.enum(['per_vehicle', 'single_price']),
+    showCard: z.boolean(),
+    singleRates: z.object({
+      fixedPrice: priceField,
+      // Only the shape is checked here. The band type in use is checked in detail below
+      mileageBands: z.array(z.object({ fromMiles: z.string(), toMiles: z.string(), ratePerMile: z.string() })),
+      slabBands: z.array(z.object({ fromMiles: z.string(), toMiles: z.string(), price: z.string() })),
+    }),
+  })
+  .superRefine((pricing, context) => {
+    // The shared rates are only checked in single price mode, and only the band type in use
+    if (pricing.setPrice !== 'single_price') {
+      return
+    }
+
+    if (pricing.mileageBySlabs) {
+      const slabBands = pricing.singleRates.slabBands
+      if (slabBands.length === 0) {
+        context.addIssue({ code: 'custom', message: 'Add at least one band', path: ['singleRates', 'slabBands'] })
+      }
+      for (let index = 0; index < slabBands.length; index++) {
+        const result = slabBandSchema.safeParse(slabBands[index])
+        if (!result.success) {
+          for (const issue of result.error.issues) {
+            context.addIssue({ code: 'custom', message: issue.message, path: ['singleRates', 'slabBands', index, ...issue.path] })
+          }
+        }
+      }
+      return
+    }
+
+    const mileageBands = pricing.singleRates.mileageBands
+    if (mileageBands.length === 0) {
+      context.addIssue({ code: 'custom', message: 'Add at least one band', path: ['singleRates', 'mileageBands'] })
+    }
+    for (let index = 0; index < mileageBands.length; index++) {
+      const result = mileageBandSchema.safeParse(mileageBands[index])
+      if (!result.success) {
+        for (const issue of result.error.issues) {
+          context.addIssue({ code: 'custom', message: issue.message, path: ['singleRates', 'mileageBands', index, ...issue.path] })
+        }
+      }
+    }
+  })
 
 const extrasSchema = z.object({
   babySeatPrice: priceField,
@@ -44,6 +116,7 @@ const extrasSchema = z.object({
   luggagePrice: priceField,
   specialLuggagePrice: priceField,
   wheelchairPrice: priceField,
+  petPrice: priceField,
   returnExtraPrice: priceField,
   waitingPricePer5Minutes: priceField,
   viaPrice: priceField,

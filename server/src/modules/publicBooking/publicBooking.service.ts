@@ -14,9 +14,6 @@ import {
   PublicVehicleResponse,
 } from "./publicBooking.types.js";
 
-// Online card payment Phase 13 (Stripe) me aayegi. Tab tak card se booking nahi ho sakti
-const CARD_PAYMENT_READY = false;
-
 // Server ke waqt ke hisaab se "YYYY-MM-DD HH:mm" (pickup time se compare karne ke liye)
 function getNowText(): string {
   const now = new Date();
@@ -46,8 +43,8 @@ export async function getPublicSettings(): Promise<PublicSettingsResponse> {
     hourlyRateStatus: settings.general.hourlyRateStatus,
     guestLogin: settings.general.guestLogin,
     isQuotation: settings.general.isQuotation,
-    showPayInCar: settings.pricing.showPayInCar,
-    cardPaymentAvailable: settings.pricing.showCard && CARD_PAYMENT_READY,
+    // Real Stripe payment Phase 13 me aayegi. Tab tak booking pending rehti hai
+    cardPaymentAvailable: settings.pricing.showCard,
     extraPrices: {
       babySeatPrice: settings.extras.babySeatPrice,
       boosterSeatPrice: settings.extras.boosterSeatPrice,
@@ -55,6 +52,7 @@ export async function getPublicSettings(): Promise<PublicSettingsResponse> {
       luggagePrice: settings.extras.luggagePrice,
       specialLuggagePrice: settings.extras.specialLuggagePrice,
       wheelchairPrice: settings.extras.wheelchairPrice,
+      petPrice: settings.extras.petPrice,
     },
     pretendDiscountType: settings.discount.pretendDiscountType,
     pretendDiscountValue: settings.discount.pretendDiscountValue,
@@ -94,11 +92,12 @@ export async function createPublicBooking(input: CreateBookingInput): Promise<Pu
   if (!settings.general.guestLogin) {
     throw new AppError("Please log in to make a booking", 403);
   }
-  if (input.paymentMethod === "pay_cash" && !settings.pricing.showPayInCar) {
-    throw new AppError("Pay in car is not available. Please choose another payment method.", 400);
+  // Website se sirf card payment hoti hai (pay in car hata diya gaya hai)
+  if (input.paymentMethod !== "pay_card") {
+    throw new AppError("Please choose card payment.", 400);
   }
-  if (input.paymentMethod === "pay_card" && !(settings.pricing.showCard && CARD_PAYMENT_READY)) {
-    throw new AppError("Card payment is not available yet. Please choose pay in car.", 400);
+  if (!settings.pricing.showCard) {
+    throw new AppError("Online booking is not available right now. Please call us to book.", 400);
   }
 
   checkPickupIsInFuture(input.quote.pickupDate, input.quote.pickupTime);

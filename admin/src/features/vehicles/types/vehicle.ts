@@ -88,6 +88,7 @@ export type SlabBandFormValues = {
 // The "£ Rates" form's values
 export type VehicleRatesFormValues = {
   rateType: RateType
+  bandsRequired: boolean
   fixedPrice: string
   hourlyRate: string
   mileageBands: MileageBandFormValues[]

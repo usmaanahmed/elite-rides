@@ -20,6 +20,7 @@ export type PriceCheckerFormValues = {
   specialLuggage: string
   meetAndGreet: boolean
   wheelchair: boolean
+  pet: boolean
   couponCode: string
 }
 
@@ -42,6 +43,7 @@ export type QuoteRequest = {
     extraLuggage: number
     specialLuggage: number
     wheelchair: boolean
+    pet: boolean
   }
   couponCode: string
   vehicleId: string

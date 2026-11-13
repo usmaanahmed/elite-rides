@@ -12,8 +12,7 @@ export interface PublicSettingsResponse {
   guestLogin: boolean;
   // true ho to booking ek quote request hai, admin approve karega
   isQuotation: boolean;
-  showPayInCar: boolean;
-  // Card ka option admin ne on kiya ho AUR online payment tayyar ho (Phase 13). Abhi hamesha false
+  // Admin ne "Show card payment" on kiya ho to customer booking kar sakta hai
   cardPaymentAvailable: boolean;
   extraPrices: {
     babySeatPrice: number;
@@ -22,6 +21,7 @@ export interface PublicSettingsResponse {
     luggagePrice: number;
     specialLuggagePrice: number;
     wheelchairPrice: number;
+    petPrice: number;
   };
   // Sirf dikhane ke liye kata hua (crossed-out) price
   pretendDiscountType: DiscountType;

@@ -11,6 +11,7 @@ const extrasSchema = z.object({
   extraLuggage: z.coerce.number().int().min(0).max(50),
   specialLuggage: z.coerce.number().int().min(0).max(50),
   wheelchair: z.boolean(),
+  pet: z.boolean().default(false),
 });
 
 const noExtras = {
@@ -20,6 +21,7 @@ const noExtras = {
   extraLuggage: 0,
   specialLuggage: 0,
   wheelchair: false,
+  pet: false,
 };
 
 export const quoteSchema = z

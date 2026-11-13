@@ -107,6 +107,10 @@ function sortBandsByFromMiles(bands: Band[]): Band[] {
 
 // Mileage/slab bands check karta hai: pehla band 1 mile se shuru ho aur bands continuous hon (koi gap na ho)
 function checkBandsAreContinuous(bands: Band[]) {
+  if (bands.length === 0) {
+    return;
+  }
+
   const sortedBands = sortBandsByFromMiles(bands);
 
   if (sortedBands[0].fromMiles !== 1) {

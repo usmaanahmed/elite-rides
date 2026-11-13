@@ -11,7 +11,6 @@ export type PublicSettings = {
   guestLogin: boolean
   // true = a booking is only a quote request until the office approves it
   isQuotation: boolean
-  showPayInCar: boolean
   cardPaymentAvailable: boolean
   extraPrices: {
     babySeatPrice: number
@@ -20,6 +19,7 @@ export type PublicSettings = {
     luggagePrice: number
     specialLuggagePrice: number
     wheelchairPrice: number
+    petPrice: number
   }
   // Shown only as a crossed-out "was" price
   pretendDiscountType: 'none' | 'fixed' | 'percent'

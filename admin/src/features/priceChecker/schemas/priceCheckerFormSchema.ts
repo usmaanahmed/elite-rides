@@ -57,6 +57,7 @@ export const priceCheckerFormSchema = z
     specialLuggage: countUpTo(50),
     meetAndGreet: z.boolean(),
     wheelchair: z.boolean(),
+    pet: z.boolean(),
     couponCode: z.string().trim().max(20, 'Coupon code is too long'),
   })
   .refine((values) => values.tripType === 'hourly' || values.dropoff.length >= 3, {

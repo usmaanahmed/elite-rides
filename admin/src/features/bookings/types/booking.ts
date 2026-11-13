@@ -37,6 +37,7 @@ export type BookingExtras = {
   extraLuggage: number
   specialLuggage: number
   wheelchair: boolean
+  pet: boolean
 }
 
 // A booking as the server sends it back

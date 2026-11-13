@@ -39,18 +39,14 @@ const slabBandSchema = z.object({
 });
 
 // "£ Rates" modal: mileage ya slab bands, fixed price aur hourly rate ek saath save hote hain
-export const updateRatesSchema = z
-  .object({
-    rateType: z.enum(["mileage", "slab"]),
-    fixedPrice: z.number().min(0),
-    hourlyRate: z.number().min(0),
-    mileageBands: z.array(mileageBandSchema).default([]),
-    slabBands: z.array(slabBandSchema).default([]),
-  })
-  .refine(
-    (data) => (data.rateType === "mileage" ? data.mileageBands.length > 0 : data.slabBands.length > 0),
-    { message: "Add at least one band", path: ["mileageBands"] }
-  );
+// Bands khaali ho sakte hain (jab Settings me "Single price" on ho to vehicle ke apne bands use nahi hote)
+export const updateRatesSchema = z.object({
+  rateType: z.enum(["mileage", "slab"]),
+  fixedPrice: z.number().min(0),
+  hourlyRate: z.number().min(0),
+  mileageBands: z.array(mileageBandSchema).default([]),
+  slabBands: z.array(slabBandSchema).default([]),
+});
 
 // "Add Calculation Format" modal: har vehicle ki value + Price/% ek saath save hoti hai
 export const updateCalculationFormatSchema = z.object({

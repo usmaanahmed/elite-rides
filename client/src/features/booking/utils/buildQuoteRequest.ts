@@ -8,6 +8,7 @@ export const NO_EXTRAS: BookingExtras = {
   extraLuggage: 0,
   specialLuggage: 0,
   wheelchair: false,
+  pet: false,
 }
 
 // Joins the journey with the extras, coupon and vehicle into the request the server prices

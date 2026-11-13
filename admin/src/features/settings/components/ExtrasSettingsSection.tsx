@@ -13,6 +13,7 @@ const extraFields: { name: ExtraFieldName; label: string }[] = [
   { name: 'luggagePrice', label: 'Extra luggage (per item)' },
   { name: 'specialLuggagePrice', label: 'Special luggage (per item)' },
   { name: 'wheelchairPrice', label: 'Wheelchair' },
+  { name: 'petPrice', label: 'Pet' },
   { name: 'returnExtraPrice', label: 'Return extra price' },
   { name: 'waitingPricePer5Minutes', label: 'Waiting (per 5 minutes)' },
   { name: 'viaPrice', label: 'Via (per stop)' },

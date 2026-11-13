@@ -54,7 +54,7 @@ export function BookingDetailsPage() {
       flightNo: '',
       arrivalFrom: '',
       notes: '',
-      paymentMethod: 'pay_cash',
+      paymentMethod: 'pay_card',
     },
     mode: 'onTouched',
   })
@@ -130,7 +130,7 @@ export function BookingDetailsPage() {
   let blockingMessage = ''
   if (settings && !settings.guestLogin) {
     blockingMessage = 'Online booking needs a customer account, which is coming soon. Please call us to book.'
-  } else if (settings && !settings.showPayInCar && !settings.cardPaymentAvailable) {
+  } else if (settings && !settings.cardPaymentAvailable) {
     blockingMessage = 'Online booking is not available right now. Please call us to book.'
   }
 
@@ -230,7 +230,6 @@ export function BookingDetailsPage() {
             <SectionCard title="Payment">
               <PaymentMethodField
                 field={register('paymentMethod')}
-                showPayInCar={settings.showPayInCar}
                 showCard={settings.cardPaymentAvailable}
                 error={errors.paymentMethod?.message}
               />

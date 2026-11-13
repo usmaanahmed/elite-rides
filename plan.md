@@ -133,7 +133,7 @@ Docs section 8. Settings ek hi document hai (single company), baqi modules `getS
 - [x] "Save All Settings" button + success message, real API se connected
 
 Fields (docs ke mutabiq):
-- **Pricing Config:** mileage by slabs (on/off), round off (on/off), set price (`per_vehicle` / `single_price`), show card, show pay in car
+- **Pricing Config:** mileage by slabs (on/off), round off (on/off), set price (`per_vehicle` / `single_price`), show card (pay in car option removed)
 - **Extras (£):** baby seat per seat, booster seat per seat, meet & greet, luggage per extra item, special luggage per item, wheelchair, return extra price, price per 5 waiting minutes
 - **General:** guest login, hourly rate status, is quotation, grace time (minutes), max passengers (default 20), booking number prefix (e.g. `ELR`), block date range, block time range (e.g. 02:00–04:00), booking success redirect URL
 - **Discount:** global discount (£ ya %, blank = none), pretend discount (sirf display ke liye crossed-out price – asal fare kam **nahi** hota)

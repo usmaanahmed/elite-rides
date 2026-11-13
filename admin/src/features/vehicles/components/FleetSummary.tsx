@@ -2,7 +2,8 @@ import { CarFront, Luggage, Route, Users } from 'lucide-react'
 import { StatCard } from '../../../shared/components/cards/StatCard'
 import { formatCount } from '../../../shared/utils/formatNumbers'
 import type { FleetCapacity } from '../types/fleetCapacity'
-import type { Vehicle } from '../types/vehicle'
+import { useSettings } from '../../settings/hooks/useSettings'
+import type { RateType, Vehicle } from '../types/vehicle'
 import { getFleetCapacity } from '../utils/getFleetCapacity'
 import { getRateText } from '../utils/getRateText'
 
@@ -21,11 +22,11 @@ function getPassengerRangeText(fleetCapacity: FleetCapacity): string {
   return `${smallest}–${largest}`
 }
 
-// Counts the vehicles that already have mileage or slab rates saved
-function countVehiclesWithRates(vehicles: Vehicle[]): number {
+// Counts the vehicles that already have rates saved (for the band type the settings use)
+function countVehiclesWithRates(vehicles: Vehicle[], rateType: RateType): number {
   let count = 0
   for (const vehicle of vehicles) {
-    if (getRateText(vehicle) !== null) {
+    if (getRateText(vehicle, rateType) !== null) {
       count = count + 1
     }
   }
@@ -35,6 +36,7 @@ function countVehiclesWithRates(vehicles: Vehicle[]): number {
 // Four tiles above the vehicles that sum up the whole fleet at a glance
 export function FleetSummary({ vehicles }: FleetSummaryProps) {
   const fleetCapacity = getFleetCapacity(vehicles)
+  const settingsQuery = useSettings()
 
   // The vehicles with the most seats and the most luggage space (the first one, if there's a tie)
   const biggestVehicle = vehicles.find((vehicle) => vehicle.passengerCapacity === fleetCapacity.largestPassengerCapacity)
@@ -50,7 +52,15 @@ export function FleetSummary({ vehicles }: FleetSummaryProps) {
     roomiestVehicleText = `${roomiestVehicle.name} carries the most luggage`
   }
 
-  const vehiclesWithRates = countVehiclesWithRates(vehicles)
+  let rateType: RateType = 'mileage'
+  if (settingsQuery.data?.pricing.mileageBySlabs) {
+    rateType = 'slab'
+  }
+  // In "Single price" mode every vehicle uses the shared rates from Settings
+  let vehiclesWithRates = countVehiclesWithRates(vehicles, rateType)
+  if (settingsQuery.data?.pricing.setPrice === 'single_price') {
+    vehiclesWithRates = vehicles.length
+  }
   const vehiclesWithoutRates = vehicles.length - vehiclesWithRates
   let ratesText = 'Every vehicle can be priced'
   if (vehiclesWithoutRates > 0) {

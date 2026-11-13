@@ -78,6 +78,9 @@ export function calculateExtraLines(extras: QuoteExtras, prices: ExtrasSettings)
   if (extras.wheelchair) {
     lines.push({ label: "Wheelchair", amount: roundMoney(prices.wheelchairPrice) });
   }
+  if (extras.pet) {
+    lines.push({ label: "Pet", amount: roundMoney(prices.petPrice) });
+  }
 
   return lines.filter((line) => line.amount !== 0);
 }

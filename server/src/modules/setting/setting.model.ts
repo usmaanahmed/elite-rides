@@ -1,6 +1,26 @@
 // Settings ka database structure. Poori company ki sirf ek hi document hogi
 import { model, Schema } from "mongoose";
 
+// Ek mileage band, e.g. "1 to 20 miles @ £2.50 per mile"
+const mileageBandSchema = new Schema(
+  {
+    fromMiles: { type: Number, required: true },
+    toMiles: { type: Number, required: true },
+    ratePerMile: { type: Number, required: true },
+  },
+  { _id: false }
+);
+
+// Ek slab band, e.g. "1 to 20 miles = £50 flat"
+const slabBandSchema = new Schema(
+  {
+    fromMiles: { type: Number, required: true },
+    toMiles: { type: Number, required: true },
+    price: { type: Number, required: true },
+  },
+  { _id: false }
+);
+
 const settingSchema = new Schema(
   {
     office: {
@@ -16,7 +36,12 @@ const settingSchema = new Schema(
       roundOff: { type: Boolean, default: false },
       setPrice: { type: String, enum: ["per_vehicle", "single_price"], default: "per_vehicle" },
       showCard: { type: Boolean, default: false },
-      showPayInCar: { type: Boolean, default: true },
+      // "single_price" mode me saari vehicles yehi shared base fare + bands use karti hain
+      singleRates: {
+        fixedPrice: { type: Number, default: 0 },
+        mileageBands: { type: [mileageBandSchema], default: [] },
+        slabBands: { type: [slabBandSchema], default: [] },
+      },
     },
     extras: {
       babySeatPrice: { type: Number, default: 0 },
@@ -25,6 +50,7 @@ const settingSchema = new Schema(
       luggagePrice: { type: Number, default: 0 },
       specialLuggagePrice: { type: Number, default: 0 },
       wheelchairPrice: { type: Number, default: 0 },
+      petPrice: { type: Number, default: 0 },
       returnExtraPrice: { type: Number, default: 0 },
       waitingPricePer5Minutes: { type: Number, default: 0 },
       viaPrice: { type: Number, default: 0 },

@@ -125,6 +125,12 @@ export function ExtrasSection({ extras, prices, onChange }: ExtrasSectionProps) 
         isOn={extras.wheelchair}
         onChange={(isOn) => onChange({ ...extras, wheelchair: isOn })}
       />
+      <ToggleRow
+        label="Pet"
+        priceText={describePrice(prices.petPrice, '')}
+        isOn={extras.pet}
+        onChange={(isOn) => onChange({ ...extras, pet: isOn })}
+      />
     </div>
   )
 }
