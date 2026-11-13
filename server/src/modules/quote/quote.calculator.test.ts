@@ -29,6 +29,7 @@ const extraPrices: ExtrasSettings = {
   wheelchairPrice: 0,
   returnExtraPrice: 0,
   waitingPricePer5Minutes: 0,
+  viaPrice: 0,
 };
 
 const noExtras = { babySeats: 0, boosterSeats: 0, meetAndGreet: false, extraLuggage: 0, specialLuggage: 0, wheelchair: false };

@@ -15,6 +15,7 @@ const extraFields: { name: ExtraFieldName; label: string }[] = [
   { name: 'wheelchairPrice', label: 'Wheelchair' },
   { name: 'returnExtraPrice', label: 'Return extra price' },
   { name: 'waitingPricePer5Minutes', label: 'Waiting (per 5 minutes)' },
+  { name: 'viaPrice', label: 'Via (per stop)' },
 ]
 
 // Prices of the optional extras a customer can add

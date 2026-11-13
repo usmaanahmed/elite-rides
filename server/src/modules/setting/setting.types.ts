@@ -33,6 +33,8 @@ export interface ExtrasSettings {
   wheelchairPrice: number;
   returnExtraPrice: number;
   waitingPricePer5Minutes: number;
+  // Har via stop ki extra price
+  viaPrice: number;
 }
 
 // General rules. Khaali string = woh option band

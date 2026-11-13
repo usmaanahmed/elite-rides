@@ -14,6 +14,7 @@ export function settingsToFormValues(settings: Settings): SettingsFormValues {
       wheelchairPrice: String(settings.extras.wheelchairPrice),
       returnExtraPrice: String(settings.extras.returnExtraPrice),
       waitingPricePer5Minutes: String(settings.extras.waitingPricePer5Minutes),
+      viaPrice: String(settings.extras.viaPrice),
     },
     general: {
       ...settings.general,
@@ -43,6 +44,7 @@ export function formValuesToSettings(values: SettingsFormValues): Settings {
       wheelchairPrice: Number(values.extras.wheelchairPrice),
       returnExtraPrice: Number(values.extras.returnExtraPrice),
       waitingPricePer5Minutes: Number(values.extras.waitingPricePer5Minutes),
+      viaPrice: Number(values.extras.viaPrice),
     },
     general: {
       ...values.general,

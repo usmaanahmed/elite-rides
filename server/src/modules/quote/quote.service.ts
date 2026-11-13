@@ -323,6 +323,14 @@ async function buildVehicleQuote(params: VehicleQuoteParams): Promise<VehicleQuo
   // Extras poori booking par ek baar lagte hain
   lines.push(...calculateExtraLines(input.extras, settings.extras));
 
+  // Har via stop par admin ki set ki hui price (poori booking par ek baar)
+  if (input.via.length > 0 && settings.extras.viaPrice > 0) {
+    lines.push({
+      label: `Via stop × ${input.via.length}`,
+      amount: roundMoney(input.via.length * settings.extras.viaPrice),
+    });
+  }
+
   // Discounts: pehle global discount, phir coupon (dono pure total par)
   let total = addUpLines(lines);
 

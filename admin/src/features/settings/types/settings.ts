@@ -27,6 +27,7 @@ export type Settings = {
     wheelchairPrice: number
     returnExtraPrice: number
     waitingPricePer5Minutes: number
+    viaPrice: number
   }
   general: {
     guestLogin: boolean
@@ -63,6 +64,7 @@ export type SettingsFormValues = {
     wheelchairPrice: string
     returnExtraPrice: string
     waitingPricePer5Minutes: string
+    viaPrice: string
   }
   general: {
     guestLogin: boolean

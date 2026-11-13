@@ -7,7 +7,8 @@ function toSettingsResponse(record: SettingsRecord): SettingsResponse {
   return {
     office: record.office,
     pricing: record.pricing,
-    extras: record.extras,
+    // viaPrice purane documents me nahi hota, isliye missing ho to 0 maante hain
+    extras: { ...record.extras, viaPrice: record.extras.viaPrice || 0 },
     general: record.general,
     discount: record.discount,
   };

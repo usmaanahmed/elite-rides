@@ -48,6 +48,7 @@ const extrasSchema = z.object({
   wheelchairPrice: priceField,
   returnExtraPrice: priceField,
   waitingPricePer5Minutes: priceField,
+  viaPrice: priceField,
 });
 
 const generalSchema = z

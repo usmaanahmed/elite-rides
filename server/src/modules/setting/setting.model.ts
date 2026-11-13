@@ -27,6 +27,7 @@ const settingSchema = new Schema(
       wheelchairPrice: { type: Number, default: 0 },
       returnExtraPrice: { type: Number, default: 0 },
       waitingPricePer5Minutes: { type: Number, default: 0 },
+      viaPrice: { type: Number, default: 0 },
     },
     general: {
       guestLogin: { type: Boolean, default: true },
