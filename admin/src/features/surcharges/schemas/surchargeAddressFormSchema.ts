@@ -10,7 +10,6 @@ export const surchargeAddressFormSchema = z
       .string()
       .trim()
       .min(1, 'Enter the address')
-      .min(5, 'Address must be at least 5 characters')
       .max(ADDRESS_MAX_LENGTH, `Address must be ${ADDRESS_MAX_LENGTH} characters or fewer`),
     fromTime: z.string().min(1, 'Choose a start time'),
     toTime: z.string().min(1, 'Choose an end time'),
