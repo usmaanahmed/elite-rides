@@ -2,7 +2,6 @@ import { BriefcaseBusiness, CarFront, Luggage, PoundSterling, SquarePen, Trash2,
 import { IconButton } from '../../../shared/components/buttons/IconButton'
 import { DataTable, type DataTableColumn } from '../../../shared/components/tables/DataTable'
 import type { Vehicle } from '../types/vehicle'
-import { getRateText } from '../utils/getRateText'
 
 // A vehicle plus its position in the list, shown in the "#" column
 type VehicleRow = Vehicle & { srNo: number }
@@ -60,11 +59,6 @@ export function VehiclesTable({ vehicles, onEdit, onEditRates, onDelete }: Vehic
       header: 'Hand bags',
       getValue: (row) => row.handLuggageCapacity,
       render: (row) => <CapacityCell icon={BriefcaseBusiness} value={row.handLuggageCapacity} />,
-    },
-    {
-      key: 'rates',
-      header: 'Distance rate',
-      render: (row) => <RateCell vehicle={row} />,
     },
     {
       key: 'action',
@@ -131,24 +125,6 @@ function CapacityCell({ icon: Icon, value }: CapacityCellProps) {
         <Icon className="size-3.5" strokeWidth={2} />
       </span>
       <span className="font-semibold tabular-nums text-ink">{value}</span>
-    </span>
-  )
-}
-
-type RateCellProps = {
-  vehicle: Vehicle
-}
-
-// e.g. "From £1.80/mile · 3 bands", or an orange "Not set yet" pill when there are no rates
-function RateCell({ vehicle }: RateCellProps) {
-  const rateText = getRateText(vehicle)
-
-  if (rateText) {
-    return <span className="whitespace-nowrap text-ink">{rateText}</span>
-  }
-  return (
-    <span className="inline-flex whitespace-nowrap rounded-full bg-accent-soft px-2.5 py-1 text-xs font-semibold text-accent-ink">
-      Not set yet
     </span>
   )
 }

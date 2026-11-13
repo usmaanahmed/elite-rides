@@ -8,6 +8,7 @@ import { ImportResultModal } from '../../../shared/components/modals/ImportResul
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { downloadCsv } from '../../../shared/utils/downloadCsv'
 import { parseCsvFile } from '../../../shared/utils/parseCsvFile'
+import { useVehicles } from '../../vehicles/hooks/useVehicles'
 import { AddFixedPriceModal } from '../components/AddFixedPriceModal'
 import { EditFixedPriceModal } from '../components/EditFixedPriceModal'
 import { FixedPricesTable } from '../components/FixedPricesTable'
@@ -22,6 +23,8 @@ export function FixedPricePage() {
   const deleteMutation = useDeleteFixedPrice()
   const deleteAllMutation = useDeleteAllFixedPrices()
   const importMutation = useImportFixedPrices()
+  // Vehicles are needed to build the template's fare columns
+  const vehiclesQuery = useVehicles()
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   // The row open in the Edit modal (null = the modal is closed)
@@ -113,10 +116,19 @@ export function FixedPricePage() {
     downloadCsv('fixed-prices.csv', CSV_HEADER, rows)
   }
 
-  // Downloads an empty CSV with the right columns and one example row, so admins know the format to follow
+  // Downloads a CSV template with the same columns the import reads:
+  // pickup, drop_code, and one "<vehicle>_fare" column for every vehicle, plus one example row
   function downloadTemplate() {
-    const exampleVehicleName = fixedPricesQuery.data?.[0]?.vehicleName ?? 'Saloon'
-    downloadCsv('fixed-price-template.csv', CSV_HEADER, [['LU1 3QF', 'heathrow', 45, exampleVehicleName]])
+    const vehicles = vehiclesQuery.data ?? []
+
+    const header = ['pickup', 'drop_code']
+    const exampleRow: (string | number)[] = ['LU1 3QF', 'heathrow']
+    for (const vehicle of vehicles) {
+      header.push(`${vehicle.name}_fare`)
+      exampleRow.push(45)
+    }
+
+    downloadCsv('fixed-price-template.csv', header, [exampleRow])
   }
 
   function openImportFilePicker() {

@@ -4,7 +4,6 @@ import {
   Luggage,
   PoundSterling,
   Repeat2,
-  Route,
   SquarePen,
   Trash2,
   Users,
@@ -16,7 +15,6 @@ import { IconButton } from '../../../shared/components/buttons/IconButton'
 import type { FleetCapacity } from '../types/fleetCapacity'
 import type { Vehicle } from '../types/vehicle'
 import { formatDiscount } from '../utils/formatDiscount'
-import { getRateText } from '../utils/getRateText'
 import { CapacityMeter } from './CapacityMeter'
 import { VehiclePhoto } from './VehiclePhoto'
 
@@ -34,7 +32,6 @@ type VehicleCardProps = {
 // One vehicle shown as a card: photo, name, how many people and bags it carries,
 // how it's priced, and buttons to edit it
 export function VehicleCard({ vehicle, fleetCapacity, onEdit, onEditRates, onDelete }: VehicleCardProps) {
-  const rateText = getRateText(vehicle)
   const hasButtons = onEdit || onEditRates || onDelete
 
   return (
@@ -76,13 +73,6 @@ export function VehicleCard({ vehicle, fleetCapacity, onEdit, onEditRates, onDel
 
         {/* A small "spec sheet" of how the vehicle is priced */}
         <dl className="mt-4 space-y-2.5 text-sm">
-          <SpecRow icon={Route} label="Distance rate">
-            {rateText ? (
-              <span className="font-medium text-ink">{rateText}</span>
-            ) : (
-              <span className="font-semibold text-accent-ink">Not set yet</span>
-            )}
-          </SpecRow>
           <SpecRow icon={BadgePercent} label="One-way discount">
             <DiscountText discountRate={vehicle.discountRate} />
           </SpecRow>
