@@ -34,6 +34,9 @@ const emptyFormValues: SurchargeAddressFormValues = {
 
 // One modal for both adding a new surcharge address and editing an existing one
 export function SurchargeAddressModal({ isOpen, onClose, addressToEdit, onSaved }: SurchargeAddressModalProps) {
+  // React Compiler can cache React Hook Form's changing formState (errors, isDirty) and show stale errors, so skip it here
+  'use no memo'
+
   const {
     register,
     handleSubmit,
