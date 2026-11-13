@@ -1,13 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { Button } from '../../../shared/components/buttons/Button'
 import { Card } from '../../../shared/components/cards/Card'
 import { FormField } from '../../../shared/components/forms/FormField'
 import { SelectInput, type SelectOption } from '../../../shared/components/inputs/SelectInput'
 import { TextArea } from '../../../shared/components/inputs/TextArea'
 import { TextInput } from '../../../shared/components/inputs/TextInput'
+import { getTodayDateString } from '../../../shared/utils/getTodayDateString'
 import { priceCheckerFormSchema } from '../schemas/priceCheckerFormSchema'
 import type { PriceCheckerFormValues, QuoteRequest } from '../types/quote'
+import { AddressAutocompleteInput } from './AddressAutocompleteInput'
 
 type PriceCheckerFormProps = {
   isLoading: boolean
@@ -57,6 +59,7 @@ function splitViaStops(viaText: string): string[] {
 export function PriceCheckerForm({ isLoading, onSubmitQuote }: PriceCheckerFormProps) {
   const {
     register,
+    control,
     handleSubmit,
     watch,
     formState: { errors },
@@ -67,6 +70,8 @@ export function PriceCheckerForm({ isLoading, onSubmitQuote }: PriceCheckerFormP
   })
 
   const tripType = watch('tripType')
+  const pickupDateValue = watch('pickupDate')
+  const todayDate = getTodayDateString()
 
   function submitForm(values: PriceCheckerFormValues) {
     const isHourly = values.tripType === 'hourly'
@@ -111,12 +116,19 @@ export function PriceCheckerForm({ isLoading, onSubmitQuote }: PriceCheckerFormP
         </div>
 
         <FormField label="Pickup address" htmlFor="pickup" error={errors.pickup?.message}>
-          <TextInput
-            id="pickup"
-            placeholder="e.g. Heathrow Airport, Longford TW6 1EW"
-            autoComplete="off"
-            {...register('pickup')}
-            hasError={!!errors.pickup}
+          <Controller
+            name="pickup"
+            control={control}
+            render={({ field }) => (
+              <AddressAutocompleteInput
+                id="pickup"
+                value={field.value}
+                placeholder="e.g. Heathrow Airport, Longford TW6 1EW"
+                hasError={!!errors.pickup}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+              />
+            )}
           />
         </FormField>
 
@@ -126,12 +138,19 @@ export function PriceCheckerForm({ isLoading, onSubmitQuote }: PriceCheckerFormP
 
         {tripType !== 'hourly' && (
           <FormField label="Dropoff address" htmlFor="dropoff" error={errors.dropoff?.message}>
-            <TextInput
-              id="dropoff"
-              placeholder="e.g. 10 Downing Street, London SW1A 2AA"
-              autoComplete="off"
-              {...register('dropoff')}
-              hasError={!!errors.dropoff}
+            <Controller
+              name="dropoff"
+              control={control}
+              render={({ field }) => (
+                <AddressAutocompleteInput
+                  id="dropoff"
+                  value={field.value}
+                  placeholder="e.g. 10 Downing Street, London SW1A 2AA"
+                  hasError={!!errors.dropoff}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                />
+              )}
             />
           </FormField>
         )}
@@ -149,7 +168,13 @@ export function PriceCheckerForm({ isLoading, onSubmitQuote }: PriceCheckerFormP
 
         <div className="grid gap-4 sm:grid-cols-2">
           <FormField label="Pickup date" htmlFor="pickupDate" error={errors.pickupDate?.message}>
-            <TextInput id="pickupDate" type="date" {...register('pickupDate')} hasError={!!errors.pickupDate} />
+            <TextInput
+              id="pickupDate"
+              type="date"
+              min={todayDate}
+              {...register('pickupDate')}
+              hasError={!!errors.pickupDate}
+            />
           </FormField>
           <FormField label="Pickup time" htmlFor="pickupTime" error={errors.pickupTime?.message}>
             <TextInput id="pickupTime" type="time" {...register('pickupTime')} hasError={!!errors.pickupTime} />
@@ -159,7 +184,13 @@ export function PriceCheckerForm({ isLoading, onSubmitQuote }: PriceCheckerFormP
         {tripType === 'return' && (
           <div className="grid gap-4 sm:grid-cols-2">
             <FormField label="Return date" htmlFor="returnDate" error={errors.returnDate?.message}>
-              <TextInput id="returnDate" type="date" {...register('returnDate')} hasError={!!errors.returnDate} />
+              <TextInput
+                id="returnDate"
+                type="date"
+                min={pickupDateValue || todayDate}
+                {...register('returnDate')}
+                hasError={!!errors.returnDate}
+              />
             </FormField>
             <FormField label="Return time" htmlFor="returnTime" error={errors.returnTime?.message}>
               <TextInput id="returnTime" type="time" {...register('returnTime')} hasError={!!errors.returnTime} />
