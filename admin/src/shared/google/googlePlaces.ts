@@ -1,5 +1,5 @@
 // Google address suggestions ("Places API (New)"), loaded with a plain <script> tag (no npm package).
-// If the key is missing or Google fails, the suggestions are simply empty: the admin can still type.
+// If the key is missing or Google fails, a reason is returned and the admin can still type.
 
 const API_KEY: string = (import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '').trim()
 const CALLBACK_NAME = 'eliteRidesGoogleMapsReady'
@@ -74,12 +74,18 @@ function loadGoogleMaps(): Promise<boolean> {
 }
 
 // Google's suggested UK addresses for what the admin has typed, e.g. "heath" -> "Heathrow Airport, …"
-export async function fetchPlaceSuggestions(text: string): Promise<string[]> {
+export type PlaceSuggestionsResult = {
+  addresses: string[]
+  // Empty when everything worked, otherwise a short reason to show the admin
+  problem: string
+}
+
+export async function fetchPlaceSuggestions(text: string): Promise<PlaceSuggestionsResult> {
   try {
     const isReady = await loadGoogleMaps()
     const google = getGoogle()
     if (!isReady || !google) {
-      return []
+      return { addresses: [], problem: 'Google Maps could not be loaded. Check the API key and its allowed websites.' }
     }
 
     const places = (await google.maps.importLibrary('places')) as PlacesLibrary
@@ -99,10 +105,10 @@ export async function fetchPlaceSuggestions(text: string): Promise<string[]> {
         addresses.push(suggestion.placePrediction.text.toString())
       }
     }
-    return addresses
+    return { addresses: addresses, problem: '' }
   } catch (error) {
     console.warn('Google address suggestions are not available:', error)
-    return []
+    return { addresses: [], problem: 'Google suggestions failed. Enable "Places API (New)" for this key.' }
   }
 }
 

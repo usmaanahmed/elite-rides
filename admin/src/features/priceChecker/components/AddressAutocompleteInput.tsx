@@ -49,6 +49,7 @@ export function AddressAutocompleteInput({
   const [googleAddresses, setGoogleAddresses] = useState<string[]>([])
   // The text the Google list was fetched for, so an old slow answer is never shown
   const [googleText, setGoogleText] = useState('')
+  const [googleProblem, setGoogleProblem] = useState('')
 
   const trimmedValue = value.trim()
 
@@ -59,8 +60,9 @@ export function AddressAutocompleteInput({
     }
 
     const timer = setTimeout(async () => {
-      const addresses = await fetchPlaceSuggestions(trimmedValue)
-      setGoogleAddresses(addresses)
+      const result = await fetchPlaceSuggestions(trimmedValue)
+      setGoogleAddresses(result.addresses)
+      setGoogleProblem(result.problem)
       setGoogleText(trimmedValue)
     }, TYPING_DELAY_MS)
 
@@ -72,9 +74,22 @@ export function AddressAutocompleteInput({
     savedAddresses = findSavedAddresses(dropdownAddressesQuery.data, trimmedValue)
   }
 
+  const isGoogleSearchOn = trimmedValue.length >= MIN_LETTERS_FOR_GOOGLE
+  const isGoogleLoading = isGoogleSearchOn && googleText !== trimmedValue
+
   let googleToShow: string[] = []
-  if (googleText === trimmedValue && trimmedValue.length >= MIN_LETTERS_FOR_GOOGLE) {
+  if (isGoogleSearchOn && googleText === trimmedValue) {
     googleToShow = googleAddresses
+  }
+
+  // The short text shown in the Google group when there are no addresses to list
+  let googleMessage = ''
+  if (isGoogleLoading) {
+    googleMessage = 'Searching Google…'
+  } else if (googleProblem !== '') {
+    googleMessage = googleProblem
+  } else if (googleToShow.length === 0) {
+    googleMessage = 'No Google locations found'
   }
 
   function selectAddress(address: string) {
@@ -83,7 +98,7 @@ export function AddressAutocompleteInput({
     setIsOpen(false)
   }
 
-  const hasSuggestions = savedAddresses.length > 0 || googleToShow.length > 0
+  const hasSuggestions = savedAddresses.length > 0 || isGoogleSearchOn
 
   return (
     <div className="relative">
@@ -109,7 +124,7 @@ export function AddressAutocompleteInput({
           {savedAddresses.length > 0 && (
             <div>
               <p className="px-4 pb-1 pt-1 text-[11px] font-semibold uppercase tracking-wide text-muted">
-                Airports &amp; stations
+                Saved addresses
               </p>
               {savedAddresses.map((address) => {
                 let Icon = MapPin
@@ -136,8 +151,11 @@ export function AddressAutocompleteInput({
             </div>
           )}
 
-          {googleToShow.length > 0 && (
+          {isGoogleSearchOn && (
             <div className={savedAddresses.length > 0 ? 'mt-1 border-t border-line pt-1' : ''}>
+              <p className="px-4 pb-1 pt-1 text-[11px] font-semibold uppercase tracking-wide text-muted">
+                Google locations
+              </p>
               {googleToShow.map((address) => (
                 <button
                   key={address}
@@ -154,7 +172,10 @@ export function AddressAutocompleteInput({
                   <span>{address}</span>
                 </button>
               ))}
-              <p className="px-4 pt-1 text-right text-[11px] text-muted">Powered by Google</p>
+              {googleMessage !== '' && <p className="px-4 py-2 text-sm text-muted">{googleMessage}</p>}
+              {googleToShow.length > 0 && (
+                <p className="px-4 pt-1 text-right text-[11px] text-muted">Powered by Google</p>
+              )}
             </div>
           )}
         </div>
