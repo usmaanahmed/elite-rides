@@ -8,6 +8,5 @@ export const banAddressFormSchema = z.object({
     .string()
     .trim()
     .min(1, 'Enter the address to ban')
-    .min(5, 'Address must be at least 5 characters')
     .max(ADDRESS_MAX_LENGTH, `Address must be ${ADDRESS_MAX_LENGTH} characters or fewer`),
 })
