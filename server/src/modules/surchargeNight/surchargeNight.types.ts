@@ -11,5 +11,11 @@ export interface SurchargeNightInput {
   status: SurchargeStatus;
 }
 
-export type SurchargeNightRecord = SurchargeNightInput;
-export type SurchargeNightResponse = SurchargeNightInput;
+// Database se aaya record (id ke saath)
+export interface SurchargeNightRecord extends SurchargeNightInput {
+  _id: { toString(): string };
+}
+
+export interface SurchargeNightResponse extends SurchargeNightInput {
+  id: string;
+}

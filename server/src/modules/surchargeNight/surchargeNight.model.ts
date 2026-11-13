@@ -1,4 +1,4 @@
-// Night surcharge ka database structure. Poori company ke liye sirf ek document hota hai
+// Night surcharge ka database structure. Har document ek raat ki window hai
 import { model, Schema } from "mongoose";
 
 const surchargeNightSchema = new Schema(
@@ -7,7 +7,7 @@ const surchargeNightSchema = new Schema(
     endTime: { type: String, default: "06:00" },
     amountType: { type: String, enum: ["fixed", "percent"], default: "fixed" },
     amount: { type: Number, default: 0 },
-    status: { type: String, enum: ["active", "inactive"], default: "inactive" },
+    status: { type: String, enum: ["active", "inactive"], default: "active" },
   },
   { timestamps: true }
 );

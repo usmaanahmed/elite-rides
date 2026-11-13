@@ -2,16 +2,22 @@
 import { SurchargeNight } from "./surchargeNight.model.js";
 import { SurchargeNightInput } from "./surchargeNight.types.js";
 
-// Ek hi document hai, isliye koi filter nahi
-export function findSurchargeNight() {
-  return SurchargeNight.findOne().lean();
+export function findAllSurchargeNights() {
+  return SurchargeNight.find().sort({ createdAt: 1 }).lean();
 }
 
-// Khaali create karne par model ki default values khud lag jati hain
-export function createDefaultSurchargeNight() {
-  return SurchargeNight.create({});
+export function findActiveSurchargeNights() {
+  return SurchargeNight.find({ status: "active" }).lean();
 }
 
-export function updateSurchargeNight(input: SurchargeNightInput) {
-  return SurchargeNight.findOneAndUpdate({}, { $set: input }, { returnDocument: "after", upsert: true, setDefaultsOnInsert: true }).lean();
+export function createSurchargeNight(data: SurchargeNightInput) {
+  return SurchargeNight.create(data);
+}
+
+export function updateSurchargeNightById(id: string, data: SurchargeNightInput) {
+  return SurchargeNight.findByIdAndUpdate(id, data, { returnDocument: "after" }).lean();
+}
+
+export function deleteSurchargeNightById(id: string) {
+  return SurchargeNight.findByIdAndDelete(id).lean();
 }

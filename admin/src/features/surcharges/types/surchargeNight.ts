@@ -10,8 +10,8 @@ export type SurchargeNightFormValues = {
   status: SurchargeStatus
 }
 
-// The night surcharge as sent to and received from the server (there is only one)
-export type SurchargeNight = {
+// A night surcharge ready to be sent to the server
+export type NewSurchargeNight = {
   // The window can run past midnight, e.g. 22:00 to 06:00
   startTime: string
   endTime: string
@@ -19,4 +19,9 @@ export type SurchargeNight = {
   // Pounds when amountType is "fixed", a percentage when it is "percent"
   amount: number
   status: SurchargeStatus
+}
+
+// A night surcharge as saved on the server
+export type SurchargeNight = NewSurchargeNight & {
+  id: string
 }
