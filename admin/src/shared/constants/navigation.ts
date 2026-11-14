@@ -14,6 +14,7 @@ import {
   MapPinPlus,
   Moon,
   Newspaper,
+  PartyPopper,
   Plane,
   Settings,
   Tags,
@@ -64,7 +65,10 @@ export const mainNavigation: NavSection[] = [
   },
   {
     title: 'Content',
-    items: [{ path: ROUTES.blogs, label: 'Blogs', icon: Newspaper }],
+    items: [
+      { path: ROUTES.blogs, label: 'Blogs', icon: Newspaper },
+      { path: ROUTES.events, label: 'Events', icon: PartyPopper },
+    ],
   },
 ]
 
@@ -102,6 +106,7 @@ export const quickActions: QuickAction[] = [
   { path: ROUTES.surchargeNight, label: 'Night surcharge', hint: 'Surcharges', icon: Moon },
   { path: ROUTES.coupons, label: 'Coupon', hint: 'Coupons', icon: Ticket },
   { path: ROUTES.newBlog, label: 'Blog post', hint: 'Content', icon: Newspaper },
+  { path: ROUTES.events, label: 'Event', hint: 'Content', icon: PartyPopper },
 ]
 
 // Looks up the label of the page at a URL, e.g. '/bookings' -> 'Bookings'

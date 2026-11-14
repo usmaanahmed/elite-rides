@@ -1,4 +1,4 @@
-// Multer ki setting: car, airport, station aur blog images ko disk par save karta hai
+// Multer ki setting: car, airport, station, event aur blog images ko disk par save karta hai
 import fs from "fs";
 import multer from "multer";
 import path from "path";
@@ -10,6 +10,8 @@ export const MAX_IMAGE_SIZE_MB = 2;
 export const MAX_AIRPORT_IMAGES = 5;
 // Ek station ki zyada se zyada itni images
 export const MAX_STATION_IMAGES = 5;
+// Ek event ki zyada se zyada itni images
+export const MAX_EVENT_IMAGES = 5;
 const allowedImageTypes = ["image/jpeg", "image/png", "image/webp"];
 
 // Vehicle images is folder me jaengi: uploads/vehicles
@@ -23,6 +25,10 @@ fs.mkdirSync(airportImagesFolder, { recursive: true });
 // Station images is folder me jaengi: uploads/stations
 export const stationImagesFolder = path.join(env.uploadsFolder, "stations");
 fs.mkdirSync(stationImagesFolder, { recursive: true });
+
+// Event images is folder me jaengi: uploads/events
+export const eventImagesFolder = path.join(env.uploadsFolder, "events");
+fs.mkdirSync(eventImagesFolder, { recursive: true });
 
 // Blog ki cover image aur blog ke andar lagi images is folder me jaengi: uploads/blogs
 export const blogImagesFolder = path.join(env.uploadsFolder, "blogs");
@@ -70,6 +76,12 @@ export const uploadStationImages = multer({
   storage: createStorage(stationImagesFolder),
   fileFilter: checkImageType,
   limits: { fileSize: MAX_IMAGE_SIZE_MB * 1024 * 1024, files: MAX_STATION_IMAGES },
+});
+
+export const uploadEventImages = multer({
+  storage: createStorage(eventImagesFolder),
+  fileFilter: checkImageType,
+  limits: { fileSize: MAX_IMAGE_SIZE_MB * 1024 * 1024, files: MAX_EVENT_IMAGES },
 });
 
 // Blog ke liye ek waqt me ek image (cover image, ya editor me lagane wali image)
