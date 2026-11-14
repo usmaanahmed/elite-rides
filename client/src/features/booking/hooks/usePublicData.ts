@@ -1,9 +1,21 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { createBooking, getDropdownAddresses, getPublicSettings, getPublicVehicles, getQuote } from '../api/publicBookingApi'
+import {
+  createBooking,
+  getBookingByReference,
+  getDropdownAddresses,
+  getPublicSettings,
+  getPublicVehicles,
+  getQuote,
+  startCardPayment,
+} from '../api/publicBookingApi'
 import type { QuoteRequest } from '../types/publicApi'
 
 // These change rarely, so React Query keeps them for 5 minutes before asking again
 const FIVE_MINUTES = 5 * 60 * 1000
+
+// After paying on Stripe, ask every 2 seconds whether the payment has reached us (at most 15 times = 30 seconds)
+const PAYMENT_CHECK_EVERY_MS = 2000
+const MAX_PAYMENT_CHECKS = 15
 
 // Booking settings from the admin panel
 export function usePublicSettings() {
@@ -57,5 +69,35 @@ export function useCouponCheck() {
 export function useCreateBooking() {
   return useMutation({
     mutationFn: createBooking,
+  })
+}
+
+// The booking for the thank-you page ("" = no reference in the link, so nothing is loaded).
+// When `isWaitingForPayment` is true (the customer just came back from Stripe), it keeps asking
+// until the server says the card payment has arrived, because Stripe tells our server a moment later.
+export function useBookingByReference(reference: string, isWaitingForPayment: boolean) {
+  return useQuery({
+    queryKey: ['public-booking', reference],
+    queryFn: () => getBookingByReference(reference),
+    enabled: reference !== '',
+    retry: false,
+    refetchInterval: (query) => {
+      const booking = query.state.data
+      if (!isWaitingForPayment || !booking) {
+        return false
+      }
+      // Paid (nothing left to pay), or we've waited long enough
+      if (!booking.canPayByCard || query.state.dataUpdateCount >= MAX_PAYMENT_CHECKS) {
+        return false
+      }
+      return PAYMENT_CHECK_EVERY_MS
+    },
+  })
+}
+
+// "Pay now" on the thank-you page: gets a new Stripe payment page
+export function useStartCardPayment() {
+  return useMutation({
+    mutationFn: startCardPayment,
   })
 }

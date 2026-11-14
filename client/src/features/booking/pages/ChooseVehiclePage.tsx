@@ -1,14 +1,18 @@
 import { useNavigate } from 'react-router'
 import { ROUTES } from '../../../shared/constants/routes'
+import { BookingAssurances } from '../components/BookingAssurances'
 import { BookingPageLayout } from '../components/BookingPageLayout'
 import { JourneySummary } from '../components/JourneySummary'
 import { MissingJourneyNotice } from '../components/MissingJourneyNotice'
+import { VehicleCardSkeleton } from '../components/VehicleCardSkeleton'
 import { VehicleOptionCard } from '../components/VehicleOptionCard'
 import { useJourneyQuote, usePublicSettings, usePublicVehicles } from '../hooks/usePublicData'
 import type { PublicVehicle, QuoteRequest, VehicleQuote } from '../types/publicApi'
 import { loadBookingDraft, saveChosenVehicle } from '../utils/bookingDraftStorage'
 import { buildQuoteRequest, NO_EXTRAS } from '../utils/buildQuoteRequest'
 import { getPretendPrice } from '../utils/getPretendPrice'
+
+const PAGE_SUBTITLE = 'Fixed fares for your journey, with no surprises. Pick the vehicle that suits you best.'
 
 // Step 2: the price of every vehicle for the customer's journey
 export function ChooseVehiclePage() {
@@ -63,9 +67,9 @@ export function ChooseVehiclePage() {
     if (quoteQuery.isPending) {
       return (
         <div className="space-y-4">
-          <div className="h-36 animate-pulse rounded-3xl bg-white/10" />
-          <div className="h-36 animate-pulse rounded-3xl bg-white/10" />
-          <div className="h-36 animate-pulse rounded-3xl bg-white/10" />
+          <VehicleCardSkeleton />
+          <VehicleCardSkeleton />
+          <VehicleCardSkeleton />
         </div>
       )
     }
@@ -106,8 +110,14 @@ export function ChooseVehiclePage() {
       )
     }
 
+    let countLabel = `${availableQuotes.length} vehicles available`
+    if (availableQuotes.length === 1) {
+      countLabel = '1 vehicle available'
+    }
+
     return (
       <div className="space-y-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/50">{countLabel}</p>
         {sortedQuotes.map((vehicleQuote) => {
           let pretendPrice: number | null = null
           if (settingsQuery.data) {
@@ -130,11 +140,14 @@ export function ChooseVehiclePage() {
   }
 
   return (
-    <BookingPageLayout title="Choose your vehicle" currentStep={2}>
-      <div className="grid gap-6 lg:grid-cols-[1fr_340px] lg:items-start">
+    <BookingPageLayout title="Choose your vehicle" subtitle={PAGE_SUBTITLE} currentStep={2}>
+      <div className="grid gap-6 lg:grid-cols-[1fr_360px] lg:items-start lg:gap-8">
         <div className="order-2 lg:order-1">{renderVehicles()}</div>
-        <div className="order-1 lg:sticky lg:top-6 lg:order-2">
+        <div className="order-1 space-y-4 lg:sticky lg:top-6 lg:order-2">
           <JourneySummary journey={journey} distanceMiles={quoteQuery.data?.distanceMiles} />
+          <div className="hidden lg:block">
+            <BookingAssurances />
+          </div>
         </div>
       </div>
     </BookingPageLayout>

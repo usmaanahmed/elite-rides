@@ -80,6 +80,8 @@
   --color-chart-grid: var(--chart-grid);
 
   --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  /* Serif font for big luxury headlines, e.g. on the login screen. Used as `font-display` */
+  --font-display: 'Cormorant Garamond', ui-serif, Georgia, serif;
 }
 
 /* Fade-and-rise animation for pages, used as `animate-page-in` */
@@ -96,6 +98,26 @@
       transform: translateY(0);
     }
   }
+
+  /* Slow zoom-out for the login photo, used as `animate-hero-zoom` */
+  --animate-hero-zoom: hero-zoom 1.8s cubic-bezier(0.22, 1, 0.36, 1);
+
+  @keyframes hero-zoom {
+    from {
+      transform: scale(1.08);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+}
+
+/* Stop Chrome from painting its blue/yellow autofill box inside the login inputs,
+   so a saved email/password still looks like the rest of the form */
+.login-input:-webkit-autofill {
+  -webkit-text-fill-color: var(--ink);
+  caret-color: var(--ink);
+  transition: background-color 100000s ease-in-out 0s;
 }
 
 html {
@@ -117,4 +139,289 @@ body {
 .scrollbar-thin {
   scrollbar-width: thin;
   scrollbar-color: var(--line) transparent;
+}
+
+/* ---------- Blog editor content ----------
+   The rich text editor (TipTap) writes plain HTML tags like <h2>, <ul> and <table>.
+   Tailwind removes the browser's default look from these tags, so they are styled here. */
+.blog-content {
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.75;
+  overflow-wrap: break-word;
+}
+
+.blog-content > :first-child {
+  margin-top: 0;
+}
+
+.blog-content p {
+  margin: 0.75em 0;
+}
+
+.blog-content h1,
+.blog-content h2,
+.blog-content h3,
+.blog-content h4 {
+  margin: 1.4em 0 0.5em;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.blog-content h1 {
+  font-size: 2em;
+}
+
+.blog-content h2 {
+  font-size: 1.6em;
+}
+
+.blog-content h3 {
+  font-size: 1.3em;
+}
+
+.blog-content h4 {
+  font-size: 1.1em;
+}
+
+.blog-content a {
+  color: var(--accent-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.blog-content ul,
+.blog-content ol {
+  margin: 0.75em 0;
+  padding-left: 1.6em;
+}
+
+.blog-content ul {
+  list-style: disc;
+}
+
+.blog-content ol {
+  list-style: decimal;
+}
+
+.blog-content li > p {
+  margin: 0.25em 0;
+}
+
+/* Checklist: a checkbox on the left of each line */
+.blog-content ul[data-type='taskList'] {
+  list-style: none;
+  padding-left: 0.25em;
+}
+
+.blog-content ul[data-type='taskList'] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6em;
+}
+
+.blog-content ul[data-type='taskList'] li > label {
+  margin-top: 0.35em;
+  user-select: none;
+}
+
+.blog-content ul[data-type='taskList'] li > label input {
+  width: 1em;
+  height: 1em;
+  cursor: pointer;
+  accent-color: var(--accent);
+}
+
+.blog-content ul[data-type='taskList'] li > div {
+  flex: 1;
+}
+
+.blog-content ul[data-type='taskList'] li[data-checked='true'] > div {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.blog-content blockquote {
+  margin: 1.2em 0;
+  border-left: 3px solid var(--accent);
+  padding: 0.2em 0 0.2em 1em;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.blog-content code {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface-muted);
+  padding: 0.1em 0.35em;
+  font-family: ui-monospace, 'Courier New', monospace;
+  font-size: 0.88em;
+}
+
+.blog-content pre {
+  margin: 1.2em 0;
+  border-radius: 12px;
+  background: #0d1017;
+  padding: 1em 1.2em;
+  overflow-x: auto;
+  color: #f2f3f5;
+  line-height: 1.6;
+}
+
+.blog-content pre code {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: 0.9em;
+}
+
+.blog-content hr {
+  margin: 2em 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
+.blog-content mark {
+  border-radius: 0.2em;
+  padding: 0 0.1em;
+}
+
+/* Highlight colours are light, so keep the text dark on them even in dark mode */
+.dark .blog-content mark {
+  color: #0d1017 !important;
+}
+
+/* Images */
+.blog-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.blog-content [data-resize-container] {
+  margin: 1em 0;
+}
+
+/* A selected image gets an orange outline */
+.blog-content .ProseMirror-selectednode img,
+.blog-content img.ProseMirror-selectednode {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* The small squares on an image's corners that resize it */
+.blog-content [data-resize-handle] {
+  z-index: 1;
+  width: 12px;
+  height: 12px;
+  margin: -6px;
+  border: 2px solid #ffffff;
+  border-radius: 3px;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.blog-content [data-resize-container]:hover [data-resize-handle],
+.blog-content .ProseMirror-selectednode [data-resize-handle],
+.blog-content [data-resize-state='true'] [data-resize-handle] {
+  opacity: 1;
+}
+
+.blog-content [data-resize-handle='top-left'],
+.blog-content [data-resize-handle='bottom-right'] {
+  cursor: nwse-resize;
+}
+
+.blog-content [data-resize-handle='top-right'],
+.blog-content [data-resize-handle='bottom-left'] {
+  cursor: nesw-resize;
+}
+
+/* YouTube videos fill the width and keep a 16:9 shape */
+.blog-content div[data-youtube-video] {
+  margin: 1.2em 0;
+}
+
+.blog-content div[data-youtube-video] iframe {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: 12px;
+}
+
+.blog-content .ProseMirror-selectednode iframe,
+.blog-content div[data-youtube-video].ProseMirror-selectednode iframe {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Tables */
+.blog-content .tableWrapper {
+  margin: 1.2em 0;
+  overflow-x: auto;
+}
+
+.blog-content table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.blog-content th,
+.blog-content td {
+  position: relative;
+  min-width: 1em;
+  border: 1px solid var(--line);
+  padding: 0.5em 0.75em;
+  vertical-align: top;
+}
+
+.blog-content th {
+  background: var(--surface-muted);
+  font-weight: 600;
+  text-align: left;
+}
+
+.blog-content th > p,
+.blog-content td > p {
+  margin: 0;
+}
+
+/* Cells picked by dragging across the table */
+.blog-content .selectedCell::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(252, 98, 3, 0.12);
+  pointer-events: none;
+}
+
+/* The line you drag to change a column's width */
+.blog-content .column-resize-handle {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  bottom: -2px;
+  width: 4px;
+  background: var(--accent);
+  pointer-events: none;
+}
+
+.blog-content.resize-cursor {
+  cursor: col-resize;
+}
+
+/* Grey hint text while the editor is empty */
+.blog-content p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--muted);
+  opacity: 0.7;
+  pointer-events: none;
 }

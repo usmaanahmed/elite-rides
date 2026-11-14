@@ -9,6 +9,7 @@ export function settingsToFormValues(settings: Settings): SettingsFormValues {
       roundOff: settings.pricing.roundOff,
       setPrice: settings.pricing.setPrice,
       showCard: settings.pricing.showCard,
+      showCash: settings.pricing.showCash,
       singleRates: {
         fixedPrice: String(settings.pricing.singleRates.fixedPrice),
         mileageBands: settings.pricing.singleRates.mileageBands.map((band) => ({
@@ -58,6 +59,7 @@ export function formValuesToSettings(values: SettingsFormValues): Settings {
       roundOff: values.pricing.roundOff,
       setPrice: values.pricing.setPrice,
       showCard: values.pricing.showCard,
+      showCash: values.pricing.showCash,
       singleRates: {
         fixedPrice: Number(values.pricing.singleRates.fixedPrice),
         mileageBands: values.pricing.singleRates.mileageBands.map((band) => ({

@@ -59,7 +59,12 @@ const bookingSchema = new Schema(
     paymentMethod: { type: String, enum: ["pay_card", "pay_cash"], required: true },
     paymentStatus: { type: String, enum: ["pending", "partially_paid", "paid"], default: "pending" },
     amountPaid: { type: Number, default: 0 },
+    // Stripe checkout ids (cs_...) jin ki payment is booking par lag chuki hai. Same payment dobara na gina jaye
+    cardPaymentIds: { type: [String], default: [] },
     notes: { type: String, default: "" },
+    // Lamba random code. Customer ka thank-you link isi se booking dhoondta hai (booking number se nahi,
+    // taake koi doosron ki bookings na dekh sake). Purani bookings me "" hota hai
+    accessToken: { type: String, default: "", index: true },
   },
   { timestamps: true }
 );

@@ -9,6 +9,8 @@ function toSettingsResponse(record: SettingsRecord): SettingsResponse {
     // singleRates purane documents me nahi hota, isliye missing ho to khaali rates maante hain
     pricing: {
       ...record.pricing,
+      // showCash purane documents me nahi hota, isliye missing ho to "on" maante hain
+      showCash: record.pricing.showCash !== false,
       singleRates: {
         fixedPrice: record.pricing.singleRates?.fixedPrice || 0,
         mileageBands: record.pricing.singleRates?.mileageBands || [],

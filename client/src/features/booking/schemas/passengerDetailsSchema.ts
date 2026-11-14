@@ -13,7 +13,7 @@ export const passengerDetailsSchema = z.object({
   flightNo: z.string().trim().max(30, 'Flight number is too long'),
   arrivalFrom: z.string().trim().max(100, 'Too long'),
   notes: z.string().trim().max(1000, 'Notes must be 1000 characters or fewer'),
-  paymentMethod: z.enum(['pay_card'], 'Choose how you want to pay'),
+  paymentMethod: z.enum(['pay_card', 'pay_cash'], 'Choose how you want to pay'),
 })
 
 export type PassengerDetailsValues = z.infer<typeof passengerDetailsSchema>

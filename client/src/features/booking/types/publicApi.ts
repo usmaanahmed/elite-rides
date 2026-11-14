@@ -11,7 +11,10 @@ export type PublicSettings = {
   guestLogin: boolean
   // true = a booking is only a quote request until the office approves it
   isQuotation: boolean
+  // true = "Pay by card" (Stripe) can be offered
   cardPaymentAvailable: boolean
+  // true = "Pay in car" (pay the driver) can be offered
+  cashPaymentAvailable: boolean
   extraPrices: {
     babySeatPrice: number
     boosterSeatPrice: number
@@ -103,6 +106,8 @@ export type NewBookingRequest = {
 
 // The booking summary the server sends back after booking
 export type ConfirmedBooking = {
+  // Secret code for the thank-you page link (?ref=...). Not the booking number.
+  reference: string
   bookingNumber: string
   status: 'quote_requested' | 'pending' | 'confirmed' | 'completed' | 'cancelled'
   customerName: string
@@ -128,4 +133,18 @@ export type ConfirmedBooking = {
   amountPaid: number
   balanceDue: number
   currency: string
+  // true = the customer still has to pay by card, so a "Pay now" button is shown
+  canPayByCard: boolean
+}
+
+// What POST /api/public/bookings sends back
+export type CreateBookingResult = {
+  booking: ConfirmedBooking
+  // Stripe's payment page. "" = no card payment needed now (pay in car, quote request, or Stripe failed)
+  checkoutUrl: string
+}
+
+// What the "Pay now" request sends back
+export type CardCheckout = {
+  checkoutUrl: string
 }

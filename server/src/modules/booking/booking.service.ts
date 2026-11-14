@@ -1,4 +1,5 @@
 // Booking ki business logic
+import { randomBytes } from "crypto";
 import { isValidObjectId } from "mongoose";
 import { AppError } from "../../utils/AppError.js";
 import { roundMoney } from "../../utils/roundMoney.js";
@@ -8,6 +9,7 @@ import { getSettings } from "../setting/setting.service.js";
 import {
   countBookings,
   createBooking as saveBooking,
+  findBookingByAccessToken,
   findBookingById,
   findBookings,
   getNextBookingSequence,
@@ -69,9 +71,17 @@ function toBookingResponse(record: BookingRecord): BookingResponse {
     paymentStatus: record.paymentStatus,
     amountPaid: record.amountPaid,
     balanceDue: roundMoney(record.total - record.amountPaid),
+    // Purani bookings me yeh do fields nahi hote
+    cardPaymentIds: record.cardPaymentIds || [],
     notes: record.notes,
+    accessToken: record.accessToken || "",
     createdAt: record.createdAt.toISOString(),
   };
+}
+
+// 48 characters ka random code (hex), jo guess nahi ho sakta
+function createAccessToken(): string {
+  return randomBytes(24).toString("hex");
 }
 
 // id sahi hai aur booking mojood hai to wapas karta hai, warna 404
@@ -161,7 +171,9 @@ export async function createBooking(input: CreateBookingInput): Promise<BookingR
     paymentMethod: input.paymentMethod,
     paymentStatus: "pending",
     amountPaid: 0,
+    cardPaymentIds: [],
     notes: input.notes,
+    accessToken: createAccessToken(),
   };
 
   const created = await saveBooking(newBooking);
@@ -227,6 +239,19 @@ export async function getBookingList(query: BookingListQuery): Promise<BookingLi
 export async function getBookingDetails(id: string): Promise<BookingResponse> {
   const record = await getBookingRecordOrFail(id);
   return toBookingResponse(record);
+}
+
+// Customer ke thank-you link wala code se booking. Code galat ho to 404
+export async function getBookingByAccessToken(accessToken: string): Promise<BookingResponse> {
+  // Sirf 48 hex characters wala code hi dhoondte hain ("" ya ajeeb text nahi)
+  if (!/^[a-f0-9]{48}$/.test(accessToken)) {
+    throw new AppError("Booking not found", 404);
+  }
+  const record = await findBookingByAccessToken(accessToken);
+  if (!record) {
+    throw new AppError("Booking not found", 404);
+  }
+  return toBookingResponse(record as unknown as BookingRecord);
 }
 
 // ---------- Status ----------
@@ -307,4 +332,35 @@ export async function updatePayment(id: string, paymentStatus: PaymentStatus, am
 
   const updated = await updateBookingById(id, { paymentStatus: paymentStatus, amountPaid: paidAmount });
   return toBookingResponse(updated as unknown as BookingRecord);
+}
+
+// Stripe ne card payment pakki kar di (sirf webhook se call hota hai, frontend se kabhi nahi).
+// paymentId Stripe checkout ka id (cs_...) hai: Stripe same event do baar bheje to dobara nahi jorte
+export async function recordCardPayment(id: string, amount: number, paymentId: string): Promise<void> {
+  const booking = await getBookingRecordOrFail(id);
+
+  const oldPaymentIds = booking.cardPaymentIds || [];
+  if (oldPaymentIds.includes(paymentId)) {
+    return;
+  }
+
+  const amountPaid = roundMoney(booking.amountPaid + amount);
+  let paymentStatus: PaymentStatus = "partially_paid";
+  if (amountPaid >= booking.total) {
+    paymentStatus = "paid";
+  }
+
+  const fieldsToChange: Record<string, unknown> = {
+    amountPaid: amountPaid,
+    paymentStatus: paymentStatus,
+    cardPaymentIds: [...oldPaymentIds, paymentId],
+  };
+
+  // Payment ka intezar karti booking ab confirmed hai (coupon bhi ab use hua)
+  if (booking.status === "pending") {
+    fieldsToChange.status = "confirmed";
+    fieldsToChange.couponUsageRecorded = await recordCouponUsageOnce(booking);
+  }
+
+  await updateBookingById(id, fieldsToChange);
 }

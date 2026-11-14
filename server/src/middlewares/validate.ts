@@ -20,6 +20,12 @@ export function validate(schema: ZodType) {
     if (req.file) {
       await deleteFile(path.resolve(req.file.path));
     }
+    // Kai images wale routes (e.g. airports) me req.files array hota hai
+    if (Array.isArray(req.files)) {
+      for (const file of req.files) {
+        await deleteFile(path.resolve(file.path));
+      }
+    }
 
     const firstIssue = result.error.issues[0];
     const fieldName = firstIssue.path.join(".");

@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Mail, MapPin, Phone, Plane, User } from 'lucide-react'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useEffect, useState } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router'
 import { ROUTES } from '../../../shared/constants/routes'
 import { BookingPageLayout } from '../components/BookingPageLayout'
@@ -16,8 +16,9 @@ import { TextField } from '../components/TextField'
 import { useCouponCheck, useCreateBooking, useJourneyQuote, usePublicSettings } from '../hooks/usePublicData'
 import { passengerDetailsSchema, type PassengerDetailsValues } from '../schemas/passengerDetailsSchema'
 import type { BookingExtras } from '../types/journey'
-import type { QuoteRequest } from '../types/publicApi'
+import type { CreateBookingResult, QuoteRequest } from '../types/publicApi'
 import { clearBookingDraft, loadBookingDraft } from '../utils/bookingDraftStorage'
+import { buildConfirmationLink } from '../utils/buildConfirmationLink'
 import { buildQuoteRequest, NO_EXTRAS } from '../utils/buildQuoteRequest'
 import { buildSuccessRedirectUrl } from '../utils/buildSuccessRedirectUrl'
 
@@ -33,6 +34,8 @@ export function BookingDetailsPage() {
   // The coupon that passed the check ("" = none)
   const [couponCode, setCouponCode] = useState('')
   const [couponError, setCouponError] = useState('')
+  // True while the browser is on its way to Stripe's payment page
+  const [isOpeningPayment, setIsOpeningPayment] = useState(false)
 
   // The live price of the chosen vehicle with the extras and coupon. It updates whenever they change.
   let quoteRequest: QuoteRequest | null = null
@@ -44,9 +47,13 @@ export function BookingDetailsPage() {
   const {
     register,
     handleSubmit,
+    control,
+    getValues,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<PassengerDetailsValues>({
     resolver: zodResolver(passengerDetailsSchema),
+    // No payment method yet: it is picked below once we know which ones the office has switched on
     defaultValues: {
       name: '',
       email: '',
@@ -54,10 +61,23 @@ export function BookingDetailsPage() {
       flightNo: '',
       arrivalFrom: '',
       notes: '',
-      paymentMethod: 'pay_card',
     },
     mode: 'onTouched',
   })
+  const paymentMethod = useWatch({ control, name: 'paymentMethod' })
+
+  // Once the settings arrive, pre-select the first payment method that is switched on (card first)
+  const settingsData = settingsQuery.data
+  useEffect(() => {
+    if (!settingsData || getValues('paymentMethod')) {
+      return
+    }
+    if (settingsData.cardPaymentAvailable) {
+      setValue('paymentMethod', 'pay_card')
+    } else if (settingsData.cashPaymentAvailable) {
+      setValue('paymentMethod', 'pay_cash')
+    }
+  }, [settingsData, getValues, setValue])
 
   if (!draft || draft.vehicleId === '') {
     return (
@@ -99,8 +119,9 @@ export function BookingDetailsPage() {
       return
     }
 
+    let result: CreateBookingResult
     try {
-      const booking = await createBookingMutation.mutateAsync({
+      result = await createBookingMutation.mutateAsync({
         quote: quoteRequest,
         vehicleId: vehicleId,
         customer: { name: values.name, email: values.email, phone: values.phone, customerId: '' },
@@ -110,33 +131,52 @@ export function BookingDetailsPage() {
         paymentMethod: values.paymentMethod,
         notes: values.notes,
       })
-      clearBookingDraft()
-
-      // The office can send customers to their own "thank you" page instead of ours
-      if (settings.bookingSuccessRedirectUrl !== '') {
-        const redirectUrl = buildSuccessRedirectUrl(settings.bookingSuccessRedirectUrl, booking)
-        if (redirectUrl) {
-          window.location.assign(redirectUrl)
-          return
-        }
-      }
-      navigate(ROUTES.bookingConfirmation, { replace: true, state: { booking: booking } })
     } catch {
       // The error message is shown above the button
+      return
     }
+
+    clearBookingDraft()
+    const booking = result.booking
+
+    // Card payment: go to Stripe's secure payment page. Stripe sends the customer back to our thank-you page.
+    if (result.checkoutUrl !== '') {
+      setIsOpeningPayment(true)
+      window.location.assign(result.checkoutUrl)
+      return
+    }
+
+    // The office can send customers to their own "thank you" page instead of ours
+    // (not while a card payment is still owed: our page has the "Pay now" button)
+    if (settings.bookingSuccessRedirectUrl !== '' && !booking.canPayByCard) {
+      const redirectUrl = buildSuccessRedirectUrl(settings.bookingSuccessRedirectUrl, booking)
+      if (redirectUrl) {
+        window.location.assign(redirectUrl)
+        return
+      }
+    }
+    navigate(buildConfirmationLink(booking.reference), { replace: true })
   }
 
   // Messages that stop the customer from booking online
   let blockingMessage = ''
   if (settings && !settings.guestLogin) {
     blockingMessage = 'Online booking needs a customer account, which is coming soon. Please call us to book.'
-  } else if (settings && !settings.cardPaymentAvailable) {
+  } else if (settings && !settings.cardPaymentAvailable && !settings.cashPaymentAvailable) {
     blockingMessage = 'Online booking is not available right now. Please call us to book.'
   }
 
   let submitLabel = 'Confirm booking'
   if (settings && settings.isQuotation) {
     submitLabel = 'Request quote'
+  } else if (paymentMethod === 'pay_card') {
+    submitLabel = 'Continue to payment'
+  }
+  if (isSubmitting) {
+    submitLabel = 'Booking…'
+  }
+  if (isOpeningPayment) {
+    submitLabel = 'Opening secure payment…'
   }
 
   return (
@@ -231,6 +271,7 @@ export function BookingDetailsPage() {
               <PaymentMethodField
                 field={register('paymentMethod')}
                 showCard={settings.cardPaymentAvailable}
+                showCash={settings.cashPaymentAvailable}
                 error={errors.paymentMethod?.message}
               />
               {settings.isQuotation && (
@@ -251,7 +292,7 @@ export function BookingDetailsPage() {
           )}
 
           {blockingMessage === '' && (
-            <SubmitButton label={isSubmitting ? 'Booking…' : submitLabel} disabled={!canBook || isSubmitting} />
+            <SubmitButton label={submitLabel} disabled={!canBook || isSubmitting || isOpeningPayment} />
           )}
 
           <p className="text-center text-sm text-white/60">

@@ -36,6 +36,8 @@ const settingSchema = new Schema(
       roundOff: { type: Boolean, default: false },
       setPrice: { type: String, enum: ["per_vehicle", "single_price"], default: "per_vehicle" },
       showCard: { type: Boolean, default: false },
+      // Website par "Pay in car" (driver ko payment) ka option
+      showCash: { type: Boolean, default: true },
       // "single_price" mode me saari vehicles yehi shared base fare + bands use karti hain
       singleRates: {
         fixedPrice: { type: Number, default: 0 },

@@ -12,8 +12,10 @@ export interface PublicSettingsResponse {
   guestLogin: boolean;
   // true ho to booking ek quote request hai, admin approve karega
   isQuotation: boolean;
-  // Admin ne "Show card payment" on kiya ho to customer booking kar sakta hai
+  // Admin ne "Show card payment" on kiya ho aur Stripe keys lagi hon to card se pay ho sakta hai
   cardPaymentAvailable: boolean;
+  // Admin ne "Pay in car" on kiya ho to driver ko payment ho sakti hai
+  cashPaymentAvailable: boolean;
   extraPrices: {
     babySeatPrice: number;
     boosterSeatPrice: number;
@@ -47,6 +49,8 @@ export interface PublicDropdownAddressResponse {
 
 // Booking ke baad customer ko wapas jaane wali summary (thank-you page ke liye)
 export interface PublicBookingResponse {
+  // Thank-you link ka secret code (?ref=...)
+  reference: string;
   bookingNumber: string;
   status: string;
   customerName: string;
@@ -72,4 +76,18 @@ export interface PublicBookingResponse {
   amountPaid: number;
   balanceDue: number;
   currency: string;
+  // true ho to thank-you page par "Pay now" (card) button dikhta hai
+  canPayByCard: boolean;
+}
+
+// POST /api/public/bookings ka jawab
+export interface CreatePublicBookingResponse {
+  booking: PublicBookingResponse;
+  // Stripe checkout page ka link. "" = abhi card payment nahi (pay in car, quote request, ya Stripe error)
+  checkoutUrl: string;
+}
+
+// "Pay now" ka jawab
+export interface CardCheckoutResponse {
+  checkoutUrl: string;
 }

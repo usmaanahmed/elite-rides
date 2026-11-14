@@ -30,6 +30,7 @@ export type Settings = {
     roundOff: boolean
     setPrice: 'per_vehicle' | 'single_price'
     showCard: boolean
+    showCash: boolean
     singleRates: SingleRates
   }
   extras: {
@@ -74,6 +75,7 @@ export type SettingsFormValues = {
     roundOff: boolean
     setPrice: 'per_vehicle' | 'single_price'
     showCard: boolean
+    showCash: boolean
     singleRates: SingleRatesFormValues
   }
   extras: {

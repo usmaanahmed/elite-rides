@@ -64,7 +64,11 @@ export interface BookingRecord {
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
   amountPaid: number;
+  // Stripe ke payment ids jo is booking par lag chuke hain
+  cardPaymentIds: string[];
   notes: string;
+  // Customer ke thank-you link ka secret code
+  accessToken: string;
   createdAt: Date;
 }
 

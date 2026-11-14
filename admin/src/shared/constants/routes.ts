@@ -4,6 +4,8 @@ export const ROUTES = {
   dashboard: '/',
   bookings: '/bookings',
   newBooking: '/bookings/new',
+  airports: '/airports',
+  stations: '/stations',
   dropdownAddresses: '/dropdown-addresses',
   banAddresses: '/ban-addresses',
   congestionAddresses: '/congestion-addresses',
@@ -14,7 +16,16 @@ export const ROUTES = {
   surchargeDates: '/surcharge-dates',
   surchargeNight: '/surcharge-night',
   coupons: '/coupons',
+  blogs: '/blogs',
+  newBlog: '/blogs/new',
+  // ":blogId" is filled in with the real id, see getEditBlogPath
+  editBlog: '/blogs/:blogId/edit',
   settings: '/settings',
   help: '/help',
   apiTest: '/api-test',
+}
+
+// The edit page address of one blog, e.g. '/blogs/123/edit'
+export function getEditBlogPath(blogId: string): string {
+  return ROUTES.editBlog.replace(':blogId', blogId)
 }

@@ -2,7 +2,7 @@
 import { Request, Response, NextFunction } from "express";
 import multer from "multer";
 import { AppError } from "../utils/AppError.js";
-import { MAX_IMAGE_SIZE_MB } from "./upload.js";
+import { MAX_AIRPORT_IMAGES, MAX_IMAGE_SIZE_MB } from "./upload.js";
 
 export function errorHandler(error: Error, req: Request, res: Response, next: NextFunction) {
   // Humara apna error (status code ke saath)
@@ -15,6 +15,8 @@ export function errorHandler(error: Error, req: Request, res: Response, next: Ne
   if (error instanceof multer.MulterError) {
     if (error.code === "LIMIT_FILE_SIZE") {
       res.status(400).json({ message: "Image must be " + MAX_IMAGE_SIZE_MB + " MB or smaller" });
+    } else if (error.code === "LIMIT_FILE_COUNT" || error.code === "LIMIT_UNEXPECTED_FILE") {
+      res.status(400).json({ message: "You can upload up to " + MAX_AIRPORT_IMAGES + " images" });
     } else {
       res.status(400).json({ message: error.message });
     }

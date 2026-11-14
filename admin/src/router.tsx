@@ -1,5 +1,9 @@
 import { createBrowserRouter } from 'react-router'
+import { AirportsPage } from './features/airports/pages/AirportsPage'
 import { BanAddressesPage } from './features/addresses/pages/BanAddressesPage'
+import { BlogsPage } from './features/blogs/pages/BlogsPage'
+import { EditBlogPage } from './features/blogs/pages/EditBlogPage'
+import { NewBlogPage } from './features/blogs/pages/NewBlogPage'
 import { NewBookingPage } from './features/bookings/pages/NewBookingPage'
 import { PriceCheckerPage } from './features/priceChecker/pages/PriceCheckerPage'
 import { CouponsPage } from './features/coupons/pages/CouponsPage'
@@ -11,6 +15,7 @@ import { ApiTestPage } from './features/connection-test/pages/ApiTestPage'
 import { DashboardPage } from './features/dashboard/pages/DashboardPage'
 import { FixedPricePage } from './features/pricing/pages/FixedPricePage'
 import { SettingsPage } from './features/settings/pages/SettingsPage'
+import { StationsPage } from './features/stations/pages/StationsPage'
 import { SurchargeAddressesPage } from './features/surcharges/pages/SurchargeAddressesPage'
 import { SurchargeNightPage } from './features/surcharges/pages/SurchargeNightPage'
 import { SurchargeOnDatePage } from './features/surcharges/pages/SurchargeOnDatePage'
@@ -36,6 +41,8 @@ export const router = createBrowserRouter([
           { index: true, element: <DashboardPage /> },
           { path: ROUTES.bookings, element: <BookingsPage /> },
           { path: ROUTES.newBooking, element: <NewBookingPage /> },
+          { path: ROUTES.airports, element: <AirportsPage /> },
+          { path: ROUTES.stations, element: <StationsPage /> },
           { path: ROUTES.dropdownAddresses, element: <DropdownAddressesPage /> },
           { path: ROUTES.banAddresses, element: <BanAddressesPage /> },
           { path: ROUTES.congestionAddresses, element: <CongestionAddressesPage /> },
@@ -45,6 +52,9 @@ export const router = createBrowserRouter([
           { path: ROUTES.surchargeDates, element: <SurchargeOnDatePage /> },
           { path: ROUTES.surchargeNight, element: <SurchargeNightPage /> },
           { path: ROUTES.coupons, element: <CouponsPage /> },
+          { path: ROUTES.blogs, element: <BlogsPage /> },
+          { path: ROUTES.newBlog, element: <NewBlogPage /> },
+          { path: ROUTES.editBlog, element: <EditBlogPage /> },
           { path: ROUTES.priceChecker, element: <PriceCheckerPage /> },
           { path: ROUTES.settings, element: <SettingsPage /> },
           { path: ROUTES.help, element: <ComingSoonPage title="Help & Support" /> },

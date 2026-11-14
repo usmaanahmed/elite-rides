@@ -24,4 +24,11 @@ export const env = {
   jwtSecret: process.env.JWT_SECRET,
   // Distance (miles) nikalne ke liye Google key. Khaali ho to quote nahi ban sakta (server phir bhi chalta hai)
   googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || "",
+  // Customer website ka address. Stripe payment ke baad customer yahan wapas aata hai
+  websiteUrl: process.env.WEBSITE_URL || "http://localhost:5174",
+  // Stripe keys. Khaali hon to card payment band rehti hai (server phir bhi chalta hai)
+  stripeSecretKey: process.env.STRIPE_SECRET_KEY || "",
+  stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET || "",
+  // Stripe ko currency ka code chahiye (e.g. "gbp"), symbol "£" nahi
+  stripeCurrency: process.env.STRIPE_CURRENCY || "gbp",
 };

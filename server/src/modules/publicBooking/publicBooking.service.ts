@@ -1,13 +1,17 @@
 // Website (customer) ke liye business logic. Yeh module doosre modules ki services hi use karta hai
 import { AppError } from "../../utils/AppError.js";
-import { createBooking } from "../booking/booking.service.js";
-import { CreateBookingInput } from "../booking/booking.types.js";
+import { createBooking, getBookingByAccessToken } from "../booking/booking.service.js";
+import { BookingResponse, CreateBookingInput } from "../booking/booking.types.js";
 import { getAllDropdownAddresses } from "../dropdownAddress/dropdownAddress.service.js";
+import { createCheckoutSession, isCardPaymentReady } from "../payment/payment.service.js";
 import { createQuote } from "../quote/quote.service.js";
 import { QuoteInput, QuoteResponse } from "../quote/quote.types.js";
 import { getSettings } from "../setting/setting.service.js";
+import { SettingsResponse } from "../setting/setting.types.js";
 import { getAllVehicles } from "../vehicle/vehicle.service.js";
 import {
+  CardCheckoutResponse,
+  CreatePublicBookingResponse,
   PublicBookingResponse,
   PublicDropdownAddressResponse,
   PublicSettingsResponse,
@@ -33,6 +37,67 @@ function checkPickupIsInFuture(pickupDate: string, pickupTime: string) {
   }
 }
 
+// Admin ne "Show card payment" on kiya ho AUR Stripe keys .env me hon, tab hi card payment
+function isCardPaymentOn(settings: SettingsResponse): boolean {
+  return settings.pricing.showCard && isCardPaymentReady();
+}
+
+// true ho to customer abhi card se pay kar sakta hai (e.g. Stripe page band kar diya tha, ya quote approve ho gaya)
+function canPayByCard(booking: BookingResponse, settings: SettingsResponse): boolean {
+  if (!isCardPaymentOn(settings)) {
+    return false;
+  }
+  if (booking.paymentMethod !== "pay_card" || booking.balanceDue <= 0) {
+    return false;
+  }
+  // Quote request ki payment admin ke approve karne ke baad hoti hai. Cancelled / completed par payment nahi
+  return booking.status === "pending" || booking.status === "confirmed";
+}
+
+// Booking ka woh hissa jo customer ko dikhana theek hai (email/phone nahi, internal fields nahi)
+function toPublicBooking(booking: BookingResponse, settings: SettingsResponse): PublicBookingResponse {
+  return {
+    reference: booking.accessToken,
+    bookingNumber: booking.bookingNumber,
+    status: booking.status,
+    customerName: booking.customer.name,
+    tripType: booking.tripType,
+    pickup: booking.pickup,
+    via: booking.via,
+    dropoff: booking.dropoff,
+    pickupDate: booking.pickupDate,
+    pickupTime: booking.pickupTime,
+    returnDate: booking.returnDate,
+    returnTime: booking.returnTime,
+    hourlyDuration: booking.hourlyDuration,
+    passengers: booking.passengers,
+    luggage: booking.luggage,
+    vehicleName: booking.vehicleName,
+    distanceMiles: booking.distanceMiles,
+    flightNo: booking.flightNo,
+    arrivalFrom: booking.arrivalFrom,
+    priceLines: booking.priceLines,
+    total: booking.total,
+    paymentMethod: booking.paymentMethod,
+    paymentStatus: booking.paymentStatus,
+    amountPaid: booking.amountPaid,
+    balanceDue: booking.balanceDue,
+    currency: settings.office.currency,
+    canPayByCard: canPayByCard(booking, settings),
+  };
+}
+
+// Booking ki baqi raqam ke liye Stripe checkout page ka link
+function startCheckout(booking: BookingResponse): Promise<string> {
+  return createCheckoutSession({
+    bookingId: booking.id,
+    bookingNumber: booking.bookingNumber,
+    accessToken: booking.accessToken,
+    customerEmail: booking.customer.email,
+    amount: booking.balanceDue,
+  });
+}
+
 export async function getPublicSettings(): Promise<PublicSettingsResponse> {
   const settings = await getSettings();
 
@@ -43,8 +108,8 @@ export async function getPublicSettings(): Promise<PublicSettingsResponse> {
     hourlyRateStatus: settings.general.hourlyRateStatus,
     guestLogin: settings.general.guestLogin,
     isQuotation: settings.general.isQuotation,
-    // Real Stripe payment Phase 13 me aayegi. Tab tak booking pending rehti hai
-    cardPaymentAvailable: settings.pricing.showCard,
+    cardPaymentAvailable: isCardPaymentOn(settings),
+    cashPaymentAvailable: settings.pricing.showCash,
     extraPrices: {
       babySeatPrice: settings.extras.babySeatPrice,
       boosterSeatPrice: settings.extras.boosterSeatPrice,
@@ -85,21 +150,25 @@ export async function getPublicQuote(input: QuoteInput): Promise<QuoteResponse> 
   return createQuote(input);
 }
 
-// Customer ki booking. Price server khud nikalta hai (createBooking ke andar)
-export async function createPublicBooking(input: CreateBookingInput): Promise<PublicBookingResponse> {
+// Customer ki chuni hui payment admin ne on ki honi chahiye
+function checkPaymentMethodIsOn(paymentMethod: string, settings: SettingsResponse) {
+  if (paymentMethod === "pay_card" && !isCardPaymentOn(settings)) {
+    throw new AppError("Card payment is not available right now. Please choose another way to pay.", 400);
+  }
+  if (paymentMethod === "pay_cash" && !settings.pricing.showCash) {
+    throw new AppError("Pay in car is not available right now. Please choose another way to pay.", 400);
+  }
+}
+
+// Customer ki booking. Price server khud nikalta hai (createBooking ke andar).
+// Card payment ho to Stripe checkout ka link bhi wapas jata hai (customer ko wahan bhejna hai)
+export async function createPublicBooking(input: CreateBookingInput): Promise<CreatePublicBookingResponse> {
   const settings = await getSettings();
 
   if (!settings.general.guestLogin) {
     throw new AppError("Please log in to make a booking", 403);
   }
-  // Website se sirf card payment hoti hai (pay in car hata diya gaya hai)
-  if (input.paymentMethod !== "pay_card") {
-    throw new AppError("Please choose card payment.", 400);
-  }
-  if (!settings.pricing.showCard) {
-    throw new AppError("Online booking is not available right now. Please call us to book.", 400);
-  }
-
+  checkPaymentMethodIsOn(input.paymentMethod, settings);
   checkPickupIsInFuture(input.quote.pickupDate, input.quote.pickupTime);
 
   // Bags gaari me aane chahiye (passengers ki check quote khud karta hai)
@@ -115,31 +184,39 @@ export async function createPublicBooking(input: CreateBookingInput): Promise<Pu
     customer: { ...input.customer, customerId: "" },
   });
 
+  // Card booking: abhi Stripe par payment. Quote request (quotation mode) ki payment approve hone ke baad hoti hai
+  let checkoutUrl = "";
+  if (input.paymentMethod === "pay_card" && booking.status === "pending") {
+    try {
+      checkoutUrl = await startCheckout(booking);
+    } catch (error) {
+      // Booking save ho chuki hai. Customer thank-you page par "Pay now" se dobara try kar sakta hai
+      console.log("Stripe checkout could not be started for booking " + booking.bookingNumber, error);
+    }
+  }
+
   return {
-    bookingNumber: booking.bookingNumber,
-    status: booking.status,
-    customerName: booking.customer.name,
-    tripType: booking.tripType,
-    pickup: booking.pickup,
-    via: booking.via,
-    dropoff: booking.dropoff,
-    pickupDate: booking.pickupDate,
-    pickupTime: booking.pickupTime,
-    returnDate: booking.returnDate,
-    returnTime: booking.returnTime,
-    hourlyDuration: booking.hourlyDuration,
-    passengers: booking.passengers,
-    luggage: booking.luggage,
-    vehicleName: booking.vehicleName,
-    distanceMiles: booking.distanceMiles,
-    flightNo: booking.flightNo,
-    arrivalFrom: booking.arrivalFrom,
-    priceLines: booking.priceLines,
-    total: booking.total,
-    paymentMethod: booking.paymentMethod,
-    paymentStatus: booking.paymentStatus,
-    amountPaid: booking.amountPaid,
-    balanceDue: booking.balanceDue,
-    currency: settings.office.currency,
+    booking: toPublicBooking(booking, settings),
+    checkoutUrl: checkoutUrl,
   };
+}
+
+// GET /api/public/bookings/:reference: thank-you page ki booking (secret code se)
+export async function getPublicBooking(reference: string): Promise<PublicBookingResponse> {
+  const booking = await getBookingByAccessToken(reference);
+  const settings = await getSettings();
+  return toPublicBooking(booking, settings);
+}
+
+// POST /api/public/bookings/:reference/checkout: "Pay now" button, naya Stripe checkout page
+export async function startPublicCardPayment(reference: string): Promise<CardCheckoutResponse> {
+  const booking = await getBookingByAccessToken(reference);
+  const settings = await getSettings();
+
+  if (!canPayByCard(booking, settings)) {
+    throw new AppError("This booking does not need a card payment.", 400);
+  }
+
+  const checkoutUrl = await startCheckout(booking);
+  return { checkoutUrl: checkoutUrl };
 }

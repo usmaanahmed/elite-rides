@@ -30,6 +30,8 @@ export interface PricingSettings {
   roundOff: boolean;
   setPrice: "per_vehicle" | "single_price";
   showCard: boolean;
+  // Website par "Pay in car" ka option
+  showCash: boolean;
   singleRates: SingleRates;
 }
 

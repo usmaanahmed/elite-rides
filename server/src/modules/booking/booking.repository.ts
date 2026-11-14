@@ -20,6 +20,10 @@ export function findBookingById(id: string) {
   return Booking.findById(id).lean();
 }
 
+export function findBookingByAccessToken(accessToken: string) {
+  return Booking.findOne({ accessToken: accessToken }).lean();
+}
+
 // filter ek simple MongoDB filter object hai jo service banati hai
 export function findBookings(filter: Record<string, unknown>, skip: number, limit: number) {
   return Booking.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).lean();

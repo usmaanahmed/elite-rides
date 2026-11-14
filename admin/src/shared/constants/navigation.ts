@@ -13,10 +13,13 @@ import {
   MapPinOff,
   MapPinPlus,
   Moon,
+  Newspaper,
+  Plane,
   Settings,
   Tags,
   Ticket,
   TrafficCone,
+  TrainFront,
 } from 'lucide-react'
 import type { MobileTab, NavItem, NavSection, QuickAction } from '../types/navigation'
 import { ROUTES } from './routes'
@@ -32,6 +35,8 @@ export const mainNavigation: NavSection[] = [
   {
     title: 'Addresses',
     items: [
+      { path: ROUTES.airports, label: 'Airports', icon: Plane },
+      { path: ROUTES.stations, label: 'Stations', icon: TrainFront },
       { path: ROUTES.dropdownAddresses, label: 'Drop down Addresses', icon: MapPin },
       { path: ROUTES.banAddresses, label: 'Ban Addresses', icon: MapPinOff },
       { path: ROUTES.congestionAddresses, label: 'Congestion Addresses', icon: TrafficCone },
@@ -57,6 +62,10 @@ export const mainNavigation: NavSection[] = [
     title: 'Coupons',
     items: [{ path: ROUTES.coupons, label: 'All Coupons', icon: Ticket }],
   },
+  {
+    title: 'Content',
+    items: [{ path: ROUTES.blogs, label: 'Blogs', icon: Newspaper }],
+  },
 ]
 
 export const footerNavigation: NavItem[] = [
@@ -80,6 +89,8 @@ export const mobileTabs: MobileTab[] = [
 // Shortcuts in the sheet that opens from the mobile "+" button
 export const quickActions: QuickAction[] = [
   { path: ROUTES.newBooking, label: 'New booking', hint: 'Bookings', icon: CalendarPlus },
+  { path: ROUTES.airports, label: 'Airport', hint: 'Addresses', icon: Plane },
+  { path: ROUTES.stations, label: 'Station', hint: 'Addresses', icon: TrainFront },
   { path: ROUTES.dropdownAddresses, label: 'Dropdown address', hint: 'Addresses', icon: MapPinPlus },
   { path: ROUTES.banAddresses, label: 'Ban address', hint: 'Addresses', icon: MapPinOff },
   { path: ROUTES.congestionAddresses, label: 'Congestion address', hint: 'Addresses', icon: TrafficCone },
@@ -90,6 +101,7 @@ export const quickActions: QuickAction[] = [
   { path: ROUTES.surchargeDates, label: 'Date surcharge', hint: 'Surcharges', icon: CalendarClock },
   { path: ROUTES.surchargeNight, label: 'Night surcharge', hint: 'Surcharges', icon: Moon },
   { path: ROUTES.coupons, label: 'Coupon', hint: 'Coupons', icon: Ticket },
+  { path: ROUTES.newBlog, label: 'Blog post', hint: 'Content', icon: Newspaper },
 ]
 
 // Looks up the label of the page at a URL, e.g. '/bookings' -> 'Bookings'

@@ -20,7 +20,12 @@ export function PricingSettingsSection() {
     <SettingsSection title="Pricing config" description="How fares are calculated and whether customers can pay by card.">
       <SettingsToggle name="pricing.mileageBySlabs" label="Mileage by slabs" description="Use slab prices instead of per-mile bands." />
       <SettingsToggle name="pricing.roundOff" label="Round off" description="Round the final fare to the nearest whole pound." />
-      <SettingsToggle name="pricing.showCard" label="Show card payment" description="Let customers pay online by card." />
+      <SettingsToggle
+        name="pricing.showCard"
+        label="Show card payment"
+        description="Let customers pay online by card (needs the Stripe keys in the server .env)."
+      />
+      <SettingsToggle name="pricing.showCash" label="Show pay in car" description="Let customers book now and pay the driver." />
 
       <FormField label="Set price" htmlFor="setPrice">
         <SelectInput id="setPrice" options={setPriceOptions} {...register('pricing.setPrice')} />

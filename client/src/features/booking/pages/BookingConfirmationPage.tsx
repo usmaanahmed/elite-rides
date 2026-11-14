@@ -1,20 +1,49 @@
-import { CircleCheck, Clock3 } from 'lucide-react'
-import { Link, useLocation } from 'react-router'
+import { CreditCard } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Link, useSearchParams } from 'react-router'
 import { COMPANY } from '../../../shared/constants/company'
 import { formatMoney } from '../../../shared/utils/formatMoney'
 import { BookingPageLayout } from '../components/BookingPageLayout'
+import { BookingStatusCard } from '../components/BookingStatusCard'
+import { ConfirmationDetailsList } from '../components/ConfirmationDetailsList'
 import { PriceBreakdown } from '../components/PriceBreakdown'
-import type { ConfirmedBooking } from '../types/publicApi'
-import { formatDisplayDate } from '../utils/formatDisplayDate'
+import { useBookingByReference, usePublicSettings, useStartCardPayment } from '../hooks/usePublicData'
+import { buildSuccessRedirectUrl } from '../utils/buildSuccessRedirectUrl'
+import { getBookingStatusText } from '../utils/getBookingStatusText'
 
-// The thank-you page after booking. The booking comes from the page we were sent from;
-// after a refresh it is gone (booking details are never loaded by number, so nobody can look up other bookings).
+// The thank-you page. The link has the booking's secret code (?ref=...), so the page can be
+// refreshed or bookmarked, and Stripe sends the customer back here after paying (&payment=done or cancelled).
 export function BookingConfirmationPage() {
-  const location = useLocation()
-  const state = location.state as { booking?: ConfirmedBooking } | null
-  const booking = state?.booking
+  const [searchParams] = useSearchParams()
+  const reference = searchParams.get('ref') || ''
+  // "done" = just paid on Stripe, "cancelled" = left Stripe without paying, "" = not coming from Stripe
+  const paymentResult = searchParams.get('payment') || ''
+  const hasJustPaid = paymentResult === 'done'
 
-  if (!booking) {
+  const bookingQuery = useBookingByReference(reference, hasJustPaid)
+  const settingsQuery = usePublicSettings()
+  const startPayment = useStartCardPayment()
+  // True while the browser is on its way to Stripe's payment page
+  const [isOpeningPayment, setIsOpeningPayment] = useState(false)
+
+  const booking = bookingQuery.data
+  const settings = settingsQuery.data
+
+  // After a card payment, the office's own "thank you" page (if set) is shown once the payment is confirmed
+  useEffect(() => {
+    if (!booking || !settings || !hasJustPaid || booking.canPayByCard) {
+      return
+    }
+    if (settings.bookingSuccessRedirectUrl === '') {
+      return
+    }
+    const redirectUrl = buildSuccessRedirectUrl(settings.bookingSuccessRedirectUrl, booking)
+    if (redirectUrl) {
+      window.location.assign(redirectUrl)
+    }
+  }, [booking, settings, hasJustPaid])
+
+  if (reference === '') {
     return (
       <BookingPageLayout title="Thank you">
         <div className="rounded-3xl bg-surface p-6 text-sm text-ink">
@@ -27,94 +56,80 @@ export function BookingConfirmationPage() {
     )
   }
 
-  // What the heading says depends on the booking's status
-  let title = 'Your booking is confirmed'
-  let message = 'Your chauffeur is booked. Please keep your booking number for any questions.'
-  let isConfirmed = true
-  if (booking.status === 'quote_requested') {
-    title = 'Your quote request has been sent'
-    message = "We'll check your request and contact you to confirm the price and your booking."
-    isConfirmed = false
-  } else if (booking.status === 'pending') {
-    title = 'Your booking has been received'
-    message = "We'll confirm it as soon as your payment is complete."
-    isConfirmed = false
+  if (bookingQuery.isPending) {
+    return (
+      <BookingPageLayout title="Your booking">
+        <div className="mx-auto max-w-2xl rounded-3xl bg-surface p-6 text-sm text-muted">Loading your booking…</div>
+      </BookingPageLayout>
+    )
   }
 
-  // Old bookings made with "pay in car" still show the driver text
-  let paymentText = 'Card payment'
-  if (booking.paymentMethod === 'pay_cash') {
-    paymentText = `Pay ${formatMoney(booking.balanceDue)} to your driver`
+  if (bookingQuery.isError) {
+    return (
+      <BookingPageLayout title="Your booking">
+        <div className="mx-auto max-w-2xl rounded-3xl bg-surface p-6 text-sm text-ink">
+          <p className="font-semibold">We couldn't find this booking</p>
+          <p className="mt-1 text-muted">
+            Please check the link, or call us on {COMPANY.phoneDisplay} with your booking number.
+          </p>
+        </div>
+      </BookingPageLayout>
+    )
+  }
+
+  const loadedBooking = bookingQuery.data
+  // Paid on Stripe, but our server hasn't been told yet: don't offer to pay again
+  const isCheckingPayment = hasJustPaid && loadedBooking.canPayByCard
+  const statusText = getBookingStatusText(loadedBooking, isCheckingPayment)
+  const showPayButton = loadedBooking.canPayByCard && !isCheckingPayment
+
+  function handlePayNow(): void {
+    startPayment.mutate(reference, {
+      onSuccess: (result) => {
+        setIsOpeningPayment(true)
+        window.location.assign(result.checkoutUrl)
+      },
+    })
+  }
+
+  let payButtonLabel = `Pay ${formatMoney(loadedBooking.balanceDue)} now`
+  if (startPayment.isPending || isOpeningPayment) {
+    payButtonLabel = 'Opening secure payment…'
   }
 
   return (
     <BookingPageLayout title="Thank you">
       <div className="mx-auto max-w-2xl space-y-4">
-        <div className="rounded-3xl bg-surface p-6 text-center text-ink sm:p-8">
-          {isConfirmed ? (
-            <CircleCheck className="mx-auto size-12 text-accent" strokeWidth={1.75} />
-          ) : (
-            <Clock3 className="mx-auto size-12 text-accent" strokeWidth={1.75} />
+        <BookingStatusCard statusText={statusText} bookingNumber={loadedBooking.bookingNumber}>
+          {paymentResult === 'cancelled' && showPayButton && (
+            <p className="mt-5 text-sm font-medium text-danger">Your payment was not completed.</p>
           )}
-          <h2 className="mt-3 text-xl font-semibold">{title}</h2>
-          <p className="mt-2 text-sm text-muted">{message}</p>
-          <p className="mt-5 text-xs font-semibold uppercase tracking-[0.18em] text-muted">Booking number</p>
-          <p className="mt-1 text-2xl font-semibold tracking-wide tabular-nums">{booking.bookingNumber}</p>
-        </div>
+          {showPayButton && (
+            <button
+              type="button"
+              onClick={handlePayNow}
+              disabled={startPayment.isPending || isOpeningPayment}
+              className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-accent px-6 text-sm font-semibold text-white transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <CreditCard className="size-4" strokeWidth={2} />
+              {payButtonLabel}
+            </button>
+          )}
+          {startPayment.isError && (
+            <p className="mt-3 text-sm font-medium text-danger">{startPayment.error.message}</p>
+          )}
+        </BookingStatusCard>
 
         <div className="rounded-3xl bg-surface p-6 text-sm text-ink">
-          <dl className="space-y-2.5">
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted">Passenger</dt>
-              <dd className="text-right font-medium">{booking.customerName}</dd>
-            </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted">Pickup</dt>
-              <dd className="text-right font-medium">
-                {formatDisplayDate(booking.pickupDate)} at {booking.pickupTime}
-              </dd>
-            </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted">From</dt>
-              <dd className="text-right font-medium">{booking.pickup}</dd>
-            </div>
-            {booking.dropoff && (
-              <div className="flex justify-between gap-4">
-                <dt className="text-muted">To</dt>
-                <dd className="text-right font-medium">{booking.dropoff}</dd>
-              </div>
-            )}
-            {booking.tripType === 'return' && (
-              <div className="flex justify-between gap-4">
-                <dt className="text-muted">Return</dt>
-                <dd className="text-right font-medium">
-                  {formatDisplayDate(booking.returnDate)} at {booking.returnTime}
-                </dd>
-              </div>
-            )}
-            {booking.tripType === 'hourly' && (
-              <div className="flex justify-between gap-4">
-                <dt className="text-muted">Duration</dt>
-                <dd className="text-right font-medium">{booking.hourlyDuration} hours</dd>
-              </div>
-            )}
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted">Vehicle</dt>
-              <dd className="text-right font-medium">{booking.vehicleName}</dd>
-            </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted">Payment</dt>
-              <dd className="text-right font-medium">{paymentText}</dd>
-            </div>
-          </dl>
+          <ConfirmationDetailsList booking={loadedBooking} />
         </div>
 
         <div className="rounded-3xl bg-surface p-6 text-ink">
-          <PriceBreakdown lines={booking.priceLines} total={booking.total} />
+          <PriceBreakdown lines={loadedBooking.priceLines} total={loadedBooking.total} />
         </div>
 
         <p className="text-center text-sm text-white/60">
-          Questions? Call us on{' '}
+          Keep this page's link to check your booking later. Questions? Call us on{' '}
           <a href={COMPANY.phoneLink} className="font-semibold text-white hover:text-accent-bright">
             {COMPANY.phoneDisplay}
           </a>

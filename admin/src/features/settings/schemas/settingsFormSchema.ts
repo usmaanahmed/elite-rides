@@ -66,6 +66,7 @@ const pricingSchema = z
     roundOff: z.boolean(),
     setPrice: z.enum(['per_vehicle', 'single_price']),
     showCard: z.boolean(),
+    showCash: z.boolean(),
     singleRates: z.object({
       fixedPrice: priceField,
       // Only the shape is checked here. The band type in use is checked in detail below

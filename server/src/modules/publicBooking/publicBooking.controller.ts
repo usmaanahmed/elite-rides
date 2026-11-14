@@ -2,10 +2,12 @@
 import { Request, Response } from "express";
 import {
   createPublicBooking,
+  getPublicBooking,
   getPublicDropdownAddresses,
   getPublicQuote,
   getPublicSettings,
   getPublicVehicles,
+  startPublicCardPayment,
 } from "./publicBooking.service.js";
 
 // GET /api/public/settings
@@ -34,6 +36,18 @@ export async function getPublicQuotePrices(req: Request, res: Response) {
 
 // POST /api/public/bookings
 export async function addPublicBooking(req: Request, res: Response) {
-  const booking = await createPublicBooking(req.body);
-  res.status(201).json(booking);
+  const result = await createPublicBooking(req.body);
+  res.status(201).json(result);
+}
+
+// GET /api/public/bookings/:reference
+export async function readPublicBooking(req: Request<{ reference: string }>, res: Response) {
+  const booking = await getPublicBooking(req.params.reference);
+  res.json(booking);
+}
+
+// POST /api/public/bookings/:reference/checkout
+export async function payPublicBookingByCard(req: Request<{ reference: string }>, res: Response) {
+  const result = await startPublicCardPayment(req.params.reference);
+  res.json(result);
 }

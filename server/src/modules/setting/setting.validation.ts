@@ -56,6 +56,7 @@ const pricingSchema = z
     roundOff: z.boolean(),
     setPrice: z.enum(["per_vehicle", "single_price"]),
     showCard: z.boolean(),
+    showCash: z.boolean(),
     singleRates: singleRatesSchema,
   })
   .refine(
