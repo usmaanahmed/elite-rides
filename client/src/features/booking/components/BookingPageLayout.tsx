@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { SiteFooter } from '../../../shared/components/layout/footer/SiteFooter'
 import { SiteHeader } from '../../../shared/components/layout/SiteHeader'
 import { BookingSteps } from './BookingSteps'
 
@@ -12,7 +13,7 @@ type BookingPageLayoutProps = {
 }
 
 // The frame of every booking page: the dark site header, a soft background glow,
-// the steps bar and a page title
+// the steps bar, a page title and the site footer
 export function BookingPageLayout({ title, subtitle, currentStep, children }: BookingPageLayoutProps) {
   return (
     <div className="relative isolate min-h-svh">
@@ -26,6 +27,8 @@ export function BookingPageLayout({ title, subtitle, currentStep, children }: Bo
         </div>
         <div className="mt-8">{children}</div>
       </main>
+      {/* No "Ready when you are" card here: the visitor is already booking */}
+      <SiteFooter showCallToAction={false} />
     </div>
   )
 }

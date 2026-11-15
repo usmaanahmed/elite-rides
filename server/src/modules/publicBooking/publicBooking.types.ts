@@ -52,6 +52,16 @@ export interface PublicAirportResponse {
   imageUrls: string[];
 }
 
+// Train station jaisi website ke home page par dikhti hai
+export interface PublicStationResponse {
+  id: string;
+  name: string;
+  description: string;
+  address: string;
+  // Photos ke links, e.g. ["/uploads/stations/1700000000-123.jpg"] (pehli photo list me dikhti hai)
+  imageUrls: string[];
+}
+
 export interface PublicDropdownAddressResponse {
   address: string;
   type: "address" | "airport" | "station";

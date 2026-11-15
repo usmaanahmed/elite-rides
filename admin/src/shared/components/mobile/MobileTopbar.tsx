@@ -1,4 +1,4 @@
-import { Bell, CarFront } from 'lucide-react'
+import { Bell } from 'lucide-react'
 import { useIsScrolled } from '../../hooks/useIsScrolled'
 import { getInitials } from '../../utils/getInitials'
 
@@ -21,9 +21,7 @@ export function MobileTopbar({ pageTitle, hasUnreadNotifications, userName, onAv
       <div className="relative flex h-14 items-center gap-2 px-4">
         {/* Brand: logo with the app name, which hides once the page title takes over */}
         <div className="flex min-w-0 items-center gap-2.5">
-          <div className="grid size-8 shrink-0 place-items-center rounded-[10px] bg-linear-to-br from-[#ff8a3d] to-[#e04f00] text-white shadow-[0_6px_14px_-6px_rgba(252,98,3,0.7)]">
-            <CarFront className="size-4" strokeWidth={2.25} />
-          </div>
+          <img src="/elite-logo.webp" alt="Elite Rides logo" className="size-9 shrink-0 rounded-[10px] bg-white object-contain" />
           <span
             className={`truncate text-[15px] font-semibold tracking-tight text-ink transition-opacity duration-200 ${isScrolled ? 'opacity-0' : 'opacity-100'}`}
           >

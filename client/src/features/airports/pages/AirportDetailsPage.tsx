@@ -1,8 +1,10 @@
+import { PlaneTakeoff } from 'lucide-react'
 import { useEffect } from 'react'
 import { useParams } from 'react-router'
+import { SiteFooter } from '../../../shared/components/layout/footer/SiteFooter'
 import { SiteHeader } from '../../../shared/components/layout/SiteHeader'
 import { COMPANY } from '../../../shared/constants/company'
-import { AirportsNotice } from '../components/AirportsNotice'
+import { SectionNotice } from '../../../shared/components/feedback/SectionNotice'
 import { AirportAbout } from '../components/details/AirportAbout'
 import { AirportBookingCard } from '../components/details/AirportBookingCard'
 import { AirportBreadcrumbs } from '../components/details/AirportBreadcrumbs'
@@ -32,6 +34,7 @@ export function AirportDetailsPage() {
       <main className="mx-auto w-full max-w-7xl px-4 pb-24 pt-6 sm:px-6 lg:px-8 lg:pb-32">
         <AirportDetailsContent airportId={airportId} />
       </main>
+      <SiteFooter />
     </div>
   )
 }
@@ -56,7 +59,8 @@ function AirportDetailsContent({ airportId }: AirportDetailsContentProps) {
   if (airportQuery.isError) {
     return (
       <div className="mt-10">
-        <AirportsNotice
+        <SectionNotice
+          icon={PlaneTakeoff}
           title="We couldn't find this airport"
           message="It may have been removed, or the connection dropped. Please try again, or call us and we'll arrange your transfer."
           onRetry={retryLoading}

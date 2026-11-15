@@ -1,10 +1,13 @@
 import { useEffect } from 'react'
 import { useLocation } from 'react-router'
+import { SiteFooter } from '../../../shared/components/layout/footer/SiteFooter'
 import { AirportsSection } from '../../airports/components/AirportsSection'
 import { FleetSection } from '../../fleet/components/FleetSection'
+import { StationsSection } from '../../stations/components/StationsSection'
 import { HeroSection } from '../components/HeroSection'
 
-// Home page of the website: hero, the fleet, then the airports. More sections (services…) will go below.
+// Home page of the website: hero, the fleet, the airports, then the stations, and the footer at the end.
+// More sections (services…) will go above the footer.
 export function HomePage() {
   const location = useLocation()
 
@@ -20,10 +23,14 @@ export function HomePage() {
   }, [location.hash])
 
   return (
-    <main>
-      <HeroSection />
-      <FleetSection />
-      <AirportsSection />
-    </main>
+    <>
+      <main>
+        <HeroSection />
+        <FleetSection />
+        <AirportsSection />
+        <StationsSection />
+      </main>
+      <SiteFooter />
+    </>
   )
 }

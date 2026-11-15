@@ -1,20 +1,22 @@
-import { Phone, PlaneTakeoff, RotateCw } from 'lucide-react'
-import { COMPANY } from '../../../shared/constants/company'
+import { Phone, RotateCw, type LucideIcon } from 'lucide-react'
+import { COMPANY } from '../../constants/company'
 
-type AirportsNoticeProps = {
+type SectionNoticeProps = {
+  // Icon in the box at the top, e.g. PlaneTakeoff for airports
+  icon: LucideIcon
   title: string
   message: string
   // Shows a "Try again" button when given (e.g. after a loading error)
   onRetry?: () => void
 }
 
-// Calm message shown in place of the airport cards when they can't be shown
-// (loading failed, or the office hasn't added any airports yet). Always offers the phone number.
-export function AirportsNotice({ title, message, onRetry }: AirportsNoticeProps) {
+// Calm message shown in place of a section's content when it can't be shown
+// (loading failed, or the office hasn't added anything yet). Always offers the phone number.
+export function SectionNotice({ icon: Icon, title, message, onRetry }: SectionNoticeProps) {
   return (
     <div className="flex flex-col items-center rounded-[28px] border border-white/10 bg-white/[0.03] px-6 py-14 text-center">
       <span className="grid size-14 place-items-center rounded-2xl border border-white/10 bg-white/5 text-accent">
-        <PlaneTakeoff className="size-6" strokeWidth={1.5} />
+        <Icon className="size-6" strokeWidth={1.5} />
       </span>
       <p className="mt-5 text-lg font-semibold text-white">{title}</p>
       <p className="mt-2 max-w-md text-sm leading-relaxed text-white/55">{message}</p>

@@ -8,6 +8,7 @@ import {
   getPublicDropdownAddresses,
   getPublicQuote,
   getPublicSettings,
+  getPublicStations,
   getPublicVehicles,
   startPublicCardPayment,
 } from "./publicBooking.service.js";
@@ -34,6 +35,12 @@ export async function readPublicAirports(req: Request, res: Response) {
 export async function readPublicAirport(req: Request<{ id: string }>, res: Response) {
   const airport = await getPublicAirport(req.params.id);
   res.json(airport);
+}
+
+// GET /api/public/stations
+export async function readPublicStations(req: Request, res: Response) {
+  const stations = await getPublicStations();
+  res.json(stations);
 }
 
 // GET /api/public/dropdown-addresses

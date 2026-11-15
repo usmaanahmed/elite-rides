@@ -1,8 +1,9 @@
+import { PlaneTakeoff } from 'lucide-react'
+import { SectionNotice } from '../../../shared/components/feedback/SectionNotice'
 import { usePublicAirports } from '../hooks/usePublicAirports'
 import { AirportCard } from './AirportCard'
 import { AirportPerks } from './AirportPerks'
 import { AirportsHeader } from './AirportsHeader'
-import { AirportsNotice } from './AirportsNotice'
 import { AirportsSkeleton } from './AirportsSkeleton'
 
 // "Airports" section on the home page (the menu's "Airports" link jumps here with /#airports).
@@ -51,7 +52,8 @@ function AirportsContent() {
 
   if (airportsQuery.isError) {
     return (
-      <AirportsNotice
+      <SectionNotice
+        icon={PlaneTakeoff}
         title="We couldn't load our airports just now"
         message="Please try again in a moment, or give us a call and we'll arrange your airport transfer."
         onRetry={retryLoading}
@@ -61,7 +63,8 @@ function AirportsContent() {
 
   if (airportsQuery.data.length === 0) {
     return (
-      <AirportsNotice
+      <SectionNotice
+        icon={PlaneTakeoff}
         title="Airport transfers on request"
         message="Give us a call with your flight details and we'll arrange your pickup or drop-off."
       />

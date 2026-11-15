@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { CarouselPosition, CarouselScroll } from '../types/fleet'
-import { getPageScrollDistance } from '../utils/getPageScrollDistance'
+import { getPageScrollTarget } from '../utils/getPageScrollTarget'
 import { readCarouselPosition } from '../utils/readCarouselPosition'
 
 // Before the row has been measured: nothing to scroll yet
@@ -54,7 +54,7 @@ export function useCarouselScroll(cardCount: number): CarouselScroll {
       behavior = 'auto'
     }
 
-    track.scrollBy({ left: direction * getPageScrollDistance(track), behavior: behavior })
+    track.scrollTo({ left: getPageScrollTarget(track, direction), behavior: behavior })
   }
 
   function showPreviousCards(): void {

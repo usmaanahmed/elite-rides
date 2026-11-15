@@ -59,9 +59,10 @@ export function BookingWidget() {
       {/* Soft orange glow behind the card */}
       <div aria-hidden="true" className="absolute -inset-6 rounded-[44px] bg-accent/10 blur-3xl" />
 
-      {/* p-4 on phones gives the fields a little more room; sm:p-7 from tablets up */}
-      <div className="relative rounded-[28px] bg-surface p-4 text-ink shadow-[0_40px_100px_-30px_rgba(0,0,0,0.9)] ring-1 ring-white/10 sm:p-7">
-        <div className="mb-5">
+      {/* p-4 on phones gives the fields a little more room; sm:p-7 from tablets up; p-5 on short laptop screens */}
+      <div className="relative rounded-[28px] bg-surface p-4 text-ink shadow-[0_40px_100px_-30px_rgba(0,0,0,0.9)] ring-1 ring-white/10 sm:p-7 short:p-5">
+        {/* On very short laptop screens the heading is hidden from view (still read by screen readers), so the hero fits */}
+        <div className="mb-5 short:mb-3 very-short:sr-only">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-accent-ink">Instant quote</p>
           <h2 className="mt-1 text-xl font-semibold tracking-tight text-ink">Book your chauffeur</h2>
         </div>
@@ -69,7 +70,7 @@ export function BookingWidget() {
         {isHourlyAvailable && <BookingTabs activeTab={visibleTab} onChange={setActiveTab} />}
 
         {/* Both forms stay mounted (just hidden), so typed details aren't lost when switching tabs */}
-        <div className={isHourlyAvailable ? 'mt-4' : ''}>
+        <div className={isHourlyAvailable ? 'mt-4 short:mt-3' : ''}>
           <div hidden={visibleTab !== 'transfer'}>
             <TransferForm onSubmit={handleTransferSubmit} maxPassengers={maxPassengers} savedJourney={savedJourney} />
           </div>
@@ -80,7 +81,7 @@ export function BookingWidget() {
           )}
         </div>
 
-        <p className="mt-4 flex items-center justify-center gap-1.5 text-xs text-muted">
+        <p className="mt-4 flex items-center justify-center gap-1.5 text-xs text-muted short:mt-3">
           <LockKeyhole className="size-3.5" strokeWidth={2} />
           No payment needed to see prices
         </p>

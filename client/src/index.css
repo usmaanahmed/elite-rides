@@ -82,6 +82,15 @@
   }
 }
 
+/* Screen-height sizes for laptops. Normal Tailwind sizes (sm, lg, xl…) only look at the screen WIDTH;
+   these two look at the HEIGHT too, so the whole hero (down to the airports strip) fits on short laptop screens.
+   Both only start from the `lg` width (64rem), where the text and the booking card sit side by side.
+   - `short:`      screens up to 850px tall, e.g. a 1366 x 768 or 1536 x 864 laptop (after the browser's own bars)
+   - `very-short:` screens up to 700px tall, e.g. a 1280 x 720 laptop
+   Example: `pt-10 short:pt-2` = 40px top padding normally, 8px on short laptop screens. */
+@custom-variant short (@media (min-width: 64rem) and (max-height: 850px));
+@custom-variant very-short (@media (min-width: 64rem) and (max-height: 700px));
+
 html {
   /* Remove the grey flash mobile browsers draw on tapped buttons and links */
   -webkit-tap-highlight-color: transparent;

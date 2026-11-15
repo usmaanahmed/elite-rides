@@ -3,9 +3,10 @@ import { HERO_HIGHLIGHTS } from '../constants/heroContent'
 // Three selling points under the hero buttons.
 // Phones: icon above a short title. Tablets and wide screens: icon beside title + description.
 // Small laptops (lg) have the booking card beside the text, so the columns are narrow: icon goes back on top.
+// Short laptop screens: smaller gaps; very short ones hide the descriptions so the hero fits on one screen.
 export function HeroHighlights() {
   return (
-    <ul className="mt-12 grid grid-cols-3 gap-4 border-t border-white/10 pt-8 sm:gap-6">
+    <ul className="mt-12 grid grid-cols-3 gap-4 border-t border-white/10 pt-8 sm:gap-6 short:mt-6 short:pt-5">
       {HERO_HIGHLIGHTS.map((highlight) => {
         const Icon = highlight.icon
 
@@ -16,7 +17,7 @@ export function HeroHighlights() {
             </span>
             <div>
               <p className="text-sm font-semibold leading-snug text-white">{highlight.title}</p>
-              <p className="mt-1 hidden text-[13px] leading-snug text-white/55 sm:block">{highlight.description}</p>
+              <p className="mt-1 hidden text-[13px] leading-snug text-white/55 sm:block very-short:hidden">{highlight.description}</p>
             </div>
           </li>
         )

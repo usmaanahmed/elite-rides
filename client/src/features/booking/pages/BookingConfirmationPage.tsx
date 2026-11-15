@@ -47,7 +47,13 @@ export function BookingConfirmationPage() {
     return (
       <BookingPageLayout title="Thank you">
         <div className="rounded-3xl bg-surface p-6 text-sm text-ink">
-          <p>Your booking has been received. If you have any questions, call us on {COMPANY.phoneDisplay}.</p>
+          <p>
+            Your booking has been received. If you have any questions, call us on{' '}
+            <a href={COMPANY.phoneLink} className="font-semibold underline">
+              {COMPANY.phoneDisplay}
+            </a>
+            .
+          </p>
           <Link to="/" className="mt-4 inline-block font-semibold text-accent-ink hover:text-ink">
             Back to home
           </Link>
@@ -70,7 +76,11 @@ export function BookingConfirmationPage() {
         <div className="mx-auto max-w-2xl rounded-3xl bg-surface p-6 text-sm text-ink">
           <p className="font-semibold">We couldn't find this booking</p>
           <p className="mt-1 text-muted">
-            Please check the link, or call us on {COMPANY.phoneDisplay} with your booking number.
+            Please check the link, or call us on{' '}
+            <a href={COMPANY.phoneLink} className="font-semibold underline">
+              {COMPANY.phoneDisplay}
+            </a>{' '}
+            with your booking number.
           </p>
         </div>
       </BookingPageLayout>

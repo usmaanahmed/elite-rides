@@ -1,11 +1,12 @@
 import { PlaneTakeoff } from 'lucide-react'
 import { AIRPORTS } from '../constants/heroContent'
 
-// Strip along the bottom of the hero listing the London airports we cover
+// Strip along the bottom of the hero listing the London airports we cover.
+// Less padding on short laptop screens, so it stays inside the first screen.
 export function AirportStrip() {
   return (
     <div className="relative border-t border-white/10">
-      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-6 sm:px-6 lg:flex-row lg:items-center lg:gap-10 lg:px-8">
+      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-6 sm:px-6 lg:flex-row lg:items-center lg:gap-10 lg:px-8 short:py-4 very-short:py-3">
         <p className="flex shrink-0 items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/45">
           <PlaneTakeoff className="size-4 text-accent" strokeWidth={2} />
           Airport transfers

@@ -7,6 +7,7 @@ import { MobileMenu } from './MobileMenu'
 
 // Top bar of the website: logo, menu links, phone number and "Book now" button.
 // It has no background of its own, so it sits on top of the dark hero.
+// A little shorter on short laptop screens (`short:h-16`), so the hero fits on one screen.
 export function SiteHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
@@ -20,7 +21,7 @@ export function SiteHeader() {
 
   return (
     <header className="relative z-20">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8 short:h-16">
         <Logo />
 
         {/* Desktop links */}

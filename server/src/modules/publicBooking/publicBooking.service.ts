@@ -6,6 +6,8 @@ import { createBooking, getBookingByAccessToken } from "../booking/booking.servi
 import { BookingResponse, CreateBookingInput } from "../booking/booking.types.js";
 import { getAllDropdownAddresses } from "../dropdownAddress/dropdownAddress.service.js";
 import { createCheckoutSession, isCardPaymentReady } from "../payment/payment.service.js";
+import { getAllStations } from "../station/station.service.js";
+import { StationResponse } from "../station/station.types.js";
 import { createQuote } from "../quote/quote.service.js";
 import { QuoteInput, QuoteResponse } from "../quote/quote.types.js";
 import { getSettings } from "../setting/setting.service.js";
@@ -18,6 +20,7 @@ import {
   PublicBookingResponse,
   PublicDropdownAddressResponse,
   PublicSettingsResponse,
+  PublicStationResponse,
   PublicVehicleResponse,
 } from "./publicBooking.types.js";
 
@@ -167,6 +170,27 @@ export async function getPublicAirports(): Promise<PublicAirportResponse[]> {
 export async function getPublicAirport(id: string): Promise<PublicAirportResponse> {
   const airport = await getAirportById(id);
   return toPublicAirport(airport);
+}
+
+// Station ka woh hissa jo website ko chahiye (photos ke sirf links, file names nahi)
+function toPublicStation(station: StationResponse): PublicStationResponse {
+  const imageUrls: string[] = [];
+  for (const image of station.images) {
+    imageUrls.push(image.url);
+  }
+  return {
+    id: station.id,
+    name: station.name,
+    description: station.description,
+    address: station.address,
+    imageUrls: imageUrls,
+  };
+}
+
+// Home page ke "Stations" section ke liye train stations (naam, description, address aur photos ke links)
+export async function getPublicStations(): Promise<PublicStationResponse[]> {
+  const stations = await getAllStations();
+  return stations.map((station) => toPublicStation(station));
 }
 
 // Airports / stations ki list (booking form ke suggestions ke liye), bina charges ke

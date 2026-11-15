@@ -1,9 +1,13 @@
-// Company details shown across the website (header, hero, footer).
-// TODO: replace the phone number with the real one before going live.
-// (020 7946 0xxx is a UK range reserved for TV/film, so it can never reach a real person.)
+// Company details shown across the website (header, hero, footer, booking pages).
 export const COMPANY = {
   name: 'Elite Rides',
+  // Full registered name, used in the footer's copyright line
+  legalName: 'Elite London Rides',
   tagline: 'London Chauffeurs',
-  phoneDisplay: '020 7946 0000',
-  phoneLink: 'tel:+442079460000',
+  phoneDisplay: '+44 20 3355 1345',
+  phoneLink: 'tel:+442033551345',
+  email: 'admin@elitelondonrides.co.uk',
+  emailLink: 'mailto:admin@elitelondonrides.co.uk',
+  // Office address (shown in the footer)
+  location: 'Elite London Rides, 10 Longford Garden Hayes, London, UB4 0JW',
 }
