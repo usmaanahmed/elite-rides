@@ -8,16 +8,7 @@ import { HeroHighlights } from './HeroHighlights'
 export function HeroContent() {
   return (
     <div className="max-w-2xl">
-      <p className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/5 py-1.5 pl-3 pr-4 text-xs font-medium text-white/75 backdrop-blur motion-safe:animate-rise-in sm:text-[13px]">
-        {/* Orange "live" dot with a soft pulse */}
-        <span className="relative flex size-2">
-          <span className="absolute inline-flex size-full rounded-full bg-accent opacity-60 motion-safe:animate-ping" />
-          <span className="relative inline-flex size-2 rounded-full bg-accent" />
-        </span>
-        Premium chauffeur service in London
-      </p>
-
-      <h1 className="mt-6 text-[2.75rem] font-semibold leading-[1.04] tracking-[-0.035em] text-white motion-safe:animate-rise-in motion-safe:[animation-delay:80ms] sm:text-6xl xl:text-7xl short:mt-4 very-short:text-6xl">
+      <h1 className="text-[2.75rem] font-semibold leading-[1.04] tracking-[-0.035em] text-white motion-safe:animate-rise-in motion-safe:[animation-delay:80ms] sm:text-6xl xl:text-7xl very-short:text-6xl">
         Arrive in{' '}
         <span className="bg-linear-to-r from-accent-bright to-accent bg-clip-text pr-1 font-display text-[1.12em] font-normal italic tracking-normal text-transparent">
           effortless
