@@ -2,6 +2,8 @@
 import { Request, Response } from "express";
 import {
   createPublicBooking,
+  getPublicAirport,
+  getPublicAirports,
   getPublicBooking,
   getPublicDropdownAddresses,
   getPublicQuote,
@@ -20,6 +22,18 @@ export async function readPublicSettings(req: Request, res: Response) {
 export async function readPublicVehicles(req: Request, res: Response) {
   const vehicles = await getPublicVehicles();
   res.json(vehicles);
+}
+
+// GET /api/public/airports
+export async function readPublicAirports(req: Request, res: Response) {
+  const airports = await getPublicAirports();
+  res.json(airports);
+}
+
+// GET /api/public/airports/:id
+export async function readPublicAirport(req: Request<{ id: string }>, res: Response) {
+  const airport = await getPublicAirport(req.params.id);
+  res.json(airport);
 }
 
 // GET /api/public/dropdown-addresses

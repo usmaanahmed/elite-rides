@@ -107,6 +107,28 @@ body {
   mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 20%, transparent 75%);
 }
 
+/* Fleet carousel row. It runs the full width of the screen (cards slide off the edges),
+   but the first card lines up with the page content: max-w-7xl (80rem) plus the page's
+   side padding (--gutter). scroll-padding makes the cards snap to that same line. */
+.fleet-track {
+  --gutter: 1rem;
+  padding-inline: max(var(--gutter), calc((100% - 80rem) / 2 + var(--gutter)));
+  scroll-padding-inline: max(var(--gutter), calc((100% - 80rem) / 2 + var(--gutter)));
+}
+
+/* Same side padding as the page: px-6 from the `sm` size, px-8 from the `lg` size */
+@media (min-width: 40rem) {
+  .fleet-track {
+    --gutter: 1.5rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .fleet-track {
+    --gutter: 2rem;
+  }
+}
+
 /* Date inputs: softer calendar icon, and left-aligned text on iPhone (Safari centres it by default) */
 input[type='date']::-webkit-calendar-picker-indicator {
   opacity: 0.5;

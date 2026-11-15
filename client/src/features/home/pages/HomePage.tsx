@@ -1,8 +1,10 @@
 import { useEffect } from 'react'
 import { useLocation } from 'react-router'
+import { AirportsSection } from '../../airports/components/AirportsSection'
+import { FleetSection } from '../../fleet/components/FleetSection'
 import { HeroSection } from '../components/HeroSection'
 
-// Home page of the website. More sections (services, fleet, airports…) will go under the hero.
+// Home page of the website: hero, the fleet, then the airports. More sections (services…) will go below.
 export function HomePage() {
   const location = useLocation()
 
@@ -20,6 +22,8 @@ export function HomePage() {
   return (
     <main>
       <HeroSection />
+      <FleetSection />
+      <AirportsSection />
     </main>
   )
 }

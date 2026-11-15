@@ -1,4 +1,5 @@
 import { createBrowserRouter } from 'react-router'
+import { AirportDetailsPage } from './features/airports/pages/AirportDetailsPage'
 import { BookingConfirmationPage } from './features/booking/pages/BookingConfirmationPage'
 import { BookingDetailsPage } from './features/booking/pages/BookingDetailsPage'
 import { ChooseVehiclePage } from './features/booking/pages/ChooseVehiclePage'
@@ -11,5 +12,6 @@ export const router = createBrowserRouter([
   { path: ROUTES.chooseVehicle, element: <ChooseVehiclePage /> },
   { path: ROUTES.bookingDetails, element: <BookingDetailsPage /> },
   { path: ROUTES.bookingConfirmation, element: <BookingConfirmationPage /> },
+  { path: ROUTES.airportDetails, element: <AirportDetailsPage /> },
   { path: '*', element: <HomePage /> },
 ])

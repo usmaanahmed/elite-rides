@@ -7,6 +7,8 @@ import {
   addPublicBooking,
   getPublicQuotePrices,
   payPublicBookingByCard,
+  readPublicAirport,
+  readPublicAirports,
   readPublicBooking,
   readPublicDropdownAddresses,
   readPublicSettings,
@@ -17,6 +19,8 @@ const router = Router();
 
 router.get("/settings", readPublicSettings);
 router.get("/vehicles", readPublicVehicles);
+router.get("/airports", readPublicAirports);
+router.get("/airports/:id", readPublicAirport);
 router.get("/dropdown-addresses", readPublicDropdownAddresses);
 router.post("/quotes", validate(quoteSchema), getPublicQuotePrices);
 router.post("/bookings", validate(createBookingSchema), addPublicBooking);

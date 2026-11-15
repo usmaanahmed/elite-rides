@@ -7,4 +7,6 @@ export const ROUTES = {
   bookingDetails: '/booking/details',
   // After booking: thank-you page
   bookingConfirmation: '/booking/confirmation',
+  // One airport: photos, description and address (build the link with buildAirportLink)
+  airportDetails: '/airports/:airportId',
 }

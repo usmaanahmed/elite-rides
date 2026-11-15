@@ -1,5 +1,7 @@
 // Website (customer) ke liye business logic. Yeh module doosre modules ki services hi use karta hai
 import { AppError } from "../../utils/AppError.js";
+import { getAirportById, getAllAirports } from "../airport/airport.service.js";
+import { AirportResponse } from "../airport/airport.types.js";
 import { createBooking, getBookingByAccessToken } from "../booking/booking.service.js";
 import { BookingResponse, CreateBookingInput } from "../booking/booking.types.js";
 import { getAllDropdownAddresses } from "../dropdownAddress/dropdownAddress.service.js";
@@ -12,6 +14,7 @@ import { getAllVehicles } from "../vehicle/vehicle.service.js";
 import {
   CardCheckoutResponse,
   CreatePublicBookingResponse,
+  PublicAirportResponse,
   PublicBookingResponse,
   PublicDropdownAddressResponse,
   PublicSettingsResponse,
@@ -137,6 +140,33 @@ export async function getPublicVehicles(): Promise<PublicVehicleResponse[]> {
     handLuggageCapacity: vehicle.handLuggageCapacity,
     imageUrl: vehicle.imageUrl,
   }));
+}
+
+// Airport ka woh hissa jo website ko chahiye (photos ke sirf links, file names nahi)
+function toPublicAirport(airport: AirportResponse): PublicAirportResponse {
+  const imageUrls: string[] = [];
+  for (const image of airport.images) {
+    imageUrls.push(image.url);
+  }
+  return {
+    id: airport.id,
+    name: airport.name,
+    description: airport.description,
+    address: airport.address,
+    imageUrls: imageUrls,
+  };
+}
+
+// Home page ke "Airports" section ke liye airports (naam, description, address aur photos ke links)
+export async function getPublicAirports(): Promise<PublicAirportResponse[]> {
+  const airports = await getAllAirports();
+  return airports.map((airport) => toPublicAirport(airport));
+}
+
+// Airport ke detail page ke liye ek airport (na mile to 404)
+export async function getPublicAirport(id: string): Promise<PublicAirportResponse> {
+  const airport = await getAirportById(id);
+  return toPublicAirport(airport);
 }
 
 // Airports / stations ki list (booking form ke suggestions ke liye), bina charges ke

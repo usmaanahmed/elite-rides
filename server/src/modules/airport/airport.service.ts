@@ -40,6 +40,20 @@ export async function getAllAirports(): Promise<AirportResponse[]> {
   return airports.map((airport) => toAirportResponse(airport as unknown as AirportRecord));
 }
 
+// Ek airport us ki id se (na mile to 404)
+export async function getAirportById(id: string): Promise<AirportResponse> {
+  if (!isValidObjectId(id)) {
+    throw new AppError("Airport not found", 404);
+  }
+
+  const airport = await findAirportById(id);
+  if (!airport) {
+    throw new AppError("Airport not found", 404);
+  }
+
+  return toAirportResponse(airport as unknown as AirportRecord);
+}
+
 // Nayi airport banao. newImageFileNames wo images hain jo multer ne save kar di hain
 export async function createAirport(input: AirportInput, newImageFileNames: string[]): Promise<AirportResponse> {
   try {

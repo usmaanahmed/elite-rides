@@ -42,6 +42,16 @@ export interface PublicVehicleResponse {
   imageUrl: string;
 }
 
+// Airport jaisi website ke home page par dikhti hai
+export interface PublicAirportResponse {
+  id: string;
+  name: string;
+  description: string;
+  address: string;
+  // Photos ke links, e.g. ["/uploads/airports/1700000000-123.jpg"] (pehli photo card par dikhti hai)
+  imageUrls: string[];
+}
+
 export interface PublicDropdownAddressResponse {
   address: string;
   type: "address" | "airport" | "station";
