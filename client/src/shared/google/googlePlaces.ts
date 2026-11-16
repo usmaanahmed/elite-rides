@@ -73,13 +73,19 @@ function loadGoogleMaps(): Promise<boolean> {
   return loadingPromise
 }
 
+// Google's answer: the addresses, plus a short reason when something went wrong (empty when all is fine)
+export type PlaceSuggestionsResult = {
+  addresses: string[]
+  problem: string
+}
+
 // Google's suggested UK addresses for what the customer has typed, e.g. "heath" -> "Heathrow Airport, …"
-export async function fetchPlaceSuggestions(text: string): Promise<string[]> {
+export async function fetchPlaceSuggestions(text: string): Promise<PlaceSuggestionsResult> {
   try {
     const isReady = await loadGoogleMaps()
     const google = getGoogle()
     if (!isReady || !google) {
-      return []
+      return { addresses: [], problem: 'Google Maps could not load. Check the API key and its allowed websites (localhost:5174).' }
     }
 
     const places = (await google.maps.importLibrary('places')) as PlacesLibrary
@@ -99,10 +105,10 @@ export async function fetchPlaceSuggestions(text: string): Promise<string[]> {
         addresses.push(suggestion.placePrediction.text.toString())
       }
     }
-    return addresses
+    return { addresses: addresses, problem: '' }
   } catch (error) {
     console.warn('Google address suggestions are not available:', error)
-    return []
+    return { addresses: [], problem: 'Google suggestions failed. Enable "Places API (New)" for this key.' }
   }
 }
 

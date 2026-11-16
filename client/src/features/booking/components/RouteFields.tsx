@@ -136,6 +136,7 @@ export function RouteFields({ register, errors, stops, onRemoveStop, onSwap, onA
         <AddressSuggestionList
           savedAddresses={autocomplete.savedAddresses}
           googleAddresses={autocomplete.googleAddresses}
+          googleProblem={autocomplete.googleProblem}
           top={(autocomplete.activeField.rowIndex + 1) * ROW_HEIGHT + 6}
           onSelect={handleSelect}
         />

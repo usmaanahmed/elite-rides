@@ -81,6 +81,7 @@ export function HourlyForm({ onSubmit, maxPassengers, savedJourney }: HourlyForm
           <AddressSuggestionList
             savedAddresses={autocomplete.savedAddresses}
             googleAddresses={autocomplete.googleAddresses}
+            googleProblem={autocomplete.googleProblem}
             top={PICKUP_BOX_HEIGHT + 6}
             onSelect={handleAddressSelect}
           />

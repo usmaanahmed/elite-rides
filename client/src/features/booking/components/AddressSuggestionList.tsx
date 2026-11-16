@@ -6,6 +6,8 @@ type AddressSuggestionListProps = {
   savedAddresses: DropdownAddress[]
   // Google's suggestions
   googleAddresses: string[]
+  // Why Google gave nothing (empty when there is no problem)
+  googleProblem: string
   // Distance from the top of the parent box, in pixels
   top: number
   onSelect: (address: string) => void
@@ -13,8 +15,8 @@ type AddressSuggestionListProps = {
 
 // The dropdown of suggested addresses under an address box.
 // Items use onMouseDown (not onClick) so the choice happens before the box loses focus and the list closes.
-export function AddressSuggestionList({ savedAddresses, googleAddresses, top, onSelect }: AddressSuggestionListProps) {
-  if (savedAddresses.length === 0 && googleAddresses.length === 0) {
+export function AddressSuggestionList({ savedAddresses, googleAddresses, googleProblem, top, onSelect }: AddressSuggestionListProps) {
+  if (savedAddresses.length === 0 && googleAddresses.length === 0 && googleProblem === '') {
     return null
   }
 
@@ -52,6 +54,8 @@ export function AddressSuggestionList({ savedAddresses, googleAddresses, top, on
           })}
         </div>
       )}
+
+      {googleProblem !== '' && <p className="px-4 py-2 text-xs text-danger">{googleProblem}</p>}
 
       {googleAddresses.length > 0 && (
         <div className={savedAddresses.length > 0 ? 'mt-1 border-t border-line pt-1' : ''}>

@@ -14,6 +14,7 @@ export type ActiveAddressField = {
 type PlaceResults = {
   forText: string
   addresses: string[]
+  problem: string
 }
 
 const MIN_LETTERS_FOR_GOOGLE = 3
@@ -43,7 +44,7 @@ export function useAddressAutocomplete() {
   const dropdownAddressesQuery = useDropdownAddresses()
   const [activeField, setActiveField] = useState<ActiveAddressField | null>(null)
   const [text, setText] = useState('')
-  const [placeResults, setPlaceResults] = useState<PlaceResults>({ forText: '', addresses: [] })
+  const [placeResults, setPlaceResults] = useState<PlaceResults>({ forText: '', addresses: [], problem: '' })
 
   const trimmedText = text.trim()
   const isOpen = activeField !== null
@@ -55,8 +56,8 @@ export function useAddressAutocomplete() {
     }
 
     const timer = setTimeout(async () => {
-      const addresses = await fetchPlaceSuggestions(trimmedText)
-      setPlaceResults({ forText: trimmedText, addresses: addresses })
+      const result = await fetchPlaceSuggestions(trimmedText)
+      setPlaceResults({ forText: trimmedText, addresses: result.addresses, problem: result.problem })
     }, TYPING_DELAY_MS)
 
     // Typing again cancels the request that hasn't started yet
@@ -69,8 +70,10 @@ export function useAddressAutocomplete() {
   }
 
   let googleAddresses: string[] = []
+  let googleProblem = ''
   if (placeResults.forText === trimmedText && trimmedText.length >= MIN_LETTERS_FOR_GOOGLE) {
     googleAddresses = placeResults.addresses
+    googleProblem = placeResults.problem
   }
 
   // The customer clicked into an address box
@@ -94,5 +97,5 @@ export function useAddressAutocomplete() {
     setActiveField(null)
   }
 
-  return { activeField, savedAddresses, googleAddresses, openFor, changeText, close, finishSelection }
+  return { activeField, savedAddresses, googleAddresses, googleProblem, openFor, changeText, close, finishSelection }
 }

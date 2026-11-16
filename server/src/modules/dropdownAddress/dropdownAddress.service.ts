@@ -5,7 +5,6 @@ import {
   createDropdownAddress as saveDropdownAddress,
   deleteDropdownAddressById,
   findAllDropdownAddresses,
-  findDropdownAddressByComparableValue,
   findDropdownAddressById,
   updateDropdownAddressById,
 } from "./dropdownAddress.repository.js";
@@ -33,14 +32,6 @@ function toDropdownAddressResponse(record: DropdownAddressRecord): DropdownAddre
 // Comparable value hamesha lowercase me save aur compare hoti hai
 function cleanInput(input: DropdownAddressInput): DropdownAddressInput {
   return { ...input, comparableValue: input.comparableValue.trim().toLowerCase() };
-}
-
-// Same comparable value wali doosri address mojood ho to error
-async function checkComparableValueIsFree(comparableValue: string, ownId?: string) {
-  const existing = await findDropdownAddressByComparableValue(comparableValue);
-  if (existing && existing._id.toString() !== ownId) {
-    throw new AppError("comparableValue: This comparable value is already used by another address", 409);
-  }
 }
 
 // Fare engine ke liye (Phase 8): customer ke address me kisi dropdown address ki comparableValue mile
@@ -76,7 +67,6 @@ export async function getAllDropdownAddresses(): Promise<DropdownAddressResponse
 
 export async function createDropdownAddress(input: DropdownAddressInput): Promise<DropdownAddressResponse> {
   const cleanedInput = cleanInput(input);
-  await checkComparableValueIsFree(cleanedInput.comparableValue);
 
   const record = await saveDropdownAddress(cleanedInput);
   return toDropdownAddressResponse(record);
@@ -93,7 +83,6 @@ export async function updateDropdownAddress(id: string, input: DropdownAddressIn
   }
 
   const cleanedInput = cleanInput(input);
-  await checkComparableValueIsFree(cleanedInput.comparableValue, id);
 
   const updated = await updateDropdownAddressById(id, cleanedInput);
   if (!updated) {
