@@ -67,6 +67,31 @@ export interface PublicDropdownAddressResponse {
   type: "address" | "airport" | "station";
 }
 
+// Tour ki ek vehicle ki price (website par tour ke detail page par)
+export interface PublicTourVehicleResponse {
+  vehicleId: string;
+  vehicleName: string;
+  description: string;
+  passengerCapacity: number;
+  luggageCapacity: number;
+  handLuggageCapacity: number;
+  imageUrl: string;
+  price: number;
+}
+
+// Tour jaisa website par dikhta hai
+export interface PublicTourResponse {
+  id: string;
+  title: string;
+  description: string;
+  // Photos ke links, e.g. ["/uploads/tours/1700000000-123.jpg"] (pehli photo card par dikhti hai)
+  imageUrls: string[];
+  // Sirf wohi vehicles jin ki is tour ke liye price set hai
+  vehicles: PublicTourVehicleResponse[];
+  // Sab se kam price (card par "From £...")
+  startingPrice: number;
+}
+
 // Booking ke baad customer ko wapas jaane wali summary (thank-you page ke liye)
 export interface PublicBookingResponse {
   // Thank-you link ka secret code (?ref=...)
@@ -75,6 +100,8 @@ export interface PublicBookingResponse {
   status: string;
   customerName: string;
   tripType: string;
+  // Tour booking me tour ka naam, baqi me ""
+  tourName: string;
   pickup: string;
   via: string[];
   dropoff: string;

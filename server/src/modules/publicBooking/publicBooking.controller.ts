@@ -2,6 +2,7 @@
 import { Request, Response } from "express";
 import {
   createPublicBooking,
+  createPublicTourBooking,
   getPublicAirport,
   getPublicAirports,
   getPublicBooking,
@@ -9,6 +10,8 @@ import {
   getPublicQuote,
   getPublicSettings,
   getPublicStations,
+  getPublicTour,
+  getPublicTours,
   getPublicVehicles,
   startPublicCardPayment,
 } from "./publicBooking.service.js";
@@ -41,6 +44,24 @@ export async function readPublicAirport(req: Request<{ id: string }>, res: Respo
 export async function readPublicStations(req: Request, res: Response) {
   const stations = await getPublicStations();
   res.json(stations);
+}
+
+// GET /api/public/tours
+export async function readPublicTours(req: Request, res: Response) {
+  const tours = await getPublicTours();
+  res.json(tours);
+}
+
+// GET /api/public/tours/:id
+export async function readPublicTour(req: Request<{ id: string }>, res: Response) {
+  const tour = await getPublicTour(req.params.id);
+  res.json(tour);
+}
+
+// POST /api/public/tour-bookings
+export async function addPublicTourBooking(req: Request, res: Response) {
+  const result = await createPublicTourBooking(req.body);
+  res.status(201).json(result);
 }
 
 // GET /api/public/dropdown-addresses

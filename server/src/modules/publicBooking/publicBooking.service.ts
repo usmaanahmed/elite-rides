@@ -2,8 +2,8 @@
 import { AppError } from "../../utils/AppError.js";
 import { getAirportById, getAllAirports } from "../airport/airport.service.js";
 import { AirportResponse } from "../airport/airport.types.js";
-import { createBooking, getBookingByAccessToken } from "../booking/booking.service.js";
-import { BookingResponse, CreateBookingInput } from "../booking/booking.types.js";
+import { createBooking, createTourBooking, getBookingByAccessToken } from "../booking/booking.service.js";
+import { BookingResponse, CreateBookingInput, CreateTourBookingInput, PaymentMethod } from "../booking/booking.types.js";
 import { getAllDropdownAddresses } from "../dropdownAddress/dropdownAddress.service.js";
 import { createCheckoutSession, isCardPaymentReady } from "../payment/payment.service.js";
 import { getAllStations } from "../station/station.service.js";
@@ -12,7 +12,10 @@ import { createQuote } from "../quote/quote.service.js";
 import { QuoteInput, QuoteResponse } from "../quote/quote.types.js";
 import { getSettings } from "../setting/setting.service.js";
 import { SettingsResponse } from "../setting/setting.types.js";
+import { getAllTours, getTourById } from "../tour/tour.service.js";
+import { TourResponse } from "../tour/tour.types.js";
 import { getAllVehicles } from "../vehicle/vehicle.service.js";
+import { VehicleResponse } from "../vehicle/vehicle.types.js";
 import {
   CardCheckoutResponse,
   CreatePublicBookingResponse,
@@ -21,6 +24,8 @@ import {
   PublicDropdownAddressResponse,
   PublicSettingsResponse,
   PublicStationResponse,
+  PublicTourResponse,
+  PublicTourVehicleResponse,
   PublicVehicleResponse,
 } from "./publicBooking.types.js";
 
@@ -68,6 +73,7 @@ function toPublicBooking(booking: BookingResponse, settings: SettingsResponse): 
     status: booking.status,
     customerName: booking.customer.name,
     tripType: booking.tripType,
+    tourName: booking.tourName,
     pickup: booking.pickup,
     via: booking.via,
     dropoff: booking.dropoff,
@@ -193,6 +199,70 @@ export async function getPublicStations(): Promise<PublicStationResponse[]> {
   return stations.map((station) => toPublicStation(station));
 }
 
+// Tour ka woh hissa jo website ko chahiye: photos ke links aur har vehicle ki price
+function toPublicTour(tour: TourResponse, vehicles: VehicleResponse[]): PublicTourResponse {
+  const imageUrls: string[] = [];
+  for (const image of tour.images) {
+    imageUrls.push(image.url);
+  }
+
+  // Vehicles ki apni tarteeb me, sirf wohi jin ki is tour ke liye price set hai
+  const tourVehicles: PublicTourVehicleResponse[] = [];
+  for (const vehicle of vehicles) {
+    const priceItem = tour.prices.find((item) => item.vehicleId === vehicle.id);
+    if (priceItem) {
+      tourVehicles.push({
+        vehicleId: vehicle.id,
+        vehicleName: vehicle.name,
+        description: vehicle.description,
+        passengerCapacity: vehicle.passengerCapacity,
+        luggageCapacity: vehicle.luggageCapacity,
+        handLuggageCapacity: vehicle.handLuggageCapacity,
+        imageUrl: vehicle.imageUrl,
+        price: priceItem.price,
+      });
+    }
+  }
+
+  let startingPrice = 0;
+  for (const tourVehicle of tourVehicles) {
+    if (startingPrice === 0 || tourVehicle.price < startingPrice) {
+      startingPrice = tourVehicle.price;
+    }
+  }
+
+  return {
+    id: tour.id,
+    title: tour.title,
+    description: tour.description,
+    imageUrls: imageUrls,
+    vehicles: tourVehicles,
+    startingPrice: startingPrice,
+  };
+}
+
+// Home page ke "Tours" section ke liye tours (jin ki kam az kam ek vehicle ki price set ho)
+export async function getPublicTours(): Promise<PublicTourResponse[]> {
+  const tours = await getAllTours();
+  const vehicles = await getAllVehicles();
+
+  const publicTours: PublicTourResponse[] = [];
+  for (const tour of tours) {
+    const publicTour = toPublicTour(tour, vehicles);
+    if (publicTour.vehicles.length > 0) {
+      publicTours.push(publicTour);
+    }
+  }
+  return publicTours;
+}
+
+// Tour ke detail page ke liye ek tour (na mile to 404)
+export async function getPublicTour(id: string): Promise<PublicTourResponse> {
+  const tour = await getTourById(id);
+  const vehicles = await getAllVehicles();
+  return toPublicTour(tour, vehicles);
+}
+
 // Airports / stations ki list (booking form ke suggestions ke liye), bina charges ke
 export async function getPublicDropdownAddresses(): Promise<PublicDropdownAddressResponse[]> {
   const addresses = await getAllDropdownAddresses();
@@ -211,6 +281,21 @@ function checkPaymentMethodIsOn(paymentMethod: string, settings: SettingsRespons
   }
   if (paymentMethod === "pay_cash" && !settings.pricing.showCash) {
     throw new AppError("Pay in car is not available right now. Please choose another way to pay.", 400);
+  }
+}
+
+// Card booking: abhi Stripe par payment, aur uska link wapas deta hai. Baqi sab ke liye "".
+// Quote request (quotation mode) ki payment approve hone ke baad hoti hai
+async function startCheckoutIfNeeded(booking: BookingResponse, paymentMethod: PaymentMethod): Promise<string> {
+  if (paymentMethod !== "pay_card" || booking.status !== "pending") {
+    return "";
+  }
+  try {
+    return await startCheckout(booking);
+  } catch (error) {
+    // Booking save ho chuki hai. Customer thank-you page par "Pay now" se dobara try kar sakta hai
+    console.log("Stripe checkout could not be started for booking " + booking.bookingNumber, error);
+    return "";
   }
 }
 
@@ -238,16 +323,30 @@ export async function createPublicBooking(input: CreateBookingInput): Promise<Cr
     customer: { ...input.customer, customerId: "" },
   });
 
-  // Card booking: abhi Stripe par payment. Quote request (quotation mode) ki payment approve hone ke baad hoti hai
-  let checkoutUrl = "";
-  if (input.paymentMethod === "pay_card" && booking.status === "pending") {
-    try {
-      checkoutUrl = await startCheckout(booking);
-    } catch (error) {
-      // Booking save ho chuki hai. Customer thank-you page par "Pay now" se dobara try kar sakta hai
-      console.log("Stripe checkout could not be started for booking " + booking.bookingNumber, error);
-    }
+  const checkoutUrl = await startCheckoutIfNeeded(booking, input.paymentMethod);
+
+  return {
+    booking: toPublicBooking(booking, settings),
+    checkoutUrl: checkoutUrl,
+  };
+}
+
+// Customer ki tour booking. Price server khud tour se nikalta hai (createTourBooking ke andar)
+export async function createPublicTourBooking(input: CreateTourBookingInput): Promise<CreatePublicBookingResponse> {
+  const settings = await getSettings();
+
+  if (!settings.general.guestLogin) {
+    throw new AppError("Please log in to make a booking", 403);
   }
+  checkPaymentMethodIsOn(input.paymentMethod, settings);
+  checkPickupIsInFuture(input.tourDate, input.pickupTime);
+
+  const booking = await createTourBooking({
+    ...input,
+    customer: { ...input.customer, customerId: "" },
+  });
+
+  const checkoutUrl = await startCheckoutIfNeeded(booking, input.paymentMethod);
 
   return {
     booking: toPublicBooking(booking, settings),

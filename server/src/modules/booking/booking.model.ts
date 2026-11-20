@@ -23,7 +23,11 @@ const bookingSchema = new Schema(
       phone: { type: String, required: true, trim: true },
       customerId: { type: String, default: "" },
     },
-    tripType: { type: String, enum: ["one_way", "return", "hourly"], required: true },
+    // "tour" = customer ne website par koi tour book kiya (price tour ki vehicle price se aati hai)
+    tripType: { type: String, enum: ["one_way", "return", "hourly", "tour"], required: true },
+    // Sirf tour booking me bhara hota hai, baqi me ""
+    tourId: { type: String, default: "" },
+    tourName: { type: String, default: "" },
     pickup: { type: String, required: true },
     via: { type: [String], default: [] },
     dropoff: { type: String, default: "" },

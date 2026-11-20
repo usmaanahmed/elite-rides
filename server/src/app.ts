@@ -21,6 +21,7 @@ import surchargeAddressRoutes from "./modules/surchargeAddress/surchargeAddress.
 import surchargeDateRoutes from "./modules/surchargeDate/surchargeDate.routes.js";
 import surchargeNightRoutes from "./modules/surchargeNight/surchargeNight.routes.js";
 import stationRoutes from "./modules/station/station.routes.js";
+import tourRoutes from "./modules/tour/tour.routes.js";
 import vehicleRoutes from "./modules/vehicle/vehicle.routes.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { requireAdmin } from "./middlewares/requireAdmin.js";
@@ -67,6 +68,7 @@ app.use("/api/quotes", requireAdmin, quoteRoutes);
 app.use("/api/bookings", requireAdmin, bookingRoutes);
 app.use("/api/blogs", requireAdmin, blogRoutes);
 app.use("/api/events", requireAdmin, eventRoutes);
+app.use("/api/tours", requireAdmin, tourRoutes);
 
 // Error handler hamesha sab se last me
 app.use(errorHandler);

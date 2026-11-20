@@ -10,6 +10,7 @@ import {
   List,
   Map,
   MapPin,
+  MapPinned,
   MapPinOff,
   MapPinPlus,
   Moon,
@@ -68,6 +69,7 @@ export const mainNavigation: NavSection[] = [
     items: [
       { path: ROUTES.blogs, label: 'Blogs', icon: Newspaper },
       { path: ROUTES.events, label: 'Events', icon: PartyPopper },
+      { path: ROUTES.tours, label: 'Tours', icon: MapPinned },
     ],
   },
 ]
@@ -107,6 +109,7 @@ export const quickActions: QuickAction[] = [
   { path: ROUTES.coupons, label: 'Coupon', hint: 'Coupons', icon: Ticket },
   { path: ROUTES.newBlog, label: 'Blog post', hint: 'Content', icon: Newspaper },
   { path: ROUTES.events, label: 'Event', hint: 'Content', icon: PartyPopper },
+  { path: ROUTES.tours, label: 'Tour', hint: 'Content', icon: MapPinned },
 ]
 
 // Looks up the label of the page at a URL, e.g. '/bookings' -> 'Bookings'

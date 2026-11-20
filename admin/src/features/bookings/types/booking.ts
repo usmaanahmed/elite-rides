@@ -47,7 +47,10 @@ export type Booking = {
   bookingNumber: string
   status: BookingStatus
   customer: { name: string; email: string; phone: string; customerId: string }
-  tripType: TripType
+  // "tour" = booked from a tour on the website
+  tripType: TripType | 'tour'
+  // Name of the tour (only for tour bookings, otherwise "")
+  tourName: string
   pickup: string
   via: string[]
   dropoff: string

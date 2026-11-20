@@ -11,6 +11,7 @@ const TRIP_TYPE_LABELS = {
   one_way: 'One way',
   return: 'Return',
   hourly: 'Hourly hire',
+  tour: 'Tour',
 }
 
 // Names of the extras the customer chose, e.g. "Baby seat × 1, Meet & greet"
@@ -53,7 +54,9 @@ export function BookingDetails({ booking }: BookingDetailsProps) {
     const returnTime = formatPickupDateAndTime(booking.returnDate, booking.returnTime)
     details.push(['Return', `${returnTime.date} ${returnTime.time}`])
   }
-  if (booking.tripType === 'hourly') {
+  if (booking.tripType === 'tour') {
+    details.push(['Tour', booking.tourName])
+  } else if (booking.tripType === 'hourly') {
     details.push(['Duration', `${booking.hourlyDuration} hours`])
   } else {
     details.push(['Distance', `${booking.distanceMiles} miles`])

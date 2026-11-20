@@ -111,7 +111,10 @@ export type ConfirmedBooking = {
   bookingNumber: string
   status: 'quote_requested' | 'pending' | 'confirmed' | 'completed' | 'cancelled'
   customerName: string
-  tripType: TripType
+  // 'tour' = booked from a tour page
+  tripType: TripType | 'tour'
+  // Name of the tour (only for tour bookings, otherwise "")
+  tourName: string
   pickup: string
   via: string[]
   dropoff: string

@@ -12,7 +12,9 @@ export const MAX_AIRPORT_IMAGES = 5;
 export const MAX_STATION_IMAGES = 5;
 // Ek event ki zyada se zyada itni images
 export const MAX_EVENT_IMAGES = 5;
-const allowedImageTypes = ["image/jpeg", "image/png", "image/webp"];
+// Ek tour ki zyada se zyada itni images
+export const MAX_TOUR_IMAGES = 8;
+const allowedImageTypes =["image/jpeg", "image/png", "image/webp"];
 
 // Vehicle images is folder me jaengi: uploads/vehicles
 export const vehicleImagesFolder = path.join(env.uploadsFolder, "vehicles");
@@ -29,6 +31,10 @@ fs.mkdirSync(stationImagesFolder, { recursive: true });
 // Event images is folder me jaengi: uploads/events
 export const eventImagesFolder = path.join(env.uploadsFolder, "events");
 fs.mkdirSync(eventImagesFolder, { recursive: true });
+
+// Tour images is folder me jaengi: uploads/tours
+export const tourImagesFolder = path.join(env.uploadsFolder, "tours");
+fs.mkdirSync(tourImagesFolder, { recursive: true });
 
 // Blog ki cover image aur blog ke andar lagi images is folder me jaengi: uploads/blogs
 export const blogImagesFolder = path.join(env.uploadsFolder, "blogs");
@@ -82,6 +88,12 @@ export const uploadEventImages = multer({
   storage: createStorage(eventImagesFolder),
   fileFilter: checkImageType,
   limits: { fileSize: MAX_IMAGE_SIZE_MB * 1024 * 1024, files: MAX_EVENT_IMAGES },
+});
+
+export const uploadTourImages = multer({
+  storage: createStorage(tourImagesFolder),
+  fileFilter: checkImageType,
+  limits: { fileSize: MAX_IMAGE_SIZE_MB * 1024 * 1024, files: MAX_TOUR_IMAGES },
 });
 
 // Blog ke liye ek waqt me ek image (cover image, ya editor me lagane wali image)

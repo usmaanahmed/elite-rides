@@ -16,6 +16,7 @@ export function buildSuccessRedirectUrl(baseUrl: string, booking: ConfirmedBooki
   const values: [string, string][] = [
     ['customer_name', booking.customerName],
     ['trip_type', booking.tripType],
+    ['tour_name', booking.tourName],
     ['pickup', booking.pickup],
     ['dropoff', booking.dropoff],
     ['via', booking.via.join('|')],
@@ -37,7 +38,7 @@ export function buildSuccessRedirectUrl(baseUrl: string, booking: ConfirmedBooki
 
   if (booking.tripType === 'hourly') {
     values.push(['hourly_duration', String(booking.hourlyDuration)])
-  } else {
+  } else if (booking.tripType !== 'tour') {
     values.push(['distance', String(booking.distanceMiles)])
   }
 

@@ -4,6 +4,7 @@ import { SiteFooter } from '../../../shared/components/layout/footer/SiteFooter'
 import { AirportsSection } from '../../airports/components/AirportsSection'
 import { FleetSection } from '../../fleet/components/FleetSection'
 import { StationsSection } from '../../stations/components/StationsSection'
+import { ToursSection } from '../../tours/components/ToursSection'
 import { HeroSection } from '../components/HeroSection'
 
 // Home page of the website: hero, the fleet, the airports, then the stations, and the footer at the end.
@@ -29,6 +30,7 @@ export function HomePage() {
         <FleetSection />
         <AirportsSection />
         <StationsSection />
+        <ToursSection />
       </main>
       <SiteFooter />
     </>

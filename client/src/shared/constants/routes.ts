@@ -9,4 +9,8 @@ export const ROUTES = {
   bookingConfirmation: '/booking/confirmation',
   // One airport: photos, description and address (build the link with buildAirportLink)
   airportDetails: '/airports/:airportId',
+  // One tour: photos, description, vehicles with prices, date and time (build the link with buildTourLink)
+  tourDetails: '/tours/:tourId',
+  // Tour booking step 2: passenger details and payment
+  tourBooking: '/tour-booking',
 }

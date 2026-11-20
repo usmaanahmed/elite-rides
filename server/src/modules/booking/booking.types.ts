@@ -7,6 +7,9 @@ export type BookingStatus = "quote_requested" | "pending" | "confirmed" | "compl
 export type PaymentMethod = "pay_card" | "pay_cash";
 export type PaymentStatus = "pending" | "partially_paid" | "paid";
 
+// Booking ka trip type: quote wale teen types ya "tour"
+export type BookingTripType = TripType | "tour";
+
 export interface BookingCustomer {
   name: string;
   email: string;
@@ -29,13 +32,32 @@ export interface CreateBookingInput {
   notes: string;
 }
 
+// Tour booking banane ki request (validation ke baad)
+export interface CreateTourBookingInput {
+  tourId: string;
+  vehicleId: string;
+  // "YYYY-MM-DD" aur "HH:mm"
+  tourDate: string;
+  pickupTime: string;
+  // Customer ko kahan se uthana hai
+  pickup: string;
+  passengers: number;
+  luggage: number;
+  customer: BookingCustomer;
+  paymentMethod: PaymentMethod;
+  notes: string;
+}
+
 // Booking jaisi database me save hoti hai
 export interface BookingRecord {
   _id: Types.ObjectId;
   bookingNumber: string;
   status: BookingStatus;
   customer: BookingCustomer;
-  tripType: TripType;
+  tripType: BookingTripType;
+  // Tour booking me tour ki id aur naam, baqi me ""
+  tourId: string;
+  tourName: string;
   pickup: string;
   via: string[];
   dropoff: string;

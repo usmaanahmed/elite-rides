@@ -16,6 +16,7 @@ import { DashboardPage } from './features/dashboard/pages/DashboardPage'
 import { EventsPage } from './features/events/pages/EventsPage'
 import { FixedPricePage } from './features/pricing/pages/FixedPricePage'
 import { SettingsPage } from './features/settings/pages/SettingsPage'
+import { ToursPage } from './features/tours/pages/ToursPage'
 import { StationsPage } from './features/stations/pages/StationsPage'
 import { SurchargeAddressesPage } from './features/surcharges/pages/SurchargeAddressesPage'
 import { SurchargeNightPage } from './features/surcharges/pages/SurchargeNightPage'
@@ -57,6 +58,7 @@ export const router = createBrowserRouter([
           { path: ROUTES.newBlog, element: <NewBlogPage /> },
           { path: ROUTES.editBlog, element: <EditBlogPage /> },
           { path: ROUTES.events, element: <EventsPage /> },
+          { path: ROUTES.tours, element: <ToursPage /> },
           { path: ROUTES.priceChecker, element: <PriceCheckerPage /> },
           { path: ROUTES.settings, element: <SettingsPage /> },
           { path: ROUTES.help, element: <ComingSoonPage title="Help & Support" /> },

@@ -21,6 +21,7 @@ export const ROUTES = {
   // ":blogId" is filled in with the real id, see getEditBlogPath
   editBlog: '/blogs/:blogId/edit',
   events: '/events',
+  tours: '/tours',
   settings: '/settings',
   help: '/help',
   apiTest: '/api-test',

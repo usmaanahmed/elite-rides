@@ -6,6 +6,8 @@ import { roundMoney } from "../../utils/roundMoney.js";
 import { recordCouponUsage } from "../coupon/coupon.service.js";
 import { createQuote } from "../quote/quote.service.js";
 import { getSettings } from "../setting/setting.service.js";
+import { getTourById } from "../tour/tour.service.js";
+import { getAllVehicles } from "../vehicle/vehicle.service.js";
 import {
   countBookings,
   createBooking as saveBooking,
@@ -22,7 +24,9 @@ import {
   BookingResponse,
   BookingStatus,
   CreateBookingInput,
+  CreateTourBookingInput,
   NewBookingData,
+  PaymentMethod,
   PaymentStatus,
 } from "./booking.types.js";
 
@@ -45,6 +49,9 @@ function toBookingResponse(record: BookingRecord): BookingResponse {
     status: record.status,
     customer: record.customer,
     tripType: record.tripType,
+    // Purani bookings me yeh do fields nahi hote
+    tourId: record.tourId || "",
+    tourName: record.tourName || "",
     pickup: record.pickup,
     via: record.via,
     dropoff: record.dropoff,
@@ -117,6 +124,109 @@ async function recordCouponUsageOnce(booking: BookingRecord): Promise<boolean> {
 
 // ---------- Create ----------
 
+// Booking ka shuru ka status. "Is Quotation" on ho to booking sirf quote request hai, admin approve karega.
+// Warna: gaari me payment = foran confirmed, card = payment aane tak pending
+async function getStartingStatus(paymentMethod: PaymentMethod): Promise<BookingStatus> {
+  const settings = await getSettings();
+  if (settings.general.isQuotation) {
+    return "quote_requested";
+  }
+  if (paymentMethod === "pay_cash") {
+    return "confirmed";
+  }
+  return "pending";
+}
+
+// Naya booking number banata hai, e.g. "ELR000042"
+async function createNextBookingNumber(): Promise<string> {
+  const settings = await getSettings();
+  const sequence = await getNextBookingSequence();
+  return makeBookingNumber(settings.general.bookingNumberPrefix, sequence);
+}
+
+// Booking database me save karta hai. Foran confirmed booking par coupon use ho jata hai
+async function saveNewBooking(newBooking: NewBookingData): Promise<BookingResponse> {
+  const created = await saveBooking(newBooking);
+  let record = created.toObject() as unknown as BookingRecord;
+
+  if (record.status === "confirmed") {
+    const wasRecorded = await recordCouponUsageOnce(record);
+    if (wasRecorded) {
+      await updateBookingById(record._id.toString(), { couponUsageRecorded: true });
+      record = { ...record, couponUsageRecorded: true };
+    }
+  }
+
+  return toBookingResponse(record);
+}
+
+// Tour ki booking. Price tour me chuni hui vehicle ki price hoti hai (frontend se price nahi aati)
+export async function createTourBooking(input: CreateTourBookingInput): Promise<BookingResponse> {
+  const tour = await getTourById(input.tourId);
+
+  const tourPrice = tour.prices.find((item) => item.vehicleId === input.vehicleId);
+  const vehicles = await getAllVehicles();
+  const vehicle = vehicles.find((item) => item.id === input.vehicleId);
+  if (!tourPrice || !vehicle) {
+    throw new AppError("This vehicle is not available for this tour", 400);
+  }
+
+  if (input.passengers > vehicle.passengerCapacity) {
+    throw new AppError(`This vehicle takes up to ${vehicle.passengerCapacity} passengers. Please choose a bigger vehicle.`, 400);
+  }
+  if (input.luggage > vehicle.luggageCapacity) {
+    throw new AppError(`This vehicle takes up to ${vehicle.luggageCapacity} large bags. Please choose a bigger vehicle.`, 400);
+  }
+
+  const newBooking: NewBookingData = {
+    bookingNumber: await createNextBookingNumber(),
+    status: await getStartingStatus(input.paymentMethod),
+    customer: input.customer,
+    tripType: "tour",
+    tourId: tour.id,
+    tourName: tour.title,
+    pickup: input.pickup,
+    via: [],
+    dropoff: "",
+    pickupDate: input.tourDate,
+    pickupTime: input.pickupTime,
+    returnDate: "",
+    returnTime: "",
+    hourlyDuration: 0,
+    passengers: input.passengers,
+    luggage: input.luggage,
+    vehicleId: vehicle.id,
+    vehicleName: vehicle.name,
+    extras: {
+      babySeats: 0,
+      boosterSeats: 0,
+      meetAndGreet: false,
+      extraLuggage: 0,
+      specialLuggage: 0,
+      wheelchair: false,
+      pet: false,
+    },
+    flightNo: "",
+    arrivalFrom: "",
+    distanceMiles: 0,
+    priceLines: [{ label: tour.title + " (" + vehicle.name + ")", amount: tourPrice.price }],
+    total: tourPrice.price,
+    couponCode: "",
+    couponDiscount: 0,
+    couponUsageRecorded: false,
+    waitingMinutes: 0,
+    waitingCharge: 0,
+    paymentMethod: input.paymentMethod,
+    paymentStatus: "pending",
+    amountPaid: 0,
+    cardPaymentIds: [],
+    notes: input.notes,
+    accessToken: createAccessToken(),
+  };
+
+  return saveNewBooking(newBooking);
+}
+
 // Booking banata hai. Price frontend se nahi aati: server dobara quote nikalta hai
 export async function createBooking(input: CreateBookingInput): Promise<BookingResponse> {
   const quote = await createQuote({ ...input.quote, vehicleId: input.vehicleId });
@@ -125,25 +235,13 @@ export async function createBooking(input: CreateBookingInput): Promise<BookingR
     throw new AppError(vehicleQuote.unavailableReason, 400);
   }
 
-  const settings = await getSettings();
-
-  // "Is Quotation" on ho to booking sirf quote request hai, admin approve karega.
-  // Warna: gaari me payment = foran confirmed, card = payment aane tak pending
-  let status: BookingStatus = "pending";
-  if (settings.general.isQuotation) {
-    status = "quote_requested";
-  } else if (input.paymentMethod === "pay_cash") {
-    status = "confirmed";
-  }
-
-  const sequence = await getNextBookingSequence();
-  const bookingNumber = makeBookingNumber(settings.general.bookingNumberPrefix, sequence);
-
   const newBooking: NewBookingData = {
-    bookingNumber: bookingNumber,
-    status: status,
+    bookingNumber: await createNextBookingNumber(),
+    status: await getStartingStatus(input.paymentMethod),
     customer: input.customer,
     tripType: input.quote.tripType,
+    tourId: "",
+    tourName: "",
     pickup: input.quote.pickup,
     via: input.quote.via,
     dropoff: input.quote.dropoff,
@@ -176,19 +274,7 @@ export async function createBooking(input: CreateBookingInput): Promise<BookingR
     accessToken: createAccessToken(),
   };
 
-  const created = await saveBooking(newBooking);
-  let record = created.toObject() as unknown as BookingRecord;
-
-  // Foran confirmed booking par coupon use ho gaya
-  if (record.status === "confirmed") {
-    const wasRecorded = await recordCouponUsageOnce(record);
-    if (wasRecorded) {
-      await updateBookingById(record._id.toString(), { couponUsageRecorded: true });
-      record = { ...record, couponUsageRecorded: true };
-    }
-  }
-
-  return toBookingResponse(record);
+  return saveNewBooking(newBooking);
 }
 
 // ---------- Read ----------

@@ -32,6 +32,7 @@ export function ConfirmationDetailsList({ booking }: ConfirmationDetailsListProp
   return (
     <dl className="space-y-2.5">
       <DetailRow label="Passenger" value={booking.customerName} />
+      {booking.tripType === 'tour' && <DetailRow label="Tour" value={booking.tourName} />}
       <DetailRow label="Pickup" value={`${formatDisplayDate(booking.pickupDate)} at ${booking.pickupTime}`} />
       <DetailRow label="From" value={booking.pickup} />
       {booking.via.map((stop, index) => (

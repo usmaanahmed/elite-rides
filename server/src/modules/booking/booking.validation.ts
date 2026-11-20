@@ -19,6 +19,25 @@ export const createBookingSchema = z.object({
   notes: z.string().trim().max(1000).default(""),
 });
 
+// Tour booking: tour, vehicle, date, time aur customer ki basic details
+export const createTourBookingSchema = z.object({
+  tourId: z.string().trim().min(1, "Choose a tour"),
+  vehicleId: z.string().trim().min(1, "Choose a vehicle"),
+  tourDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use date like 2026-12-25"),
+  pickupTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Use time like 06:30"),
+  pickup: z.string().trim().min(3, "Enter the pickup address").max(300),
+  passengers: z.coerce.number().int().min(1, "At least 1 passenger").max(99),
+  luggage: z.coerce.number().int().min(0).max(99).default(0),
+  customer: z.object({
+    name: z.string().trim().min(2, "Enter the passenger name").max(100),
+    email: z.string().trim().toLowerCase().email("Enter a valid email address").max(200),
+    phone: z.string().trim().min(6, "Enter a valid phone number").max(30),
+    customerId: z.string().trim().default(""),
+  }),
+  paymentMethod: z.enum(["pay_card", "pay_cash"]),
+  notes: z.string().trim().max(1000).default(""),
+});
+
 export const bookingStatusSchema = z.object({
   status: z.enum(["pending", "confirmed", "completed", "cancelled"]),
 });

@@ -1,10 +1,11 @@
 // Website (customer) ke public URLs. In par login nahi chahiye
 import { Router } from "express";
 import { validate } from "../../middlewares/validate.js";
-import { createBookingSchema } from "../booking/booking.validation.js";
+import { createBookingSchema, createTourBookingSchema } from "../booking/booking.validation.js";
 import { quoteSchema } from "../quote/quote.validation.js";
 import {
   addPublicBooking,
+  addPublicTourBooking,
   getPublicQuotePrices,
   payPublicBookingByCard,
   readPublicAirport,
@@ -13,6 +14,8 @@ import {
   readPublicDropdownAddresses,
   readPublicSettings,
   readPublicStations,
+  readPublicTour,
+  readPublicTours,
   readPublicVehicles,
 } from "./publicBooking.controller.js";
 
@@ -23,6 +26,9 @@ router.get("/vehicles", readPublicVehicles);
 router.get("/airports", readPublicAirports);
 router.get("/airports/:id", readPublicAirport);
 router.get("/stations", readPublicStations);
+router.get("/tours", readPublicTours);
+router.get("/tours/:id", readPublicTour);
+router.post("/tour-bookings", validate(createTourBookingSchema), addPublicTourBooking);
 router.get("/dropdown-addresses", readPublicDropdownAddresses);
 router.post("/quotes", validate(quoteSchema), getPublicQuotePrices);
 router.post("/bookings", validate(createBookingSchema), addPublicBooking);
