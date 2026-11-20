@@ -17,7 +17,8 @@ type PlaceResults = {
   problem: string
 }
 
-const MIN_LETTERS_FOR_GOOGLE = 3
+// 2 letters are enough so short postcodes like "W2" or "E1" also show suggestions
+const MIN_LETTERS_FOR_GOOGLE = 2
 // Wait this long after the last key press before asking Google (saves requests)
 const TYPING_DELAY_MS = 250
 const MAX_SAVED_ADDRESSES = 5
