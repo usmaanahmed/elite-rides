@@ -5,8 +5,19 @@ const API_KEY: string = (import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '').trim()
 const CALLBACK_NAME = 'eliteRidesGoogleMapsReady'
 
 // The small part of Google's library we use (written by hand, so no extra types package is needed)
+type PlaceAddressComponent = {
+  longText: string | null
+  types: string[]
+}
+
+type PlaceDetails = {
+  fetchFields: (request: { fields: string[] }) => Promise<unknown>
+  addressComponents?: PlaceAddressComponent[]
+}
+
 type PlacePrediction = {
   text: { toString: () => string }
+  toPlace: () => PlaceDetails
 }
 
 type SuggestionsResult = {
@@ -32,6 +43,8 @@ type GoogleGlobal = {
 let loadingPromise: Promise<boolean> | null = null
 // Google bills one "session" from the first letter typed until an address is chosen
 let sessionToken: object | null = null
+// Remembers Google's prediction for each suggested text, so we can ask for its postcode when it is picked
+const predictionByText = new Map<string, PlacePrediction>()
 
 function getGoogle(): GoogleGlobal | undefined {
   return (window as unknown as { google?: GoogleGlobal }).google
@@ -102,7 +115,9 @@ export async function fetchPlaceSuggestions(text: string): Promise<PlaceSuggesti
     const addresses: string[] = []
     for (const suggestion of result.suggestions) {
       if (suggestion.placePrediction) {
-        addresses.push(suggestion.placePrediction.text.toString())
+        const text = suggestion.placePrediction.text.toString()
+        predictionByText.set(text, suggestion.placePrediction)
+        addresses.push(text)
       }
     }
     return { addresses: addresses, problem: '' }
@@ -110,6 +125,37 @@ export async function fetchPlaceSuggestions(text: string): Promise<PlaceSuggesti
     console.warn('Google address suggestions are not available:', error)
     return { addresses: [], problem: 'Google suggestions failed. Enable "Places API (New)" for this key.' }
   }
+}
+
+// A picked Google address often has no postcode (e.g. "Leonardo Hotel London Croydon, Wellesley Road, Croydon, UK"),
+// but fixed prices are matched by postcode. So we ask Google for the postcode and add it at the end:
+// "Leonardo Hotel London Croydon, Wellesley Road, Croydon, UK CR0 9XY".
+// If anything fails, the address is returned unchanged.
+export async function addPostcodeToAddress(address: string): Promise<string> {
+  const prediction = predictionByText.get(address)
+  if (!prediction) {
+    return address
+  }
+
+  try {
+    const place = prediction.toPlace()
+    await place.fetchFields({ fields: ['addressComponents'] })
+
+    const components = place.addressComponents || []
+    for (const component of components) {
+      if (component.types.includes('postal_code') && component.longText) {
+        const postcode = component.longText
+        // Already in the text (with or without space)? Then nothing to add
+        if (address.replace(/\s+/g, '').toUpperCase().includes(postcode.replace(/\s+/g, '').toUpperCase())) {
+          return address
+        }
+        return `${address} ${postcode}`
+      }
+    }
+  } catch (error) {
+    console.warn('Could not get the postcode for this address:', error)
+  }
+  return address
 }
 
 // Call after the customer picks an address, so the next search starts a new Google session

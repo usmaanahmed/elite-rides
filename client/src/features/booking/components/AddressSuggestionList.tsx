@@ -1,4 +1,5 @@
 import { MapPin, Plane, TrainFront } from 'lucide-react'
+import { addPostcodeToAddress } from '../../../shared/google/googlePlaces'
 import type { DropdownAddress } from '../types/publicApi'
 
 type AddressSuggestionListProps = {
@@ -65,9 +66,11 @@ export function AddressSuggestionList({ savedAddresses, googleAddresses, googleP
               type="button"
               role="option"
               aria-selected={false}
-              onMouseDown={(event) => {
+              onMouseDown={async (event) => {
                 event.preventDefault()
-                onSelect(address)
+                // Add the postcode (if Google has one) so fixed prices can match this address
+                const addressWithPostcode = await addPostcodeToAddress(address)
+                onSelect(addressWithPostcode)
               }}
               className="flex w-full items-start gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-surface-muted"
             >
