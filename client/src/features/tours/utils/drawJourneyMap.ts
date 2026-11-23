@@ -50,6 +50,26 @@ function createStopPin(stop: TourStop): HTMLElement {
   return pin
 }
 
+// The small round car icon shown in the middle of the line between two stops
+function createTransferPin(): HTMLElement {
+  const pin = document.createElement('div')
+  pin.className = 'grid size-7 place-items-center rounded-full bg-night text-white ring-1 ring-white/30 shadow-lg'
+  // Same "car" icon as the timeline (lucide car)
+  pin.innerHTML =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/>' +
+    '<circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>'
+  return pin
+}
+
+// The point halfway between two stops
+function getMiddlePosition(from: TourStop, to: TourStop): Position {
+  return {
+    lat: (from.place.lat + to.place.lat) / 2,
+    lng: (from.place.lng + to.place.lng) / 2,
+  }
+}
+
 // The tooltip of a pin, e.g. "1. Start: Buckingham Palace"
 function getPinTitle(stop: TourStop): string {
   let label = `Day ${stop.dayNumber}`
@@ -119,6 +139,22 @@ export async function drawJourneyMap(element: HTMLElement, stops: TourStop[]): P
         },
       ],
     })
+
+    // A car icon in the middle of each line between two stops of the same day
+    for (let index = 0; index < stops.length - 1; index++) {
+      const fromStop = stops[index]
+      const toStop = stops[index + 1]
+      if (fromStop.dayNumber !== toStop.dayNumber) {
+        continue
+      }
+      new markerLibrary.AdvancedMarkerElement({
+        map: map,
+        position: getMiddlePosition(fromStop, toStop),
+        content: createTransferPin(),
+        title: 'Private transfer',
+        zIndex: 1,
+      })
+    }
 
     // Zoom so every stop fits. A single stop gets a fixed zoom instead (fitBounds would zoom in too far).
     if (stops.length === 1) {

@@ -1,3 +1,4 @@
+import { Car } from 'lucide-react'
 import type { TourStop } from '../types/tour'
 import { getDayDateText } from '../utils/tourDates'
 
@@ -53,29 +54,48 @@ function StopTag({ stop }: { stop: TourStop }) {
   return null
 }
 
+// The small "car" step between two stops of the same day (the same icon is shown on the map)
+function TransferStep() {
+  return (
+    <div className="flex items-center gap-4 py-4">
+      <span
+        aria-hidden="true"
+        className="relative z-10 grid size-8 shrink-0 place-items-center rounded-full bg-night text-white/70 ring-1 ring-white/20"
+      >
+        <Car className="size-4" strokeWidth={2} />
+      </span>
+      <p className="text-sm font-medium text-white/60">Private transfer</p>
+    </div>
+  )
+}
+
 // One place of the timeline: number on the left (joined by a line), name, address and note on the right
 function TimelineStop({ stop, isLastOfDay }: TimelineStopProps) {
   return (
-    <li className="relative flex gap-4 pb-7 last:pb-0">
+    <li className="relative">
       {/* The line down to the next stop of the same day */}
       {!isLastOfDay && (
         <span aria-hidden="true" className="absolute bottom-0 left-4 top-8 w-px -translate-x-1/2 bg-linear-to-b from-accent/60 to-white/10" />
       )}
 
-      <StopNumber stop={stop} />
+      <div className="flex gap-4">
+        <StopNumber stop={stop} />
 
-      <div className="min-w-0 pt-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <h4 className="font-semibold text-white">{stop.place.name}</h4>
-          <StopTag stop={stop} />
+        <div className="min-w-0 pt-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h4 className="font-semibold text-white">{stop.place.name}</h4>
+            <StopTag stop={stop} />
+          </div>
+          {stop.place.address !== '' && stop.place.address !== stop.place.name && (
+            <p className="mt-1 text-sm text-white/45">{stop.place.address}</p>
+          )}
+          {stop.place.description !== '' && (
+            <p className="mt-2 text-sm leading-relaxed text-white/70">{stop.place.description}</p>
+          )}
         </div>
-        {stop.place.address !== '' && stop.place.address !== stop.place.name && (
-          <p className="mt-1 text-sm text-white/45">{stop.place.address}</p>
-        )}
-        {stop.place.description !== '' && (
-          <p className="mt-2 text-sm leading-relaxed text-white/70">{stop.place.description}</p>
-        )}
       </div>
+
+      {!isLastOfDay && <TransferStep />}
     </li>
   )
 }

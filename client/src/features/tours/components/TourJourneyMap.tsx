@@ -1,4 +1,4 @@
-import { ArrowUpRight, LoaderCircle, MapPinned } from 'lucide-react'
+import { ArrowUpRight, Car, LoaderCircle, MapPinned } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import type { TourStop } from '../types/tour'
 import { buildRouteLink } from '../utils/buildRouteLink'
@@ -83,6 +83,10 @@ export function TourJourneyMap({ stops, tourTitle }: TourJourneyMapProps) {
           <li className="flex items-center gap-2">
             <span aria-hidden="true" className="size-3 rounded-full bg-white" />
             End
+          </li>
+          <li className="flex items-center gap-2">
+            <Car aria-hidden="true" className="size-3.5" strokeWidth={2} />
+            Transfer
           </li>
         </ul>
 
