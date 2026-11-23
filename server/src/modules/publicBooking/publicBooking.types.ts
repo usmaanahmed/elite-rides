@@ -1,6 +1,7 @@
 // Website (customer) ke liye public APIs ke TypeScript types.
 // Yahan sirf woh fields hain jo customer ko dikhane mein koi harj nahi (koi charges/internal settings nahi)
 import { DiscountType } from "../setting/setting.types.js";
+import { TourItineraryDay } from "../tour/tour.types.js";
 
 export interface PublicSettingsResponse {
   companyName: string;
@@ -90,6 +91,12 @@ export interface PublicTourResponse {
   vehicles: PublicTourVehicleResponse[];
   // Sab se kam price (card par "From £...")
   startingPrice: number;
+  // "YYYY-MM-DD" ya "" (date set nahi)
+  startDate: string;
+  endDate: string;
+  durationDays: number;
+  // Din-ba-din jagahein (pehla din = Day 1)
+  itinerary: TourItineraryDay[];
 }
 
 // Booking ke baad customer ko wapas jaane wali summary (thank-you page ke liye)

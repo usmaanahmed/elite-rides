@@ -1,5 +1,5 @@
 import { ChevronRight, MapPinned } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Link, useParams } from 'react-router'
 import { SectionNotice } from '../../../shared/components/feedback/SectionNotice'
 import { SiteFooter } from '../../../shared/components/layout/footer/SiteFooter'
@@ -7,10 +7,12 @@ import { SiteHeader } from '../../../shared/components/layout/SiteHeader'
 import { COMPANY } from '../../../shared/constants/company'
 import { ROUTES } from '../../../shared/constants/routes'
 import { AirportDetailsSkeleton } from '../../airports/components/details/AirportDetailsSkeleton'
+import { TourFacts } from '../components/TourFacts'
 import { TourGallery } from '../components/TourGallery'
 import { TourScheduleForm } from '../components/TourScheduleForm'
 import { usePublicTour } from '../hooks/usePublicTours'
 import type { PublicTour } from '../types/tour'
+import { getStopsWithLocation, getTourStops } from '../utils/getTourStops'
 
 // Page for one tour (/tours/:tourId), opened from the tour cards on the home page.
 // Shows the title, photo gallery and description, and lets the customer choose a vehicle, date and time.
@@ -71,8 +73,13 @@ type TourDetailsProps = {
   tour: PublicTour
 }
 
-// The loaded tour: breadcrumbs, title, photo gallery, then the description, vehicles and date form
+// The loaded tour: breadcrumbs, title and quick facts, photo gallery,
+// then the description, itinerary (timeline + map), vehicles and date form
 function TourDetails({ tour }: TourDetailsProps) {
+  // All places of the tour as one numbered list (same numbers in the timeline and on the map)
+  const stops = useMemo(() => getTourStops(tour), [tour])
+  const stopsOnMap = useMemo(() => getStopsWithLocation(stops), [stops])
+
   // Browser tab title, e.g. "Windsor tour | Elite Rides"
   useEffect(() => {
     const previousTitle = document.title
@@ -116,6 +123,9 @@ function TourDetails({ tour }: TourDetailsProps) {
         <h1 className="mt-5 text-4xl font-semibold leading-[1.02] tracking-[-0.04em] text-white sm:text-6xl lg:text-7xl">
           {tour.title}
         </h1>
+        <div className="mt-8">
+          <TourFacts tour={tour} stops={stops} />
+        </div>
       </div>
 
       <div className="mt-10 lg:mt-14">
@@ -123,7 +133,7 @@ function TourDetails({ tour }: TourDetailsProps) {
       </div>
 
       <div className="mt-16 lg:mt-24">
-        <TourScheduleForm tour={tour} />
+        <TourScheduleForm tour={tour} stops={stops} stopsOnMap={stopsOnMap} />
       </div>
     </>
   )

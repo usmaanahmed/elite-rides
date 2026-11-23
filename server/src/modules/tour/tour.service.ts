@@ -12,7 +12,7 @@ import {
   findTourById,
   updateTourById,
 } from "./tour.repository.js";
-import { TourInput, TourRecord, TourResponse, TourUpdateInput } from "./tour.types.js";
+import { TourInput, TourItineraryDay, TourRecord, TourResponse, TourUpdateInput } from "./tour.types.js";
 
 // Database wala tour frontend ke format me badalta hai
 function toTourResponse(tour: TourRecord): TourResponse {
@@ -24,9 +24,29 @@ function toTourResponse(tour: TourRecord): TourResponse {
     id: tour._id.toString(),
     title: tour.title,
     description: tour.description,
+    startDate: tour.startDate ?? "",
+    endDate: tour.endDate ?? "",
+    durationDays: tour.durationDays ?? 1,
+    itinerary: toItineraryResponse(tour),
     prices: tour.prices.map((item) => ({ vehicleId: item.vehicleId, price: item.price })),
     images: images,
   };
+}
+
+// Itinerary ke din aur un ki jagahein (purane tours me itinerary nahi hoti, to khali list)
+function toItineraryResponse(tour: TourRecord): TourItineraryDay[] {
+  const days: TourItineraryDay[] = [];
+  for (const day of tour.itinerary ?? []) {
+    const places = day.places.map((place) => ({
+      name: place.name,
+      address: place.address ?? "",
+      lat: place.lat ?? 0,
+      lng: place.lng ?? 0,
+      description: place.description,
+    }));
+    days.push({ title: day.title, places: places });
+  }
+  return days;
 }
 
 // Disk se images delete karta hai (file names ki list do)
@@ -123,6 +143,10 @@ export async function updateTour(id: string, input: TourUpdateInput, newImageFil
   const updatedTour = await updateTourById(id, {
     title: input.title,
     description: input.description,
+    startDate: input.startDate,
+    endDate: input.endDate,
+    durationDays: input.durationDays,
+    itinerary: input.itinerary,
     prices: input.prices,
     imageFileNames: allFileNames,
   });

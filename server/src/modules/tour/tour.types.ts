@@ -7,10 +7,31 @@ export interface TourPrice {
   price: number;
 }
 
+// Ek din ki ek jagah (Google Maps se chuni hui), e.g.
+// { name: "Stonehenge", address: "Salisbury SP4 7DE, UK", lat: 51.17, lng: -1.82, description: "Guided visit" }
+export interface TourPlace {
+  name: string;
+  address: string;
+  lat: number;
+  lng: number;
+  description: string;
+}
+
+// Itinerary ka ek din (din ka number list ki position se banta hai: pehla = Day 1)
+export interface TourItineraryDay {
+  title: string;
+  places: TourPlace[];
+}
+
 // Form se aane wali values (validation ke baad)
 export interface TourInput {
   title: string;
   description: string;
+  // "YYYY-MM-DD" ya khali text ("" = date set nahi)
+  startDate: string;
+  endDate: string;
+  durationDays: number;
+  itinerary: TourItineraryDay[];
   prices: TourPrice[];
 }
 

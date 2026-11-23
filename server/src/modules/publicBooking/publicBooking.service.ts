@@ -238,6 +238,10 @@ function toPublicTour(tour: TourResponse, vehicles: VehicleResponse[]): PublicTo
     imageUrls: imageUrls,
     vehicles: tourVehicles,
     startingPrice: startingPrice,
+    startDate: tour.startDate,
+    endDate: tour.endDate,
+    durationDays: tour.durationDays,
+    itinerary: tour.itinerary,
   };
 }
 

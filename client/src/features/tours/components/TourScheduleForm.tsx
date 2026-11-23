@@ -8,12 +8,18 @@ import { TimeField } from '../../booking/components/TimeField'
 import { getDefaultPickupTime } from '../../booking/utils/getDefaultPickupTime'
 import { getTodayDateString } from '../../booking/utils/getTodayDateString'
 import { tourScheduleSchema, type TourScheduleValues } from '../schemas/tourScheduleSchema'
-import type { PublicTour, TourBookingDraft } from '../types/tour'
+import type { PublicTour, TourBookingDraft, TourStop } from '../types/tour'
 import { loadTourDraft, saveTourDraft } from '../utils/tourDraftStorage'
+import { TourItinerary } from './TourItinerary'
+import { TourJourneyEnds } from './TourJourneyEnds'
 import { TourVehicleOption } from './TourVehicleOption'
 
 type TourScheduleFormProps = {
   tour: PublicTour
+  // All stops of the tour, numbered in order (empty when there is no itinerary)
+  stops: TourStop[]
+  // Only the stops that have a map position
+  stopsOnMap: TourStop[]
 }
 
 // Starting values: what the customer chose before (when they come back to change it), or a pickup in two hours
@@ -41,9 +47,10 @@ function buildDefaultValues(tour: PublicTour): TourScheduleValues {
   }
 }
 
-// Step 1 of a tour booking, on the tour page: choose the vehicle (each has the tour price),
-// then the tour date and pickup time. "Continue" saves the choice and opens the details page.
-export function TourScheduleForm({ tour }: TourScheduleFormProps) {
+// Step 1 of a tour booking, on the tour page: the description and itinerary, then choose the vehicle
+// (each has the tour price), then the tour date and pickup time. The card on the right also shows
+// where the tour starts and ends. "Continue" saves the choice and opens the details page.
+export function TourScheduleForm({ tour, stops, stopsOnMap }: TourScheduleFormProps) {
   const navigate = useNavigate()
 
   const {
@@ -82,6 +89,8 @@ export function TourScheduleForm({ tour }: TourScheduleFormProps) {
             )}
           </section>
 
+          {stops.length > 0 && <TourItinerary tour={tour} stops={stops} stopsOnMap={stopsOnMap} />}
+
           <section aria-labelledby="tour-vehicles-heading">
             <h2 id="tour-vehicles-heading" className="text-2xl font-semibold tracking-tight text-white">
               Choose your vehicle
@@ -99,6 +108,12 @@ export function TourScheduleForm({ tour }: TourScheduleFormProps) {
 
         <aside className="lg:sticky lg:top-8">
           <div className="rounded-3xl bg-surface p-5 text-ink sm:p-6">
+            {stops.length > 0 && (
+              <div className="mb-5">
+                <h2 className="sr-only">Where the tour starts and ends</h2>
+                <TourJourneyEnds stops={stops} />
+              </div>
+            )}
             <h2 className="text-lg font-semibold">When do you want to go?</h2>
             <div className="mt-4 space-y-3">
               <DateField
