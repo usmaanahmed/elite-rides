@@ -8,8 +8,12 @@ function buildFormData(tour: NewTour): FormData {
   const formData = new FormData()
   formData.append('title', tour.title)
   formData.append('description', tour.description)
-  // The prices go as one piece of JSON text, the server reads it back into a list
+  formData.append('startDate', tour.startDate)
+  formData.append('endDate', tour.endDate)
+  formData.append('durationDays', String(tour.durationDays))
+  // The prices and the itinerary go as one piece of JSON text, the server reads them back into lists
   formData.append('prices', JSON.stringify(tour.prices))
+  formData.append('itinerary', JSON.stringify(tour.itinerary))
 
   for (const file of tour.newImages) {
     formData.append('images', file)
