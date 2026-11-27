@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Luggage, Plus, Users } from 'lucide-react'
+import { useEffect } from 'react'
 import { useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { LUGGAGE_OPTIONS, MAX_STOPS } from '../constants/bookingOptions'
 import { transferFormSchema, type TransferFormValues } from '../schemas/transferFormSchema'
@@ -21,11 +22,27 @@ type TransferFormProps = {
   maxPassengers: number
   // The journey entered before (when the customer comes back to change it), or null
   savedJourney: JourneyDetails | null
+  // Pickup address sent by another page (e.g. an airport), or '' if none
+  startingPickup: string
+  // Changes every time a page sends a pickup, so the same station can be chosen again
+  startingPickupKey: string
 }
 
 // "Transfer" tab: a trip from A to B, with optional stops and an optional return journey
-export function TransferForm({ onSubmit, maxPassengers, savedJourney }: TransferFormProps) {
+export function TransferForm({
+  onSubmit,
+  maxPassengers,
+  savedJourney,
+  startingPickup,
+  startingPickupKey,
+}: TransferFormProps) {
   const passengerOptions = buildNumberOptions(1, maxPassengers, 1, false, '')
+
+  // Start from the saved journey, but an airport chosen on another page replaces the pickup
+  const startingValues = buildTransferDefaults(savedJourney)
+  if (startingPickup !== '') {
+    startingValues.pickup = startingPickup
+  }
 
   const {
     register,
@@ -37,9 +54,16 @@ export function TransferForm({ onSubmit, maxPassengers, savedJourney }: Transfer
     formState: { errors },
   } = useForm<TransferFormValues>({
     resolver: zodResolver(transferFormSchema),
-    defaultValues: buildTransferDefaults(savedJourney),
+    defaultValues: startingValues,
     mode: 'onTouched',
   })
+
+  // The form is already on the page when a station is chosen (same page), so put the new pickup in the box
+  useEffect(() => {
+    if (startingPickup !== '') {
+      setValue('pickup', startingPickup, { shouldValidate: true, shouldDirty: true })
+    }
+  }, [startingPickup, startingPickupKey, setValue])
 
   const stopsArray = useFieldArray({ control, name: 'stops' })
   const hasReturn = useWatch({ control, name: 'hasReturn' })

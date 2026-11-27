@@ -11,6 +11,10 @@ export const ROUTES = {
   airportDetails: '/airports/:airportId',
   // One tour: photos, description, vehicles with prices, date and time (build the link with buildTourLink)
   tourDetails: '/tours/:tourId',
+  // All published blogs
+  blogs: '/blogs',
+  // One blog (build the link with buildBlogLink)
+  blogDetails: '/blogs/:slug',
   // Tour booking step 2: passenger details and payment
   tourBooking: '/tour-booking',
 }

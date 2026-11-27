@@ -1,16 +1,16 @@
 import { TrainFront } from 'lucide-react'
 import { SectionNotice } from '../../../shared/components/feedback/SectionNotice'
 import { usePublicStations } from '../hooks/usePublicStations'
-import { StationRow } from './StationRow'
+import { StationsCarousel } from './StationsCarousel'
 import { StationsHeader } from './StationsHeader'
 import { StationsSkeleton } from './StationsSkeleton'
 
+// Page-width box with the page's side padding (the carousel itself runs the full screen width)
+const containerClasses = 'mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8'
+
 // "Stations" section on the home page (the menu's "Stations" link jumps here with /#stations).
 // The stations come from the server: the ones the office manages on the admin panel's
-// "Stations" page.
-// Wide screens: heading on the left (stays in view while scrolling), list of stations on the right.
-// Phones: heading on top, list underneath.
-// `overflow-clip` (not overflow-hidden) keeps the glows inside without stopping the sticky heading.
+// "Stations" page. Heading on top, a sideways-scrolling carousel of station cards underneath.
 export function StationsSection() {
   return (
     <section
@@ -24,14 +24,12 @@ export function StationsSection() {
         <div className="absolute -right-48 bottom-0 size-[560px] rounded-full bg-dusk/10 blur-[150px]" />
       </div>
 
-      <div className="mx-auto grid max-w-7xl gap-14 px-4 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-20 lg:px-8">
-        <div className="lg:sticky lg:top-12 lg:self-start">
-          <StationsHeader />
-        </div>
+      <div className={containerClasses}>
+        <StationsHeader />
+      </div>
 
-        <div>
-          <StationsContent />
-        </div>
+      <div className="mt-14 lg:mt-16">
+        <StationsContent />
       </div>
     </section>
   )
@@ -71,13 +69,5 @@ function StationsContent() {
     )
   }
 
-  return (
-    <ul aria-label="Stations we cover" className="divide-y divide-white/10 border-y border-white/10">
-      {stationsQuery.data.map((station, index) => (
-        <li key={station.id}>
-          <StationRow station={station} position={index + 1} />
-        </li>
-      ))}
-    </ul>
-  )
+  return <StationsCarousel stations={stationsQuery.data} />
 }

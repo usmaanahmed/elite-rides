@@ -33,7 +33,7 @@ export function TourDetailsPage() {
         <div className="map-grid absolute inset-x-0 top-0 h-[900px]" />
       </div>
       <SiteHeader />
-      <main className="mx-auto w-full max-w-7xl px-4 pb-24 pt-6 sm:px-6 lg:px-8 lg:pb-32">
+      <main className="mx-auto w-full max-w-[1440px] px-4 pb-24 pt-6 sm:px-6 lg:px-8 lg:pb-32">
         <TourDetailsContent tourId={tourId} />
       </main>
       <SiteFooter />

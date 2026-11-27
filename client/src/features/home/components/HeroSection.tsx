@@ -15,7 +15,7 @@ export function HeroSection() {
       <HeroBackground />
       <SiteHeader />
 
-      <div className="mx-auto grid w-full max-w-7xl flex-1 items-center gap-12 px-4 pb-16 pt-8 sm:px-6 lg:grid-cols-[1fr_420px] lg:gap-14 lg:px-8 lg:pb-20 lg:pt-10 xl:grid-cols-[1fr_460px] xl:gap-24 short:pb-6 short:pt-2">
+      <div className="mx-auto grid w-full max-w-[1440px] flex-1 items-center gap-12 px-4 pb-16 pt-8 sm:px-6 lg:grid-cols-[1fr_420px] lg:gap-14 lg:px-8 lg:pb-20 lg:pt-10 xl:grid-cols-[1fr_460px] xl:gap-24 short:pb-6 short:pt-2">
         <HeroContent />
         <BookingWidget />
       </div>

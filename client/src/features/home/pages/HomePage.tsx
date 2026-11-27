@@ -2,7 +2,9 @@ import { useEffect } from 'react'
 import { useLocation } from 'react-router'
 import { SiteFooter } from '../../../shared/components/layout/footer/SiteFooter'
 import { AirportsSection } from '../../airports/components/AirportsSection'
+import { BlogsSection } from '../../blogs/components/BlogsSection'
 import { FleetSection } from '../../fleet/components/FleetSection'
+import { PaymentsSection } from '../../payments/components/PaymentsSection'
 import { StationsSection } from '../../stations/components/StationsSection'
 import { ToursSection } from '../../tours/components/ToursSection'
 import { HeroSection } from '../components/HeroSection'
@@ -31,6 +33,8 @@ export function HomePage() {
         <AirportsSection />
         <StationsSection />
         <ToursSection />
+        <BlogsSection />
+        <PaymentsSection />
       </main>
       <SiteFooter />
     </>

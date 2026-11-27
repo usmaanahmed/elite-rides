@@ -5,6 +5,8 @@ import {
   createPublicTourBooking,
   getPublicAirport,
   getPublicAirports,
+  getPublicBlog,
+  getPublicBlogs,
   getPublicBooking,
   getPublicDropdownAddresses,
   getPublicQuote,
@@ -92,4 +94,16 @@ export async function readPublicBooking(req: Request<{ reference: string }>, res
 export async function payPublicBookingByCard(req: Request<{ reference: string }>, res: Response) {
   const result = await startPublicCardPayment(req.params.reference);
   res.json(result);
+}
+
+// GET /api/public/blogs
+export async function readPublicBlogs(req: Request, res: Response) {
+  const blogs = await getPublicBlogs();
+  res.json(blogs);
+}
+
+// GET /api/public/blogs/:slug
+export async function readPublicBlog(req: Request<{ slug: string }>, res: Response) {
+  const blog = await getPublicBlog(req.params.slug);
+  res.json(blog);
 }

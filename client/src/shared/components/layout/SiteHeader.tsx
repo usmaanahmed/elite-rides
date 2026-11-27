@@ -20,8 +20,8 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="relative z-20">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8 short:h-16">
+    <header className="relative z-20 pt-4 sm:pt-6 short:pt-3">
+      <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between gap-6 px-4 sm:px-6 lg:px-8 short:h-16">
         <Logo />
 
         {/* Desktop links */}
@@ -31,7 +31,7 @@ export function SiteHeader() {
               <li key={link.href}>
                 <a
                   href={link.href}
-                  className="rounded-full px-4 py-2 text-sm font-medium text-white/70 transition-colors hover:bg-white/5 hover:text-white"
+                  className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium text-white/70 transition-colors hover:bg-white/5 hover:text-white"
                 >
                   {link.label}
                 </a>

@@ -6,7 +6,7 @@ import { AIRPORTS } from '../constants/heroContent'
 export function AirportStrip() {
   return (
     <div className="relative border-t border-white/10">
-      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-6 sm:px-6 lg:flex-row lg:items-center lg:gap-10 lg:px-8 short:py-4 very-short:py-3">
+      <div className="mx-auto flex max-w-[1440px] flex-col gap-4 px-4 py-6 sm:px-6 lg:flex-row lg:items-center lg:gap-10 lg:px-8 short:py-4 very-short:py-3">
         <p className="flex shrink-0 items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/45">
           <PlaneTakeoff className="size-4 text-accent" strokeWidth={2} />
           Airport transfers

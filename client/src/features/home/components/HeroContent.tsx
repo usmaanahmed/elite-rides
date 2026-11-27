@@ -9,16 +9,16 @@ export function HeroContent() {
   return (
     <div className="max-w-2xl">
       <h1 className="text-[2.75rem] font-semibold leading-[1.04] tracking-[-0.035em] text-white motion-safe:animate-rise-in motion-safe:[animation-delay:80ms] sm:text-6xl xl:text-7xl very-short:text-6xl">
-        Arrive in{' '}
+        Wherever You Go
+        <br />
+        We’re Just a{' '}
         <span className="bg-linear-to-r from-accent-bright to-accent bg-clip-text pr-1 font-display text-[1.12em] font-normal italic tracking-normal text-transparent">
-          effortless
-        </span>{' '}
-        luxury.
+          Click Away.
+        </span>
       </h1>
 
       <p className="mt-6 max-w-xl text-base leading-relaxed text-white/65 motion-safe:animate-rise-in motion-safe:[animation-delay:160ms] sm:text-lg short:mt-4">
-        Airport transfers, executive travel and hourly chauffeur hire across London and the UK. Fixed upfront
-        fares, flight tracking and courteous, professional chauffeurs — every single time.
+        Book Your Ride Instantly — No Delays, No Hassles.
       </p>
 
       <div className="mt-9 flex flex-col gap-3 motion-safe:animate-rise-in motion-safe:[animation-delay:240ms] sm:flex-row sm:items-center short:mt-6">

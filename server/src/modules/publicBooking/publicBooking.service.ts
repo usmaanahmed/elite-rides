@@ -2,6 +2,8 @@
 import { AppError } from "../../utils/AppError.js";
 import { getAirportById, getAllAirports } from "../airport/airport.service.js";
 import { AirportResponse } from "../airport/airport.types.js";
+import { getPublishedBlogBySlug, getPublishedBlogs } from "../blog/blog.service.js";
+import { BlogListItemResponse, BlogResponse } from "../blog/blog.types.js";
 import { createBooking, createTourBooking, getBookingByAccessToken } from "../booking/booking.service.js";
 import { BookingResponse, CreateBookingInput, CreateTourBookingInput, PaymentMethod } from "../booking/booking.types.js";
 import { getAllDropdownAddresses } from "../dropdownAddress/dropdownAddress.service.js";
@@ -265,6 +267,16 @@ export async function getPublicTour(id: string): Promise<PublicTourResponse> {
   const tour = await getTourById(id);
   const vehicles = await getAllVehicles();
   return toPublicTour(tour, vehicles);
+}
+
+// Website ke "Blogs" ke liye published blogs (content ke baghair)
+export async function getPublicBlogs(): Promise<BlogListItemResponse[]> {
+  return getPublishedBlogs();
+}
+
+// Blog ke page ke liye ek published blog (slug se)
+export async function getPublicBlog(slug: string): Promise<BlogResponse> {
+  return getPublishedBlogBySlug(slug);
 }
 
 // Airports / stations ki list (booking form ke suggestions ke liye), bina charges ke

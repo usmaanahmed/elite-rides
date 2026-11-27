@@ -18,6 +18,8 @@ import {
   findBlogById,
   findBlogBySlug,
   findOtherBlogUsingImage,
+  findPublishedBlogBySlug,
+  findPublishedBlogs,
   updateBlogById,
 } from "./blog.repository.js";
 import {
@@ -158,6 +160,21 @@ async function buildSaveData(
 export async function getAllBlogs(): Promise<BlogListItemResponse[]> {
   const blogs = await findAllBlogs();
   return blogs.map((blog) => toBlogListItem(blog as unknown as BlogRecord));
+}
+
+// Website ke liye sirf published blogs (content ke baghair)
+export async function getPublishedBlogs(): Promise<BlogListItemResponse[]> {
+  const blogs = await findPublishedBlogs();
+  return blogs.map((blog) => toBlogListItem(blog as unknown as BlogRecord));
+}
+
+// Website ke liye ek published blog, slug se, content ke saath (na mile to 404)
+export async function getPublishedBlogBySlug(slug: string): Promise<BlogResponse> {
+  const blog = await findPublishedBlogBySlug(slug);
+  if (!blog) {
+    throw new AppError("Blog not found", 404);
+  }
+  return toBlogResponse(blog as unknown as BlogRecord);
 }
 
 // Ek blog, content ke saath (edit page ke liye)

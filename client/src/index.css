@@ -117,12 +117,12 @@ body {
 }
 
 /* Fleet carousel row. It runs the full width of the screen (cards slide off the edges),
-   but the first card lines up with the page content: max-w-7xl (80rem) plus the page's
+   but the first card lines up with the page content: max-w-[1440px] (90rem) plus the page's
    side padding (--gutter). scroll-padding makes the cards snap to that same line. */
 .fleet-track {
   --gutter: 1rem;
-  padding-inline: max(var(--gutter), calc((100% - 80rem) / 2 + var(--gutter)));
-  scroll-padding-inline: max(var(--gutter), calc((100% - 80rem) / 2 + var(--gutter)));
+  padding-inline: max(var(--gutter), calc((100% - 90rem) / 2 + var(--gutter)));
+  scroll-padding-inline: max(var(--gutter), calc((100% - 90rem) / 2 + var(--gutter)));
 }
 
 /* Same side padding as the page: px-6 from the `sm` size, px-8 from the `lg` size */
@@ -145,5 +145,124 @@ input[type='date']::-webkit-calendar-picker-indicator {
 }
 
 input[type='date']::-webkit-date-and-time-value {
+  text-align: left;
+}
+
+/* ---------- Blog text ----------
+   The blog's text is plain HTML (<h2>, <ul>, <img>…) written in the admin's editor.
+   Tailwind removes the browser's default look from these tags, so they are styled here. */
+.blog-content {
+  color: rgb(255 255 255 / 0.75);
+  font-size: 1.05rem;
+  line-height: 1.8;
+  overflow-wrap: break-word;
+}
+
+.blog-content p {
+  margin: 1em 0;
+}
+
+.blog-content h1,
+.blog-content h2,
+.blog-content h3,
+.blog-content h4 {
+  margin: 1.8em 0 0.6em;
+  color: #fff;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.blog-content h1,
+.blog-content h2 {
+  font-size: 1.75em;
+}
+
+.blog-content h3 {
+  font-size: 1.35em;
+}
+
+.blog-content h4 {
+  font-size: 1.15em;
+}
+
+.blog-content a {
+  color: var(--accent-bright);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.blog-content ul,
+.blog-content ol {
+  margin: 1em 0;
+  padding-left: 1.6em;
+}
+
+.blog-content ul {
+  list-style: disc;
+}
+
+.blog-content ol {
+  list-style: decimal;
+}
+
+.blog-content blockquote {
+  margin: 1.5em 0;
+  border-left: 3px solid var(--accent);
+  padding-left: 1em;
+  color: rgb(255 255 255 / 0.6);
+  font-style: italic;
+}
+
+.blog-content img {
+  max-width: 100%;
+  height: auto;
+  margin: 1.5em 0;
+  border-radius: 16px;
+}
+
+.blog-content iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border-radius: 16px;
+}
+
+.blog-content hr {
+  margin: 2em 0;
+  border: 0;
+  border-top: 1px solid rgb(255 255 255 / 0.12);
+}
+
+.blog-content code {
+  border-radius: 6px;
+  background: rgb(255 255 255 / 0.08);
+  padding: 0.1em 0.35em;
+  font-size: 0.9em;
+}
+
+.blog-content pre {
+  margin: 1.5em 0;
+  border-radius: 12px;
+  background: rgb(0 0 0 / 0.4);
+  padding: 1em 1.2em;
+  overflow-x: auto;
+}
+
+.blog-content pre code {
+  background: none;
+  padding: 0;
+}
+
+.blog-content table {
+  width: 100%;
+  margin: 1.5em 0;
+  border-collapse: collapse;
+}
+
+.blog-content th,
+.blog-content td {
+  border: 1px solid rgb(255 255 255 / 0.15);
+  padding: 0.5em 0.75em;
   text-align: left;
 }

@@ -1,27 +1,29 @@
-// Grey placeholder rows in the same shape as the station list, shown while the stations load.
-// Keeping the same size stops the page from jumping when the real rows appear.
+import { FLEET_CARD_WIDTH } from '../../fleet/constants/fleetCarousel'
+
+// Grey placeholder cards in the same shape as the stations carousel, shown while the stations load.
+// Keeping the same size stops the page from jumping when the real cards appear.
 export function StationsSkeleton() {
   return (
-    <div aria-hidden="true" className="divide-y divide-white/10 border-y border-white/10">
-      <StationRowSkeleton />
-      <StationRowSkeleton />
-      <StationRowSkeleton />
-      <StationRowSkeleton />
+    <div aria-hidden="true" className="fleet-track flex gap-4 overflow-hidden sm:gap-5">
+      <StationCardSkeleton />
+      <StationCardSkeleton />
+      <StationCardSkeleton />
+      <StationCardSkeleton />
     </div>
   )
 }
 
-// One placeholder row: photo box, three text lines, round arrow
-function StationRowSkeleton() {
+// One placeholder card: photo box, three text lines, round arrow
+function StationCardSkeleton() {
   return (
-    <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 py-5 sm:gap-6 sm:py-6">
-      <div className="size-20 animate-pulse rounded-2xl bg-white/6 sm:h-28 sm:w-40 lg:h-32 lg:w-48" />
-      <div>
+    <div className={`shrink-0 overflow-hidden rounded-[28px] bg-night-raised ring-1 ring-white/10 ${FLEET_CARD_WIDTH}`}>
+      <div className="aspect-4/3 animate-pulse bg-white/6" />
+      <div className="p-5 sm:p-6">
         <div className="h-2.5 w-20 animate-pulse rounded-full bg-white/8" />
         <div className="mt-3 h-6 w-48 max-w-full animate-pulse rounded-full bg-white/10" />
         <div className="mt-3 h-3 w-3/4 animate-pulse rounded-full bg-white/6" />
+        <div className="mt-6 ml-auto size-10 animate-pulse rounded-full bg-white/6" />
       </div>
-      <div className="size-10 animate-pulse rounded-full bg-white/6 sm:size-11" />
     </div>
   )
 }

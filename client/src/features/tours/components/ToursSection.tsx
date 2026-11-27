@@ -65,7 +65,7 @@ function ToursFrame({ children }: ToursFrameProps) {
         <div className="absolute -right-40 bottom-0 size-[520px] rounded-full bg-accent/10 blur-[150px]" />
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-16">
           <div>
             <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.22em] text-accent-bright">

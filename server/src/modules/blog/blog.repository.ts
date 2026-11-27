@@ -7,6 +7,16 @@ export function findAllBlogs() {
   return Blog.find().select("-content").sort({ createdAt: -1 }).lean();
 }
 
+// Sirf published blogs (website ke liye), naye sab se upar. Content list me nahi chahiye
+export function findPublishedBlogs() {
+  return Blog.find({ status: "published" }).select("-content").sort({ publishedAt: -1 }).lean();
+}
+
+// Slug se ek published blog (draft website par nahi dikhna chahiye)
+export function findPublishedBlogBySlug(slug: string) {
+  return Blog.findOne({ slug: slug, status: "published" }).lean();
+}
+
 export function findBlogById(id: string) {
   return Blog.findById(id).lean();
 }

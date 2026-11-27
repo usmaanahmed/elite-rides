@@ -5,7 +5,7 @@ import { FleetNotice } from './FleetNotice'
 import { FleetSkeleton } from './FleetSkeleton'
 
 // Page-width box with the page's side padding (the carousel itself runs the full screen width)
-const containerClasses = 'mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'
+const containerClasses = 'mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8'
 
 // "The fleet" section on the home page (the menu's "Fleet" link jumps here with /#fleet).
 // The vehicles come from the server: the ones the office manages on the admin panel's

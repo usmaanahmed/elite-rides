@@ -19,11 +19,6 @@ export function FleetHeader() {
           vehicle for every journey.
         </h2>
       </div>
-
-      <p className="max-w-md text-base leading-relaxed text-white/60 lg:pb-2">
-        From a quick airport run to a family trip with plenty of luggage, choose the vehicle that fits. Every
-        vehicle comes with a professional chauffeur and a fixed fare agreed before you book.
-      </p>
     </div>
   )
 }

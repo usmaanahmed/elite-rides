@@ -22,7 +22,7 @@ export function AirportsSection() {
         <div className="absolute -left-40 bottom-0 size-[520px] rounded-full bg-accent/10 blur-[150px]" />
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
         <AirportsHeader />
 
         <div className="mt-14 lg:mt-16">

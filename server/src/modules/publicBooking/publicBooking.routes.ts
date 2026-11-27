@@ -10,6 +10,8 @@ import {
   payPublicBookingByCard,
   readPublicAirport,
   readPublicAirports,
+  readPublicBlog,
+  readPublicBlogs,
   readPublicBooking,
   readPublicDropdownAddresses,
   readPublicSettings,
@@ -26,6 +28,8 @@ router.get("/vehicles", readPublicVehicles);
 router.get("/airports", readPublicAirports);
 router.get("/airports/:id", readPublicAirport);
 router.get("/stations", readPublicStations);
+router.get("/blogs", readPublicBlogs);
+router.get("/blogs/:slug", readPublicBlog);
 router.get("/tours", readPublicTours);
 router.get("/tours/:id", readPublicTour);
 router.post("/tour-bookings", validate(createTourBookingSchema), addPublicTourBooking);

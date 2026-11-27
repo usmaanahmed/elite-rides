@@ -12,18 +12,13 @@ export function AirportsHeader() {
           id="airports-heading"
           className="mt-5 max-w-2xl text-4xl font-semibold leading-[1.05] tracking-[-0.035em] text-white sm:text-5xl lg:text-6xl"
         >
-          Arrive to a chauffeur,{' '}
+          Arrive to an Elite Ride,{' '}
           <span className="bg-linear-to-r from-accent-bright to-accent bg-clip-text pr-1 font-display text-[1.12em] font-normal italic tracking-normal text-transparent">
             not
           </span>{' '}
           a queue.
         </h2>
       </div>
-
-      <p className="max-w-md text-base leading-relaxed text-white/60 lg:pb-2">
-        Door-to-door transfers to and from the airports below. Tell us your flight number and we'll be there when
-        you land, whether you're early, on time or delayed.
-      </p>
     </div>
   )
 }

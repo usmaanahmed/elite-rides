@@ -1,6 +1,6 @@
 import { LockKeyhole } from 'lucide-react'
 import { useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 import { ROUTES } from '../../../shared/constants/routes'
 import { DEFAULT_MAX_PASSENGERS } from '../constants/bookingOptions'
 import { usePublicSettings } from '../hooks/usePublicData'
@@ -9,6 +9,7 @@ import type { TransferFormValues } from '../schemas/transferFormSchema'
 import type { BookingTab } from '../types/booking'
 import { loadBookingDraft, saveJourney } from '../utils/bookingDraftStorage'
 import { buildHourlyJourney, buildTransferJourney } from '../utils/buildJourney'
+import { getStartingPickup } from '../utils/getStartingPickup'
 import { BookingTabs } from './BookingTabs'
 import { HourlyForm } from './HourlyForm'
 import { TransferForm } from './TransferForm'
@@ -17,6 +18,9 @@ import { TransferForm } from './TransferForm'
 // Submitting saves the journey and opens step 2 (choose a vehicle with prices).
 export function BookingWidget() {
   const navigate = useNavigate()
+  const location = useLocation()
+  // Pickup sent by another page (e.g. the airport page), or '' if none
+  const startingPickup = getStartingPickup(location.state)
   const settingsQuery = usePublicSettings()
   // The journey entered before, so "Change" brings the customer back to a filled-in form
   const [savedJourney] = useState(() => {
@@ -72,7 +76,13 @@ export function BookingWidget() {
         {/* Both forms stay mounted (just hidden), so typed details aren't lost when switching tabs */}
         <div className={isHourlyAvailable ? 'mt-4 short:mt-3' : ''}>
           <div hidden={visibleTab !== 'transfer'}>
-            <TransferForm onSubmit={handleTransferSubmit} maxPassengers={maxPassengers} savedJourney={savedJourney} />
+            <TransferForm
+              onSubmit={handleTransferSubmit}
+              maxPassengers={maxPassengers}
+              savedJourney={savedJourney}
+              startingPickup={startingPickup}
+              startingPickupKey={location.key}
+            />
           </div>
           {isHourlyAvailable && (
             <div hidden={visibleTab !== 'hourly'}>

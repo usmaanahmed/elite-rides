@@ -46,7 +46,9 @@ export function FleetCarousel({ vehicles }: FleetCarouselProps) {
 
       {position.hasOverflow && (
         <FleetCarouselControls
-          vehicleCount={vehicles.length}
+          itemCount={vehicles.length}
+          itemName="vehicles"
+          trackId="fleet-track"
           position={position}
           onPrevious={showPreviousCards}
           onNext={showNextCards}

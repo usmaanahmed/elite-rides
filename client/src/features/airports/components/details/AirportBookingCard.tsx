@@ -5,11 +5,14 @@ import { AIRPORT_BOOKING_POINTS } from '../../constants/airportBookingPoints'
 
 type AirportBookingCardProps = {
   airportName: string
+  // Full address of the airport, filled into the pickup box of the booking form
+  airportAddress: string
 }
 
 // Card next to the airport details (stays in view while scrolling on wide screens):
-// what comes with the transfer, a "Get a fixed price" button to the booking form, and the phone number
-export function AirportBookingCard({ airportName }: AirportBookingCardProps) {
+// what comes with the transfer, a "Get a fixed price" button to the booking form
+// (with this airport already filled in as the pickup), and the phone number
+export function AirportBookingCard({ airportName, airportAddress }: AirportBookingCardProps) {
   return (
     <div className="relative isolate overflow-hidden rounded-[28px] bg-night-raised p-6 shadow-[0_30px_70px_-35px_rgba(0,0,0,0.95)] ring-1 ring-white/10 sm:p-8">
       {/* Warm glow in the top corner (decoration only) */}
@@ -39,6 +42,7 @@ export function AirportBookingCard({ airportName }: AirportBookingCardProps) {
 
       <Link
         to="/#quote"
+        state={{ pickup: airportAddress }}
         className="group mt-8 flex h-12 items-center justify-center gap-2 rounded-full bg-accent text-sm font-semibold text-white shadow-[0_14px_34px_-12px_rgba(252,98,3,0.7)] transition hover:bg-accent-bright"
       >
         Get a fixed price

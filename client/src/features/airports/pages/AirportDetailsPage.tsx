@@ -31,7 +31,7 @@ export function AirportDetailsPage() {
     <div className="relative isolate min-h-svh overflow-x-clip">
       <AirportDetailsBackground />
       <SiteHeader />
-      <main className="mx-auto w-full max-w-7xl px-4 pb-24 pt-6 sm:px-6 lg:px-8 lg:pb-32">
+      <main className="mx-auto w-full max-w-[1440px] px-4 pb-24 pt-6 sm:px-6 lg:px-8 lg:pb-32">
         <AirportDetailsContent airportId={airportId} />
       </main>
       <SiteFooter />
@@ -106,7 +106,7 @@ function AirportDetails({ airport }: AirportDetailsProps) {
           <AirportLocation airport={airport} />
         </div>
         <aside className="lg:sticky lg:top-8">
-          <AirportBookingCard airportName={airport.name} />
+          <AirportBookingCard airportName={airport.name} airportAddress={airport.address} />
         </aside>
       </div>
 

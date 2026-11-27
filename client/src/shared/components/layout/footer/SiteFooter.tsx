@@ -21,7 +21,7 @@ export function SiteFooter({ showCallToAction = true }: SiteFooterProps) {
     <footer className="relative isolate overflow-hidden border-t border-white/10">
       <FooterBackground />
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
         {showCallToAction && (
           <div className="pt-20 sm:pt-24 lg:pt-28">
             <FooterCallToAction />
