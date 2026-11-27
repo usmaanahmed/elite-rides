@@ -22,7 +22,9 @@ export function SiteHeader() {
   return (
     <header className="relative z-20 pt-4 sm:pt-6 short:pt-3">
       <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between gap-6 px-4 sm:px-6 lg:px-8 short:h-16">
-        <Logo />
+        <div className="shrink-0">
+          <Logo />
+        </div>
 
         {/* Desktop links */}
         <nav aria-label="Main" className="hidden lg:block">
@@ -31,7 +33,7 @@ export function SiteHeader() {
               <li key={link.href}>
                 <a
                   href={link.href}
-                  className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium text-white/70 transition-colors hover:bg-white/5 hover:text-white"
+                  className="whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium text-white/70 2xl:px-4 transition-colors hover:bg-white/5 hover:text-white"
                 >
                   {link.label}
                 </a>
@@ -43,14 +45,14 @@ export function SiteHeader() {
         <div className="flex items-center gap-3">
           <a
             href={COMPANY.phoneLink}
-            className="hidden items-center gap-2 text-sm font-semibold text-white/85 transition-colors hover:text-white md:inline-flex"
+            className="hidden items-center gap-2 whitespace-nowrap text-sm font-semibold text-white/85 transition-colors hover:text-white xl:inline-flex"
           >
             <Phone className="size-4 text-accent" strokeWidth={2} />
             {COMPANY.phoneDisplay}
           </a>
           <a
             href="/#quote"
-            className="hidden h-10 items-center rounded-full bg-white px-5 text-sm font-semibold text-ink transition-colors hover:bg-accent hover:text-white sm:inline-flex"
+            className="hidden h-10 shrink-0 items-center whitespace-nowrap rounded-full bg-white px-5 text-sm font-semibold text-ink transition-colors hover:bg-accent hover:text-white sm:inline-flex"
           >
             Book now
           </a>
