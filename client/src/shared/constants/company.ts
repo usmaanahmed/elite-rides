@@ -3,7 +3,7 @@ export const COMPANY = {
   name: 'Elite Rides',
   // Full registered name, used in the footer's copyright line
   legalName: 'Elite London Rides',
-  tagline: 'London Chauffeurs',
+  tagline: 'London Elite',
   phoneDisplay: '+44 20 3355 1345',
   phoneLink: 'tel:+442033551345',
   email: 'admin@elitelondonrides.co.uk',

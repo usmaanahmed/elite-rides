@@ -9,8 +9,8 @@ export function FooterBrand() {
       <Logo />
 
       <p className="mt-7 text-[15px] leading-relaxed text-white/55">
-        Airport transfers, executive travel and hourly chauffeur hire across London and the UK. Fixed fares and
-        professional chauffeurs, every single time.
+        Airport transfers, executive travel and hourly Elite hire across London and the UK. Fixed fares and
+        professional cabs, every single time.
       </p>
 
       <div className="mt-9">

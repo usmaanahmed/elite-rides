@@ -22,7 +22,7 @@ export function StationsHeader() {
         the car.
       </h2>
       <p className="mt-6 max-w-md text-base leading-relaxed text-white/60">
-        Fixed-price chauffeur transfers to and from the stations listed here. Add meet & greet and your chauffeur
+        Fixed-price Elite transfers to and from the stations listed here. Add meet & greet and your Elite
         will be waiting for you when you arrive.
       </p>
 

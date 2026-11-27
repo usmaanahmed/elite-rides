@@ -10,7 +10,7 @@ export const AIRPORT_PERKS: AirportPerk[] = [
   },
   {
     title: 'Meet & greet',
-    description: 'Add it to your booking and your chauffeur waits in arrivals with your name.',
+    description: 'Add it to your booking and your Elite waits in arrivals with your name.',
     icon: UserRoundCheck,
   },
   {

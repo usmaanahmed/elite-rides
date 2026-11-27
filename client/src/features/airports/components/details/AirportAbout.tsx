@@ -10,7 +10,7 @@ type AirportAboutProps = {
 export function AirportAbout({ airport }: AirportAboutProps) {
   let description = airport.description
   if (description === '') {
-    description = `Book a fixed-price chauffeur transfer to or from ${airport.name}. Share your flight number and we'll time your pickup to your landing.`
+    description = `Book a fixed-price Elite transfer to or from ${airport.name}. Share your flight number and we'll time your pickup to your landing.`
   }
 
   return (

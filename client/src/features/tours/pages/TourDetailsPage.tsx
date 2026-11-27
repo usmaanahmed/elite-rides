@@ -118,7 +118,7 @@ function TourDetails({ tour }: TourDetailsProps) {
       <div className="mt-10 motion-safe:animate-rise-in lg:mt-12">
         <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.22em] text-accent-bright">
           <span className="h-px w-8 bg-accent" />
-          Chauffeur tour
+          Elite tour
         </p>
         <h1 className="mt-5 text-4xl font-semibold leading-[1.02] tracking-[-0.04em] text-white sm:text-6xl lg:text-7xl">
           {tour.title}

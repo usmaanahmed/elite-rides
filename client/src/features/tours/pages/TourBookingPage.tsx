@@ -210,7 +210,7 @@ export function TourBookingPage() {
             </div>
           </SectionCard>
 
-          <SectionCard title="Pickup" description="Where should your chauffeur collect you?">
+          <SectionCard title="Pickup" description="Where should your Elite collect you?">
             <div className="space-y-3">
               <TextField
                 id="tour-pickup-address"

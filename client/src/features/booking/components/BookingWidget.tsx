@@ -68,7 +68,7 @@ export function BookingWidget() {
         {/* On very short laptop screens the heading is hidden from view (still read by screen readers), so the hero fits */}
         <div className="mb-5 short:mb-3 very-short:sr-only">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-accent-ink">Instant quote</p>
-          <h2 className="mt-1 text-xl font-semibold tracking-tight text-ink">Book your chauffeur</h2>
+          <h2 className="mt-1 text-xl font-semibold tracking-tight text-ink">Book Your Elite Rides</h2>
         </div>
 
         {isHourlyAvailable && <BookingTabs activeTab={visibleTab} onChange={setActiveTab} />}

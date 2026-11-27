@@ -12,7 +12,7 @@ export function FooterCallToAction() {
         <div>
           <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.22em] text-accent-bright">
             <span className="h-px w-8 bg-accent" />
-            Book your chauffeur
+            Book Your Elite Rides
           </p>
           <h2 className="mt-5 text-4xl font-semibold leading-[1.05] tracking-[-0.035em] text-white sm:text-5xl lg:text-6xl">
             Ready when{' '}

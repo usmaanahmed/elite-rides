@@ -7,7 +7,7 @@ export const FOOTER_SERVICE_LINKS: NavLink[] = [
   { label: 'Airport transfers', href: '/#airports' },
   { label: 'Station transfers', href: '/#stations' },
   { label: 'Executive travel', href: '/#services' },
-  { label: 'Hourly chauffeur hire', href: '/#services' },
+  { label: 'Hourly Elite hire', href: '/#services' },
 ]
 
 // Footer "Company" column

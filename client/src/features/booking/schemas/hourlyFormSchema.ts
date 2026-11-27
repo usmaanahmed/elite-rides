@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { isDateBeforeToday } from '../utils/isDateBeforeToday'
 import { isTimeInPast } from '../utils/isTimeInPast'
 
-// Rules for the "By the hour" tab (chauffeur hired for a number of hours).
+// Rules for the "By the hour" tab (Elite hired for a number of hours).
 // Dropdown values (hours, time, passengers, luggage) are kept as text, the way <select> gives them.
 export const hourlyFormSchema = z
   .object({

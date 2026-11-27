@@ -1,6 +1,6 @@
 import { HERO_HIGHLIGHTS } from '../../home/constants/heroContent'
 
-// The same three selling points as the home page (licensed chauffeurs, fixed fares, flight tracking),
+// The same three selling points as the home page (licensed Elite, fixed fares, flight tracking),
 // shown under the journey card so the customer feels safe choosing
 export function BookingAssurances() {
   return (

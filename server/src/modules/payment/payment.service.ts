@@ -49,7 +49,7 @@ export async function createCheckoutSession(info: CheckoutBookingInfo): Promise<
           price_data: {
             currency: env.stripeCurrency,
             unit_amount: amountInPence,
-            product_data: { name: `Chauffeur booking ${info.bookingNumber}` },
+            product_data: { name: `Elite booking ${info.bookingNumber}` },
           },
         },
       ],

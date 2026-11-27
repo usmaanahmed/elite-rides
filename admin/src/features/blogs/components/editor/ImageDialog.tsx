@@ -156,7 +156,7 @@ export function ImageDialog({ onInsert, onUploadImage, onClose }: ImageDialogPro
             id="editorImageAlt"
             value={altText}
             onChange={(event) => setAltText(event.target.value)}
-            placeholder="e.g. Chauffeur opening the car door at Heathrow"
+            placeholder="e.g. Elite opening the car door at Heathrow"
             maxLength={200}
             autoComplete="off"
           />

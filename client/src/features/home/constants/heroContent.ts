@@ -4,7 +4,7 @@ import type { Airport, HeroHighlight } from '../types/hero'
 // Selling points shown under the hero buttons
 export const HERO_HIGHLIGHTS: HeroHighlight[] = [
   {
-    title: 'Licensed chauffeurs',
+    title: 'Licensed Cabs',
     description: 'Vetted, professional and discreet',
     icon: ShieldCheck,
   },

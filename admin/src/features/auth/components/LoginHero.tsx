@@ -42,7 +42,7 @@ export function LoginHero() {
         <div className="max-w-xl">
           <p className="hidden items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/70 lg:flex">
             <span className="h-px w-8 bg-[#ff8a3d]" />
-            Chauffeur operations
+            Elite operations
           </p>
 
           <p className="font-display text-[32px] font-semibold leading-[1.05] text-white lg:mt-5 lg:text-[44px] xl:text-[56px] 2xl:text-[60px]">

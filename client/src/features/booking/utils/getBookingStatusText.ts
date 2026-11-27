@@ -48,7 +48,7 @@ export function getBookingStatusText(booking: ConfirmedBooking, isCheckingPaymen
   if (booking.status === 'confirmed' || booking.status === 'completed') {
     return {
       title: 'Your booking is confirmed',
-      message: 'Your chauffeur is booked. Please keep your booking number for any questions.',
+      message: 'Your Elite is booked. Please keep your booking number for any questions.',
       icon: 'confirmed',
     }
   }

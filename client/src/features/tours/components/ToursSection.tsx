@@ -70,7 +70,7 @@ function ToursFrame({ children }: ToursFrameProps) {
           <div>
             <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.22em] text-accent-bright">
               <span className="h-px w-8 bg-accent" />
-              Chauffeur tours
+              Elite tours
             </p>
             <h2
               id="tours-heading"
@@ -81,7 +81,7 @@ function ToursFrame({ children }: ToursFrameProps) {
           </div>
 
           <p className="max-w-md text-base leading-relaxed text-white/60 lg:pb-2">
-            Choose a tour, pick your vehicle and the day. One fixed price covers your chauffeur for the whole tour.
+            Choose a tour, pick your vehicle and the day. One fixed price covers your Elite for the whole tour.
           </p>
         </div>
 

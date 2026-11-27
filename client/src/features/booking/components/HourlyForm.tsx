@@ -28,7 +28,7 @@ type HourlyFormProps = {
 // The pickup box is 60px tall; the suggestions open just under it
 const PICKUP_BOX_HEIGHT = 60
 
-// "By the hour" tab: a chauffeur stays with the customer for a set number of hours
+// "By the hour" tab: an Elite stays with the customer for a set number of hours
 export function HourlyForm({ onSubmit, maxPassengers, savedJourney }: HourlyFormProps) {
   const passengerOptions = buildNumberOptions(1, maxPassengers, 1, false, '')
   const autocomplete = useAddressAutocomplete()
