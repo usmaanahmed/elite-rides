@@ -4,6 +4,7 @@ import {
   CalendarPlus,
   Calculator,
   Car,
+  CircleHelp,
   Gauge,
   House,
   LifeBuoy,
@@ -70,6 +71,7 @@ export const mainNavigation: NavSection[] = [
       { path: ROUTES.blogs, label: 'Blogs', icon: Newspaper },
       { path: ROUTES.events, label: 'Events', icon: PartyPopper },
       { path: ROUTES.tours, label: 'Tours', icon: MapPinned },
+      { path: ROUTES.faqs, label: 'FAQs', icon: CircleHelp },
     ],
   },
 ]
@@ -110,6 +112,7 @@ export const quickActions: QuickAction[] = [
   { path: ROUTES.newBlog, label: 'Blog post', hint: 'Content', icon: Newspaper },
   { path: ROUTES.events, label: 'Event', hint: 'Content', icon: PartyPopper },
   { path: ROUTES.tours, label: 'Tour', hint: 'Content', icon: MapPinned },
+  { path: ROUTES.faqs, label: 'FAQ', hint: 'Content', icon: CircleHelp },
 ]
 
 // Looks up the label of the page at a URL, e.g. '/bookings' -> 'Bookings'

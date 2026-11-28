@@ -3,6 +3,7 @@ import { useLocation } from 'react-router'
 import { SiteFooter } from '../../../shared/components/layout/footer/SiteFooter'
 import { AirportsSection } from '../../airports/components/AirportsSection'
 import { BlogsSection } from '../../blogs/components/BlogsSection'
+import { FaqSection } from '../../faqs/components/FaqSection'
 import { FleetSection } from '../../fleet/components/FleetSection'
 import { PaymentsSection } from '../../payments/components/PaymentsSection'
 import { StationsSection } from '../../stations/components/StationsSection'
@@ -34,6 +35,7 @@ export function HomePage() {
         <StationsSection />
         <ToursSection />
         <BlogsSection />
+        <FaqSection />
         <PaymentsSection />
       </main>
       <SiteFooter />

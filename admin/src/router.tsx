@@ -14,6 +14,7 @@ import { BookingsPage } from './features/bookings/pages/BookingsPage'
 import { ApiTestPage } from './features/connection-test/pages/ApiTestPage'
 import { DashboardPage } from './features/dashboard/pages/DashboardPage'
 import { EventsPage } from './features/events/pages/EventsPage'
+import { FaqsPage } from './features/faqs/pages/FaqsPage'
 import { FixedPricePage } from './features/pricing/pages/FixedPricePage'
 import { SettingsPage } from './features/settings/pages/SettingsPage'
 import { ToursPage } from './features/tours/pages/ToursPage'
@@ -59,6 +60,7 @@ export const router = createBrowserRouter([
           { path: ROUTES.editBlog, element: <EditBlogPage /> },
           { path: ROUTES.events, element: <EventsPage /> },
           { path: ROUTES.tours, element: <ToursPage /> },
+          { path: ROUTES.faqs, element: <FaqsPage /> },
           { path: ROUTES.priceChecker, element: <PriceCheckerPage /> },
           { path: ROUTES.settings, element: <SettingsPage /> },
           { path: ROUTES.help, element: <ComingSoonPage title="Help & Support" /> },

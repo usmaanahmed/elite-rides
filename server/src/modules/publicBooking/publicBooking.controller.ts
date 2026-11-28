@@ -9,6 +9,7 @@ import {
   getPublicBlogs,
   getPublicBooking,
   getPublicDropdownAddresses,
+  getPublicFaqs,
   getPublicQuote,
   getPublicSettings,
   getPublicStations,
@@ -46,6 +47,12 @@ export async function readPublicAirport(req: Request<{ id: string }>, res: Respo
 export async function readPublicStations(req: Request, res: Response) {
   const stations = await getPublicStations();
   res.json(stations);
+}
+
+// GET /api/public/faqs
+export async function readPublicFaqs(req: Request, res: Response) {
+  const faqs = await getPublicFaqs();
+  res.json(faqs);
 }
 
 // GET /api/public/tours

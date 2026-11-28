@@ -14,6 +14,7 @@ import {
   readPublicBlogs,
   readPublicBooking,
   readPublicDropdownAddresses,
+  readPublicFaqs,
   readPublicSettings,
   readPublicStations,
   readPublicTour,
@@ -28,6 +29,7 @@ router.get("/vehicles", readPublicVehicles);
 router.get("/airports", readPublicAirports);
 router.get("/airports/:id", readPublicAirport);
 router.get("/stations", readPublicStations);
+router.get("/faqs", readPublicFaqs);
 router.get("/blogs", readPublicBlogs);
 router.get("/blogs/:slug", readPublicBlog);
 router.get("/tours", readPublicTours);

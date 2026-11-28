@@ -12,6 +12,7 @@ import bookingRoutes from "./modules/booking/booking.routes.js";
 import couponRoutes from "./modules/coupon/coupon.routes.js";
 import dropdownAddressRoutes from "./modules/dropdownAddress/dropdownAddress.routes.js";
 import eventRoutes from "./modules/event/event.routes.js";
+import faqRoutes from "./modules/faq/faq.routes.js";
 import fixedPriceRoutes from "./modules/fixedPrice/fixedPrice.routes.js";
 import paymentRoutes from "./modules/payment/payment.routes.js";
 import publicBookingRoutes from "./modules/publicBooking/publicBooking.routes.js";
@@ -69,6 +70,7 @@ app.use("/api/bookings", requireAdmin, bookingRoutes);
 app.use("/api/blogs", requireAdmin, blogRoutes);
 app.use("/api/events", requireAdmin, eventRoutes);
 app.use("/api/tours", requireAdmin, tourRoutes);
+app.use("/api/faqs", requireAdmin, faqRoutes);
 
 // Error handler hamesha sab se last me
 app.use(errorHandler);

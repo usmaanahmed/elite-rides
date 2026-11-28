@@ -8,6 +8,8 @@ import { createBooking, createTourBooking, getBookingByAccessToken } from "../bo
 import { BookingResponse, CreateBookingInput, CreateTourBookingInput, PaymentMethod } from "../booking/booking.types.js";
 import { getAllDropdownAddresses } from "../dropdownAddress/dropdownAddress.service.js";
 import { createCheckoutSession, isCardPaymentReady } from "../payment/payment.service.js";
+import { getAllFaqs } from "../faq/faq.service.js";
+import { FaqResponse } from "../faq/faq.types.js";
 import { getAllStations } from "../station/station.service.js";
 import { StationResponse } from "../station/station.types.js";
 import { createQuote } from "../quote/quote.service.js";
@@ -199,6 +201,11 @@ function toPublicStation(station: StationResponse): PublicStationResponse {
 export async function getPublicStations(): Promise<PublicStationResponse[]> {
   const stations = await getAllStations();
   return stations.map((station) => toPublicStation(station));
+}
+
+// Home page ke "FAQ" section ke liye sawal aur jawab
+export async function getPublicFaqs(): Promise<FaqResponse[]> {
+  return getAllFaqs();
 }
 
 // Tour ka woh hissa jo website ko chahiye: photos ke links aur har vehicle ki price

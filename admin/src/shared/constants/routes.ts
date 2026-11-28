@@ -22,6 +22,7 @@ export const ROUTES = {
   editBlog: '/blogs/:blogId/edit',
   events: '/events',
   tours: '/tours',
+  faqs: '/faqs',
   settings: '/settings',
   help: '/help',
   apiTest: '/api-test',
